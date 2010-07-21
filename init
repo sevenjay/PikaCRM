@@ -1,0 +1,8 @@
+#ifndef _PikaCRM_icpp_init_stub
+#define _PikaCRM_icpp_init_stub
+#include "CtrlLib/init"
+#include "Sql/init"
+#include "plugin/sqlite3/init"
+#include "SplashSV/init"
+#include "SystemLog/init"
+#endif

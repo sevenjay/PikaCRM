@@ -1,0 +1,19 @@
+uses
+	CtrlLib,
+	Sql,
+	plugin/sqlite3,
+	SplashSV,
+	SystemLog;
+
+file
+	PikaCRM.h,
+	srcdoc.tpp,
+	PikaCRM.t,
+	SrcImages.iml,
+	PikaCRM.cpp tabsize 4,
+	main.cpp,
+	PikaCRM.lay;
+
+mainconfig
+	"" = "GUI";
+

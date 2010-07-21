@@ -1,0 +1,9 @@
+LAYOUT(PikaCRMLayout, 540, 288)
+	ITEM(Label, lbOne, SetLabel(t_("\vdd")).LeftPosZ(32, 184).TopPosZ(28, 48))
+	ITEM(Button, bt, SetLabel(t_("test")).LeftPosZ(264, 56).TopPosZ(24, 15))
+END_LAYOUT
+
+LAYOUT(SplashLayout, 244, 124)
+	ITEM(Label, dv___0, SetLabel(t_("Pika Custom")).LeftPosZ(56, 88).TopPosZ(32, 31))
+END_LAYOUT
+
