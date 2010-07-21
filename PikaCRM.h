@@ -12,6 +12,18 @@ using namespace Upp;
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
 
+#define SOFTWARE_NAME					"PikaCRM"
+#define SOFTWARE_VERSION				"0.0.1"
+#define BUILD_DATE						Date(2009, 7, 20)
+
+//define file path and name------------------------------------------------------
+#define APP_CONFIG_DIR					".PikaCRM"//need mkdir ".MobileConnect/"
+
+#define FILE_CONFIG						"PikaCRM.ini"//in PATH_USER_HOME
+#define FILE_LOG						"PikaCRM.log"//in PATH_USER_HOME
+//end define file path and name--------------------------------------------------
+
+
 
 class PikaCRM
 {
@@ -25,18 +37,29 @@ private :
 
 	SplashSV mSplash;
 	
+	//private utility-------------------------------------------------------------------
+	String  getConfigDirPath();
 	String	getLang4Char();
 	Image	getLangLogo();
+	
+
 	
 public:
 	PikaCRM();
 	~PikaCRM();
-	bool IsHaveDBFile();
+	
+	//application control--------------------------------------------------------------
+	String GetLogPath();
 	void OpenMainFrom();
 	void CloseMainFrom();
+	bool IsHaveDBFile();
 	void InitialDB();
 	
+	void LoadConfig();
+	void SetConfig();
+	void SaveConfig();
+	
+	//interactive with GUI==============================================================
 };
 
 #endif
-

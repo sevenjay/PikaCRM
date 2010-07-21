@@ -5,9 +5,12 @@
 
 
 GUI_APP_MAIN
-{
+{	
+	RLOG("start application...");//in ~/.upp/PikaCRM/PikaCRM.log
+//try ///@todo
+	PikaCRM pikaCRM;
 	SysLog.Open(GetExeTitle());
-	SetVppLogName("log.txt");	
+	SetVppLogName(pikaCRM.GetLogPath());	
 #ifdef _DEBUG
 	SysLog.SetLevels(SystemLog::LALLDEBUG);// enables all log levels
 #else
@@ -40,11 +43,12 @@ GUI_APP_MAIN
 	SysLog.EnableSysLog(false);
 
 	SysLog(SystemLog::LDEBUG) << "Start logging\n";
-	
-	PikaCRM pikaCRM;
+
 	pikaCRM.OpenMainFrom();
 	
 	Ctrl::EventLoop();
 	SysLog(SystemLog::LDEBUG) << "End Application Main\n";
+	
+//catch ///@todo
 }
 
