@@ -6,7 +6,7 @@
 
 GUI_APP_MAIN
 {	
-	RLOG("start application...");//in ~/.upp/PikaCRM/PikaCRM.log
+	RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log
 //try ///@todo
 	PikaCRM pikaCRM;
 	SysLog.Open(GetExeTitle());

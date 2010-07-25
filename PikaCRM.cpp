@@ -75,8 +75,35 @@ bool PikaCRM::IsHaveDBFile()
 void PikaCRM::LoadConfig()
 {
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
-	
-	
+	if(FileExists(config_file_path))
+	{
+		if(mConfig.Load(config_file_path))
+			;//do nothing
+		else
+		{
+			SysLog.Error("load the config file fail\n");
+			///@todo thow and renew outside
+		}
+		//mConfig.IsDBEncrypt=true;
+		//mConfig.Password="lalala";
+		//bool testS=mConfig.Save(config_file_path);
+		String testP;
+		bool testL2=mConfig.Load(config_file_path);
+		testP=mConfig.Password;
+		testP="ddddddd";
+	}
+	else
+	{
+		//make a new config file
+		mConfig.IsDBEncrypt=false;
+		if(mConfig.Save(config_file_path))
+			;//do nothing
+		else
+		{
+			SysLog.Error("make a new config file fail\n");
+			///@todo thow can't save
+		}
+	}
 }
 void PikaCRM::SetConfig()
 {
