@@ -50,6 +50,10 @@ void PikaCRM::OpenMainFrom()
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
 	LoadConfig();
 	
+	mSplash.ShowSplashStatus(t_("Loading Database..."));
+	SysLog.Info(t_("Loading Database..."))<<"\n";
+	InitialDB();
+	
 	MainFrom.OpenMain();
 	
 	mSplash.ShowSplashStatus(t_("Normal Running..."));
@@ -65,12 +69,40 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 
 bool PikaCRM::IsHaveDBFile()
 {		
-	
-	
-	
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	return FileExists(database_file_path);
 }
 
+void PikaCRM::InitialDB()
+{
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	if(!mSqlite3Session.Open(database_file_path))
+	{
+		SysLog.Error("can't create or open database file\n"+database_file_path+"\n");
+		///@todo thow 
+	}
+	SysLog.Debug("create or open database file\n"+database_file_path+"\n");
+	if(!mPassword.IsEmpty())
+	{
+		SysLog.Info("setting database encrypted\n");
+		if(!mSqlite3Session.SetKey(mPassword))
+		{
+			SysLog.Error("sqlite3 set key error\n");
+			///@note we dont know how to deal this error, undefine		
+		}
+	}
+	
+#ifdef _DEBUG
+	mSqlite3Session.SetTrace();
+#endif
 
+	mSql.reset(new Sql(mSqlite3Session));//mSql=mSqlite3Session will error
+	bool	is_sql_ok=mSql->Execute("drop table TEST");
+
+    //mSql.ClearError();
+
+    is_sql_ok=mSql->Execute("create table TEST (A INTEGER, B TEXT)");
+}
 
 void PikaCRM::LoadConfig()
 {
@@ -78,26 +110,24 @@ void PikaCRM::LoadConfig()
 	if(FileExists(config_file_path))
 	{
 		if(mConfig.Load(config_file_path))
-			;//do nothing
+		{
+			SysLog.Debug("loaded the config file\n");
+		}
 		else
 		{
 			SysLog.Error("load the config file fail\n");
 			///@todo thow and renew outside
 		}
-		//mConfig.IsDBEncrypt=true;
-		//mConfig.Password="lalala";
-		//bool testS=mConfig.Save(config_file_path);
-		String testP;
-		bool testL2=mConfig.Load(config_file_path);
-		testP=mConfig.Password;
-		testP="ddddddd";
 	}
 	else
 	{
-		//make a new config file
+		SysLog.Info("make a new config file\n");
 		mConfig.IsDBEncrypt=false;
+		//mConfig.Password="lalala";
 		if(mConfig.Save(config_file_path))
-			;//do nothing
+		{
+			SysLog.Debug("make the config file\n");
+		}
 		else
 		{
 			SysLog.Error("make a new config file fail\n");
@@ -139,7 +169,7 @@ String PikaCRM::getConfigDirPath()
 			;//do nothing
 		else
 		{
-			RLOG("Can't create the application config directory!");
+			RLOG("can't create the application config directory!");
 			//throw this error///@todo throw "Can't create config directory!"
 		}
 	}

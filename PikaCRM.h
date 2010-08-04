@@ -11,6 +11,9 @@ using namespace Upp;
 //useful library
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
+#include <plugin/sqlite3/Sqlite3.h>
+#include "boost/smart_ptr.hpp"
+
 
 #define SOFTWARE_NAME					"PikaCRM"
 #define SOFTWARE_VERSION				"0.0.1"
@@ -21,6 +24,7 @@ using namespace Upp;
 
 #define FILE_CONFIG						"PikaCRM.xml"//in PATH_USER_HOME
 #define FILE_LOG						"PikaCRM.log"//in PATH_USER_HOME
+#define FILE_DATABASE					"PikaCRM.sqlite"//in PATH_USER_HOME
 //end define file path and name--------------------------------------------------
 
 struct Config {
@@ -58,6 +62,11 @@ private :
 	SplashSV mSplash;
 	
 	Config mConfig;
+	
+	Sqlite3Session mSqlite3Session;
+	boost::shared_ptr<Sql> mSql;
+	//Sql * mSql;
+	String mPassword;
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
 	String	getLang4Char();
