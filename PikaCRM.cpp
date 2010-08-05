@@ -13,13 +13,12 @@
 
 PikaCRM::PikaCRM()
 {
-	Upp::CtrlLayout(MainFrom, t_("Pika Customer Relationship Management"));
-	
 	mLanguage=LNG_('Z','H','T','W');
 	//mLanguage=LNG_('E','N','U','S');
-	
-	
 	Upp::SetLanguage(mLanguage);
+
+	Upp::CtrlLayout(MainFrom, t_("Pika Customer Relationship Management"));
+	
 	int QtfHigh=20;
 	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(),SrcImages::Logo(),mLanguage);
 	
@@ -30,7 +29,7 @@ PikaCRM::PikaCRM()
 	
 	//splash.Close();
 	MainFrom.WhenClose=THISBACK(CloseMainFrom);
-	MainFrom.lbOne=t_("Setting");
+	//MainFrom.lbOne=t_("Setting");
 }
 
 PikaCRM::~PikaCRM()
@@ -52,7 +51,15 @@ void PikaCRM::OpenMainFrom()
 	
 	mSplash.ShowSplashStatus(t_("Loading Database..."));
 	SysLog.Info(t_("Loading Database..."))<<"\n";
-	InitialDB();
+	if(IsHaveDBFile())
+	{
+		CreateOrOpenDB();//OpenDB
+	}
+	else
+	{
+		CreateOrOpenDB();//CreateDB
+		InitialDB();
+	}
 	
 	MainFrom.OpenMain();
 	
@@ -73,7 +80,7 @@ bool PikaCRM::IsHaveDBFile()
 	return FileExists(database_file_path);
 }
 
-void PikaCRM::InitialDB()
+void PikaCRM::CreateOrOpenDB()
 {
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
 	if(!mSqlite3Session.Open(database_file_path))
@@ -96,7 +103,10 @@ void PikaCRM::InitialDB()
 #ifdef _DEBUG
 	mSqlite3Session.SetTrace();
 #endif
-
+	mSql.reset(new Sql(mSqlite3Session));//mSql=mSqlite3Session will error
+}
+void PikaCRM::InitialDB()
+{
 	FileIn initial("initial.sql");
 	if(!initial)
 	{
@@ -105,8 +115,6 @@ void PikaCRM::InitialDB()
 	}
 	bool is_sql_ok = SqlPerformScript(mSqlite3Session,initial);
 	
-	
-	mSql.reset(new Sql(mSqlite3Session));//mSql=mSqlite3Session will error
 	is_sql_ok=mSql->Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name

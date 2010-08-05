@@ -84,6 +84,7 @@ public:
 	void OpenMainFrom();
 	void CloseMainFrom();
 	bool IsHaveDBFile();
+	void CreateOrOpenDB();
 	void InitialDB();
 	
 	void LoadConfig();
