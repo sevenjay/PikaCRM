@@ -81,7 +81,8 @@ void PikaCRM::InitialDB()
 		SysLog.Error("can't create or open database file\n"+database_file_path+"\n");
 		///@todo thow 
 	}
-	SysLog.Debug("create or open database file\n"+database_file_path+"\n");
+	SysLog.Debug("create or open database file: "+database_file_path+"\n");
+	
 	if(!mPassword.IsEmpty())
 	{
 		SysLog.Info("setting database encrypted\n");
@@ -96,12 +97,19 @@ void PikaCRM::InitialDB()
 	mSqlite3Session.SetTrace();
 #endif
 
+	FileIn initial("initial.sql");
+	if(!initial)
+	{
+		SysLog.Error("can't open database initial file: initial.sql\n");
+		///@todo thow 
+	}
+	bool is_sql_ok = SqlPerformScript(mSqlite3Session,initial);
+	
+	
 	mSql.reset(new Sql(mSqlite3Session));//mSql=mSqlite3Session will error
-	bool	is_sql_ok=mSql->Execute("drop table TEST");
-
-    //mSql.ClearError();
-
-    is_sql_ok=mSql->Execute("create table TEST (A INTEGER, B TEXT)");
+	is_sql_ok=mSql->Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
+							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
+							///@todo set user name
 }
 
 void PikaCRM::LoadConfig()

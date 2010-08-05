@@ -17,6 +17,7 @@ using namespace Upp;
 
 #define SOFTWARE_NAME					"PikaCRM"
 #define SOFTWARE_VERSION				"0.0.1"
+#define DATABASE_VERSION				"1"
 #define BUILD_DATE						Date(2010, 7, 25)
 
 //define file path and name------------------------------------------------------
