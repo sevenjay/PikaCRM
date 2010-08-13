@@ -47,12 +47,13 @@ void PikaCRM::OpenMainFrom()
 	mSplash.ShowSplash();
 	mSplash.ShowSplashStatus(t_("Loading Settings..."));
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
-	LoadConfig();
+	LoadConfig();///@todo see if encrypt?
 	
 	mSplash.ShowSplashStatus(t_("Loading Database..."));
 	SysLog.Info(t_("Loading Database..."))<<"\n";
 	if(IsHaveDBFile())
 	{
+		SetupDB();
 		CreateOrOpenDB();//OpenDB
 	}
 	else
@@ -118,6 +119,56 @@ void PikaCRM::InitialDB()
 	is_sql_ok=mSql->Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name
+}
+void PikaCRM::SetupDB()
+{
+	WithInitialDBLayout<TopWindow> d,e;
+	CtrlLayoutOKCancel(d, t_("Setup your database"));
+	d.esPassword.Password();
+	d.optPW.WhenAction=callback1(OnOptPWPush, &d);
+	/*CtrlRetriever r;
+	Size sz = size;
+	r
+		(d.cx, size.cx)
+		(d.cy, size.cy)
+		(d.lang, lang)
+	;*/
+	
+
+	String note,note2;
+	note<<"[1 "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
+	d.rtNoteEncrypted.SetQTF(note);
+	note2<<"[1 "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";
+	d.rtNoteEncrypted2.SetQTF(note2);
+	if(d.Run() == IDOK) {
+		/*r.Retrieve();
+		Init();
+		if(sz != size)
+			Generate();*/
+	}
+	
+	
+}
+void PikaCRM::OnOptPWPush(WithInitialDBLayout<TopWindow> * d)
+{
+	if(d->optPW)
+	{
+		d->esPassword.SetEditable(true);
+		d->esPassword.NotNull(true);
+		d->esPassword.WantFocus(true);
+		d->esCheckPassword.SetEditable(true);
+		d->esCheckPassword.NotNull(true);
+		d->esCheckPassword.WantFocus(true);
+	}
+	else 
+	{
+		d->esPassword.SetEditable(false);
+		d->esPassword.NotNull(false);
+		d->esPassword.WantFocus(false);
+		d->esCheckPassword.SetEditable(false);
+		d->esCheckPassword.NotNull(false);
+		d->esCheckPassword.WantFocus(false);
+	}
 }
 
 void PikaCRM::LoadConfig()

@@ -15,5 +15,6 @@ file
 	PikaCRM.lay;
 
 mainconfig
-	"" = "GUI";
+	"No GTK" = "GUI NOGTK",
+	"GTK" = "GUI";
 

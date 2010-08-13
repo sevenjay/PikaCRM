@@ -57,7 +57,7 @@ class PikaCRM
 private :
 	WithPikaCRMLayout<TopWindow> MainFrom;
 	
-	//CallbackArgTarget<int> mCBLanguage;	
+	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 
 	SplashSV mSplash;
@@ -68,28 +68,34 @@ private :
 	boost::shared_ptr<Sql> mSql;
 	//Sql * mSql;
 	String mPassword;
+	//-------------------------------------------------------------------------------
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
 	String	getLang4Char();
 	Image	getLangLogo();
 	
 
+	//application control--------------------------------------------------------------
+	void CloseMainFrom();
+	//used in initial====================================================
+	bool IsHaveDBFile();
+	void CreateOrOpenDB();
+	void InitialDB();
+	void SetupDB();
+		static void OnOptPWPush(WithInitialDBLayout<TopWindow> * d);
+	
+	void LoadConfig();
+	void SetConfig();
+	void SaveConfig();
+	//end used in initial================================================
 	
 public:
 	PikaCRM();
 	~PikaCRM();
 	
-	//application control--------------------------------------------------------------
+	//main control--------------------------------------------------------------
 	String GetLogPath();
-	void OpenMainFrom();
-	void CloseMainFrom();
-	bool IsHaveDBFile();
-	void CreateOrOpenDB();
-	void InitialDB();
-	
-	void LoadConfig();
-	void SetConfig();
-	void SaveConfig();
+	void   OpenMainFrom();
 	
 	//interactive with GUI==============================================================
 };

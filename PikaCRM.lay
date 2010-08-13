@@ -3,7 +3,16 @@ LAYOUT(PikaCRMLayout, 540, 288)
 	ITEM(Button, bt, SetLabel(t_("test")).LeftPosZ(264, 56).TopPosZ(24, 15))
 END_LAYOUT
 
-LAYOUT(InitialDBLayout, 400, 200)
-	ITEM(Option, dv___0, SetLabel(t_("t_(\"Setting\")")).LeftPosZ(56, 56).TopPosZ(36, 16))
+LAYOUT(InitialDBLayout, 400, 204)
+	ITEM(Option, optPW, SetLabel(t_("Use password to encrypt your database.")).LeftPosZ(24, 240).TopPosZ(16, 16))
+	ITEM(RichTextCtrl, rtNoteEncrypted, LeftPosZ(36, 336).TopPosZ(32, 19))
+	ITEM(RichTextCtrl, rtNoteEncrypted2, LeftPosZ(36, 336).TopPosZ(48, 28))
+	ITEM(EditString, esPassword, MaxChars(16).SetEditable(false).WantFocus(false).LeftPosZ(148, 100).TopPosZ(80, 19))
+	ITEM(EditString, esCheckPassword, MaxChars(16).SetEditable(false).WantFocus(false).LeftPosZ(148, 100).TopPosZ(108, 19))
+	ITEM(Option, optRequire, SetLabel(t_("Require the user to enter this password when start.")).LeftPosZ(24, 292).TopPosZ(136, 16))
+	ITEM(Label, dv___6, SetLabel(t_("Re-Enter Password:")).LeftPosZ(36, 104).TopPosZ(108, 20))
+	ITEM(Label, dv___7, SetLabel(t_("Enter new Password:")).LeftPosZ(36, 100).TopPosZ(80, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(176, 128).TopPosZ(172, 20))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(288, 12).TopPosZ(172, 20))
 END_LAYOUT
 
