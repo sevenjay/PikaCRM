@@ -45,20 +45,34 @@ String PikaCRM::GetLogPath()
 void PikaCRM::OpenMainFrom()
 {
 	mSplash.ShowSplash();
+	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	
 	mSplash.ShowSplashStatus(t_("Loading Settings..."));
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
-	LoadConfig();///@todo see if encrypt?
+	LoadConfig(config_file_path);///@todo see if encrypt?
 	
 	mSplash.ShowSplashStatus(t_("Loading Database..."));
 	SysLog.Info(t_("Loading Database..."))<<"\n";
-	if(IsHaveDBFile())
+	if(!IsHaveDBFile(database_file_path))
 	{
-		SetupDB();
-		CreateOrOpenDB();//OpenDB
+		CreateOrOpenDB(database_file_path);//OpenDB
+		/*if(GetDBVersion()<DATABASE_VERSION)
+			UpdateDB();
+		else if(GetDBVersion()>DATABASE_VERSION)
+			show can not up compatibility, please use the Latest version
+		
+		
+		
+		*/
 	}
 	else
 	{
-		CreateOrOpenDB();//CreateDB
+		mSplash.HideSplash();
+		///@todo first welcome
+		SetupDB(config_file_path);
+		mSplash.ShowSplash();
+		CreateOrOpenDB(database_file_path);//CreateDB
 		InitialDB();
 	}
 	
@@ -75,15 +89,13 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 	MainFrom.Close();
 }
 
-bool PikaCRM::IsHaveDBFile()
-{		
-	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+bool PikaCRM::IsHaveDBFile(String database_file_path)
+{	
 	return FileExists(database_file_path);
 }
 
-void PikaCRM::CreateOrOpenDB()
+void PikaCRM::CreateOrOpenDB(String database_file_path)
 {
-	String database_file_path = getConfigDirPath()+FILE_DATABASE;
 	if(!mSqlite3Session.Open(database_file_path))
 	{
 		SysLog.Error("can't create or open database file\n"+database_file_path+"\n");
@@ -91,10 +103,10 @@ void PikaCRM::CreateOrOpenDB()
 	}
 	SysLog.Debug("create or open database file: "+database_file_path+"\n");
 	
-	if(!mPassword.IsEmpty())
+	if(!mConfig.Password.IsEmpty())
 	{
 		SysLog.Info("setting database encrypted\n");
-		if(!mSqlite3Session.SetKey(mPassword))
+		if(!mSqlite3Session.SetKey(mConfig.Password))
 		{
 			SysLog.Error("sqlite3 set key error\n");
 			///@note we dont know how to deal this error, undefine		
@@ -120,19 +132,15 @@ void PikaCRM::InitialDB()
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name
 }
-void PikaCRM::SetupDB()
+void PikaCRM::SetupDB(String config_file_path)
 {
-	WithInitialDBLayout<TopWindow> d,e;
-	CtrlLayoutOKCancel(d, t_("Setup your database"));
+	WithInitialDBLayout<TopWindow> d;
+	CtrlLayoutOK(d, t_("Setup your database"));
 	d.esPassword.Password();
+	d.esCheckPassword.Password();
+	d.optRequire.SetEditable(false);
 	d.optPW.WhenAction=callback1(OnOptPWPush, &d);
-	/*CtrlRetriever r;
-	Size sz = size;
-	r
-		(d.cx, size.cx)
-		(d.cy, size.cy)
-		(d.lang, lang)
-	;*/
+	d.ok.WhenPush = callback1(CheckPWSame, &d);
 	
 
 	String note,note2;
@@ -141,10 +149,14 @@ void PikaCRM::SetupDB()
 	note2<<"[1 "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";
 	d.rtNoteEncrypted2.SetQTF(note2);
 	if(d.Run() == IDOK) {
-		/*r.Retrieve();
-		Init();
-		if(sz != size)
-			Generate();*/
+		if(d.optPW)
+		{
+			mConfig.IsDBEncrypt=true;
+			mConfig.Password=d.esPassword;
+			mConfig.IsRememberPW=!(bool)d.optRequire;		
+		}
+
+		SaveConfig(config_file_path);
 	}
 	
 	
@@ -159,6 +171,7 @@ void PikaCRM::OnOptPWPush(WithInitialDBLayout<TopWindow> * d)
 		d->esCheckPassword.SetEditable(true);
 		d->esCheckPassword.NotNull(true);
 		d->esCheckPassword.WantFocus(true);
+		d->optRequire.SetEditable(true);
 	}
 	else 
 	{
@@ -168,12 +181,19 @@ void PikaCRM::OnOptPWPush(WithInitialDBLayout<TopWindow> * d)
 		d->esCheckPassword.SetEditable(false);
 		d->esCheckPassword.NotNull(false);
 		d->esCheckPassword.WantFocus(false);
+		d->optRequire.SetEditable(false);
 	}
 }
-
-void PikaCRM::LoadConfig()
+void PikaCRM::CheckPWSame(WithInitialDBLayout<TopWindow> * d)
 {
-	String config_file_path = getConfigDirPath()+FILE_CONFIG;
+	String p1=d->esPassword;
+	String p2=d->esCheckPassword;
+	if(d->optPW && !p1.IsEqual(p2))
+		PromptOK(t_("Re-Enter Password does correspond to the new Password."));
+}
+
+void PikaCRM::LoadConfig(String config_file_path)
+{
 	if(FileExists(config_file_path))
 	{
 		if(mConfig.Load(config_file_path))
@@ -190,23 +210,24 @@ void PikaCRM::LoadConfig()
 	{
 		SysLog.Info("make a new config file\n");
 		mConfig.IsDBEncrypt=false;
-		//mConfig.Password="lalala";
-		if(mConfig.Save(config_file_path))
-		{
-			SysLog.Debug("make the config file\n");
-		}
-		else
-		{
-			SysLog.Error("make a new config file fail\n");
-			///@todo thow can't save
-		}
+		mConfig.Password="";
+		SaveConfig(config_file_path);
 	}
 }
 void PikaCRM::SetConfig()
 {
 }
-void PikaCRM::SaveConfig()
+void PikaCRM::SaveConfig(String config_file_path)
 {
+	if(mConfig.Save(config_file_path))
+	{
+		SysLog.Debug("Save the config file\n");
+	}
+	else
+	{
+		SysLog.Error("Save config file fail\n");
+		///@todo thow can't save
+	}
 }
 
 //end application control-----------------------------------------------------------

@@ -31,11 +31,15 @@ using namespace Upp;
 struct Config {
 	bool	IsDBEncrypt;
 	String	Password;
+	bool	IsRememberPW;
+	String	SystemKey;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
 			("Encrypted", IsDBEncrypt)
 			("Password", Password)
+			("RememberPW", IsRememberPW)
+			("SystemKey", SystemKey)
 		;
 	}
 	
@@ -67,7 +71,6 @@ private :
 	Sqlite3Session mSqlite3Session;
 	boost::shared_ptr<Sql> mSql;
 	//Sql * mSql;
-	String mPassword;
 	//-------------------------------------------------------------------------------
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
@@ -78,15 +81,16 @@ private :
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
 	//used in initial====================================================
-	bool IsHaveDBFile();
-	void CreateOrOpenDB();
+	bool IsHaveDBFile(String database_file_path);
+	void CreateOrOpenDB(String database_file_path);
 	void InitialDB();
-	void SetupDB();
+	void SetupDB(String config_file_path);
 		static void OnOptPWPush(WithInitialDBLayout<TopWindow> * d);
+		static void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
 	
-	void LoadConfig();
+	void LoadConfig(String config_file_path);
 	void SetConfig();
-	void SaveConfig();
+	void SaveConfig(String config_file_path);
 	//end used in initial================================================
 	
 public:
