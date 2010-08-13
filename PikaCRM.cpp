@@ -54,7 +54,7 @@ void PikaCRM::OpenMainFrom()
 	
 	mSplash.ShowSplashStatus(t_("Loading Database..."));
 	SysLog.Info(t_("Loading Database..."))<<"\n";
-	if(!IsHaveDBFile(database_file_path))
+	if(IsHaveDBFile(database_file_path))
 	{
 		CreateOrOpenDB(database_file_path);//OpenDB
 		/*if(GetDBVersion()<DATABASE_VERSION)
@@ -82,6 +82,16 @@ void PikaCRM::OpenMainFrom()
 	SysLog.Info(t_("Normal Running..."))<<"\n";
 	
 	mSplash.SetSplashTimer(1500);
+	
+	//test if database OK
+	bool is_sql_ok=mSql->Execute("select * from System;");
+	if(is_sql_ok)
+		while(mSql->Fetch())
+			SysLog.Debug("") << (*mSql)[0]<<(*mSql)[1]<<(*mSql)[2]<<(*mSql)[3]<<(*mSql)[1]<<"\n";
+	else
+	{
+		SysLog.Error(mSql->GetLastError()+"\n");
+	}
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
@@ -98,10 +108,14 @@ void PikaCRM::CreateOrOpenDB(String database_file_path)
 {
 	if(!mSqlite3Session.Open(database_file_path))
 	{
-		SysLog.Error("can't create or open database file\n"+database_file_path+"\n");
+		SysLog.Error("can't create or open database file: "+database_file_path+"\n");
 		///@todo thow 
 	}
 	SysLog.Debug("create or open database file: "+database_file_path+"\n");
+	
+#ifdef _DEBUG
+	mSqlite3Session.SetTrace();
+#endif
 	
 	if(!mConfig.Password.IsEmpty())
 	{
@@ -112,10 +126,7 @@ void PikaCRM::CreateOrOpenDB(String database_file_path)
 			///@note we dont know how to deal this error, undefine		
 		}
 	}
-	
-#ifdef _DEBUG
-	mSqlite3Session.SetTrace();
-#endif
+
 	mSql.reset(new Sql(mSqlite3Session));//mSql=mSqlite3Session will error
 }
 void PikaCRM::InitialDB()
