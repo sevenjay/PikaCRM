@@ -162,8 +162,9 @@ void PikaCRM::SetupDB(String config_file_path)
 	if(d.Run() == IDOK) {
 		if(d.optPW)
 		{
+			String tempPW=d.esPassword.GetData();
 			mConfig.IsDBEncrypt=true;
-			mConfig.Password=d.esPassword;
+			mConfig.Password=getMD5(tempPW<<PW_MAGIC_WORD);
 			mConfig.IsRememberPW=!(bool)d.optRequire;		
 		}
 
@@ -294,6 +295,18 @@ Image PikaCRM::getLangLogo()
 		image=SrcImages::Logo();
 							
 	return image;
+}
+String PikaCRM::getMD5(String & text)
+{
+	unsigned char digest[16];
+	MD5(digest, ~text, text.GetLength());
+	String md5ed(digest, 16);
+		
+	String r;
+	for(int i = 0; i < md5ed.GetCount(); i++)
+		r << UPP::FormatIntHex((byte)md5ed[i], 2);
+		
+	return r;
 }
 	    
 //end private utility---------------------------------------------------------------

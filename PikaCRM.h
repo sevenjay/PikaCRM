@@ -20,6 +20,9 @@ using namespace Upp;
 #define DATABASE_VERSION				"1"
 #define BUILD_DATE						Date(2010, 7, 25)
 
+#define PW_MAGIC_WORD					"sevenjay777"
+#define PW_SETKEY_ROLL_WAY				"exchange 1st and 2nd char"
+
 //define file path and name------------------------------------------------------
 #define APP_CONFIG_DIR					".PikaCRM"//need mkdir ".MobileConnect/"
 
@@ -76,6 +79,7 @@ private :
 	String  getConfigDirPath();
 	String	getLang4Char();
 	Image	getLangLogo();
+	String	getMD5(String & text);
 	
 
 	//application control--------------------------------------------------------------
