@@ -21,7 +21,7 @@ using namespace Upp;
 #define BUILD_DATE						Date(2010, 7, 25)
 
 #define PW_MAGIC_WORD					"sevenjay777"
-#define PW_SETKEY_ROLL_WAY				"exchange 1st and 2nd char"
+//we let PW SETKEY ROLL by getSwap1st2ndChar
 
 //define file path and name------------------------------------------------------
 #define APP_CONFIG_DIR					".PikaCRM"//need mkdir ".MobileConnect/"
@@ -80,6 +80,7 @@ private :
 	String	getLang4Char();
 	Image	getLangLogo();
 	String	getMD5(String & text);
+	String	getSwap1st2ndChar(String & text);
 	
 
 	//application control--------------------------------------------------------------

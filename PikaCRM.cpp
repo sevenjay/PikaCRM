@@ -120,7 +120,7 @@ void PikaCRM::CreateOrOpenDB(String database_file_path)
 	if(!mConfig.Password.IsEmpty())
 	{
 		SysLog.Info("setting database encrypted\n");
-		if(!mSqlite3Session.SetKey(mConfig.Password))
+		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
 		{
 			SysLog.Error("sqlite3 set key error\n");
 			///@note we dont know how to deal this error, undefine		
@@ -306,6 +306,15 @@ String PikaCRM::getMD5(String & text)
 	for(int i = 0; i < md5ed.GetCount(); i++)
 		r << UPP::FormatIntHex((byte)md5ed[i], 2);
 		
+	return r;
+}
+String PikaCRM::getSwap1st2ndChar(String & text)
+{
+	String r(text);
+	//String r2=text;
+	r.Remove(0);
+	r.Insert(1,text[0]);
+	
 	return r;
 }
 	    
