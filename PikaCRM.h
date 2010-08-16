@@ -92,6 +92,7 @@ private :
 	void SetupDB(String config_file_path);
 		static void OnOptPWPush(WithInitialDBLayout<TopWindow> * d);
 		static void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
+	bool IsDBWork();
 	
 	void LoadConfig(String config_file_path);
 	void SetConfig();

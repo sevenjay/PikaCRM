@@ -51,6 +51,17 @@ void PikaCRM::OpenMainFrom()
 	mSplash.ShowSplashStatus(t_("Loading Settings..."));
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
 	LoadConfig(config_file_path);///@todo see if encrypt?
+	/*
+	if( encrypted )
+		if(not RememberPW )
+			let user input PW, check the same with mConfig.Password;
+		else//RememberPW 
+			if(getSystemKey==Systemkey)
+				just using mConfig.Password;
+			else//use different PC
+				let user input PW, check the same with mConfig.Password;
+	else if()
+	*/
 	
 	mSplash.ShowSplashStatus(t_("Loading Database..."));
 	SysLog.Info(t_("Loading Database..."))<<"\n";
@@ -75,6 +86,18 @@ void PikaCRM::OpenMainFrom()
 		CreateOrOpenDB(database_file_path);//CreateDB
 		InitialDB();
 	}
+	/*
+	if(IsDBWork())
+		//donothing
+	else
+	{
+		//pw error or not the file?
+		showErrorMsg();
+		goto enter PW
+	}
+	
+	
+	*/
 	
 	MainFrom.OpenMain();
 	
@@ -87,7 +110,7 @@ void PikaCRM::OpenMainFrom()
 	bool is_sql_ok=mSql->Execute("select * from System;");
 	if(is_sql_ok)
 		while(mSql->Fetch())
-			SysLog.Debug("") << (*mSql)[0]<<(*mSql)[1]<<(*mSql)[2]<<(*mSql)[3]<<(*mSql)[1]<<"\n";
+			SysLog.Debug("") << (*mSql)[0]<<(*mSql)[1]<<(*mSql)[2]<<(*mSql)[3]<<(*mSql)[4]<<"\n";
 	else
 	{
 		SysLog.Error(mSql->GetLastError()+"\n");
@@ -223,6 +246,8 @@ void PikaCRM::LoadConfig(String config_file_path)
 		SysLog.Info("make a new config file\n");
 		mConfig.IsDBEncrypt=false;
 		mConfig.Password="";
+		mConfig.IsRememberPW=false;
+		mConfig.SystemKey="";
 		SaveConfig(config_file_path);
 	}
 }
