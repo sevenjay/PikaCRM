@@ -8,11 +8,28 @@ using namespace Upp;
 #define LAYOUTFILE <PikaCRM/PikaCRM.lay>
 #include <CtrlCore/lay.h>
 
-//useful library
+//useful library------------------------------------------------------
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
 #include <plugin/sqlite3/Sqlite3.h>
 #include "boost/smart_ptr.hpp"
+//end useful library---------------------------------------------------
+
+//platform dependent---------------------------------------------------
+#ifdef PLATFORM_POSIX
+
+#include <sys/ioctl.h>//for open
+#include <sys/fcntl.h>
+#include <linux/hdreg.h>
+
+#elif defined(PLATFORM_WIN32)
+
+#endif
+//end platform dependent------------------------------------------------
+
+#include <string>
+//#include <vector>
+
 
 
 #define SOFTWARE_NAME					"PikaCRM"
@@ -90,9 +107,13 @@ private :
 	void CreateOrOpenDB(String database_file_path);
 	void InitialDB();
 	void SetupDB(String config_file_path);
-		static void OnOptPWPush(WithInitialDBLayout<TopWindow> * d);
-		static void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
+		void OnOptPWAction(WithInitialDBLayout<TopWindow> * d);
+		void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
 	bool IsDBWork();
+	
+	void InputPWCheck();
+		void CheckPWRight(WithInputPWLayout<TopWindow> * d, String & pw);
+	String GetSystemKey();
 	
 	void LoadConfig(String config_file_path);
 	void SetConfig();

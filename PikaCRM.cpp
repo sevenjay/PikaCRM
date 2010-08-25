@@ -51,17 +51,29 @@ void PikaCRM::OpenMainFrom()
 	mSplash.ShowSplashStatus(t_("Loading Settings..."));
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
 	LoadConfig(config_file_path);///@todo see if encrypt?
-	/*
-	if( encrypted )
-		if(not RememberPW )
-			let user input PW, check the same with mConfig.Password;
-		else//RememberPW 
-			if(getSystemKey==Systemkey)
-				just using mConfig.Password;
-			else//use different PC
-				let user input PW, check the same with mConfig.Password;
-	else if()
-	*/
+
+	if(mConfig.IsDBEncrypt)
+	{
+		mSplash.HideSplash();
+		if(mConfig.IsRememberPW)
+		{
+			SysLog.Debug("Remeber the PW\n");
+			String key=GetSystemKey();
+			SysLog.Info(key);
+			PromptOK(key);
+			//if(GetSystemKey()==mConfig.SystemKey)
+				;//just using mConfig.Password;
+			/*	else//use different PC
+				InputPWCheck();
+			*/
+		}
+		else//not Remember PW 
+		{
+			InputPWCheck();
+		}
+		mSplash.ShowSplash();
+	}
+
 	
 	mSplash.ShowSplashStatus(t_("Loading Database..."));
 	SysLog.Info(t_("Loading Database..."))<<"\n";
@@ -109,8 +121,8 @@ void PikaCRM::OpenMainFrom()
 	//test if database OK
 	bool is_sql_ok=mSql->Execute("select * from System;");
 	if(is_sql_ok)
-		while(mSql->Fetch())
-			SysLog.Debug("") << (*mSql)[0]<<(*mSql)[1]<<(*mSql)[2]<<(*mSql)[3]<<(*mSql)[4]<<"\n";
+		while(mSql->Fetch())//user,ap_ver,sqlite_ver,db_ver
+			SysLog.Debug("") << (*mSql)[0]<<", "<<(*mSql)[1]<<", "<<(*mSql)[2]<<", "<<(*mSql)[3]<<"\n";
 	else
 	{
 		SysLog.Error(mSql->GetLastError()+"\n");
@@ -173,8 +185,8 @@ void PikaCRM::SetupDB(String config_file_path)
 	d.esPassword.Password();
 	d.esCheckPassword.Password();
 	d.optRequire.SetEditable(false);
-	d.optPW.WhenAction=callback1(OnOptPWPush, &d);
-	d.ok.WhenPush = callback1(CheckPWSame, &d);
+	d.optPW.WhenAction=THISBACK1(OnOptPWAction, &d);
+	d.ok.WhenPush = THISBACK1(CheckPWSame, &d);
 	
 
 	String note,note2;
@@ -196,7 +208,7 @@ void PikaCRM::SetupDB(String config_file_path)
 	
 	
 }
-void PikaCRM::OnOptPWPush(WithInitialDBLayout<TopWindow> * d)
+void PikaCRM::OnOptPWAction(WithInitialDBLayout<TopWindow> * d)
 {
 	if(d->optPW)
 	{
@@ -267,6 +279,64 @@ void PikaCRM::SaveConfig(String config_file_path)
 	}
 }
 
+
+void PikaCRM::InputPWCheck()
+{
+	WithInputPWLayout<TopWindow> d;
+	CtrlLayoutOK(d,t_("Pika Customer Relationship Management"));
+	d.ok.WhenPush = THISBACK2(CheckPWRight, &d, mConfig.Password);
+	
+	if(d.Run() == IDOK) {
+		mConfig.IsRememberPW=(bool)d.optRememberPW;
+
+		SaveConfig(getConfigDirPath()+FILE_CONFIG);
+	}
+	else
+	{
+		///@todo exit all
+	}
+}
+
+void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, String & pw)
+{
+	String p1=d->esPassword;
+	String pwMD5=getMD5(p1<<PW_MAGIC_WORD);
+	if(!pw.IsEqual(pwMD5))
+		PromptOK(t_("The Password is incorrect!"));
+}
+
+String PikaCRM::GetSystemKey()
+{
+#ifdef PLATFORM_POSIX
+
+	
+	FILE * 	p_process;
+	char  	buf[101]={};
+	int		pos;
+	const char	process_cmd[] = "pwd";
+	String 	output;
+		if ( NULL != (p_process=popen(process_cmd,"r")) ) 
+		{
+			if ( fread(buf,sizeof(char),100,p_process) > 0) 
+			{
+				output=buf;
+				printf("printf %s\n",buf);
+			}
+			pclose(p_process);
+			return output;
+		}
+		else 
+		{
+		    perror("fail to popen process");
+		    //return FAIL;
+		}
+
+#elif defined(PLATFORM_WIN32)
+	///@todo include SystemInfo
+
+#endif
+	
+}
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================
 

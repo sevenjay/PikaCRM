@@ -15,3 +15,11 @@ LAYOUT(InitialDBLayout, 412, 204)
 	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(288, 24).TopPosZ(172, 20))
 END_LAYOUT
 
+LAYOUT(InputPWLayout, 300, 120)
+	ITEM(EditString, esPassword, MaxChars(16).LeftPosZ(120, 116).TopPosZ(36, 19))
+	ITEM(Label, dv___1, SetLabel(t_("Password:")).LeftPosZ(52, 64).TopPosZ(36, 20))
+	ITEM(Option, optRememberPW, SetLabel(t_("Remember the Password")).LeftPosZ(52, 160).TopPosZ(64, 16))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(164, 48).TopPosZ(88, 20))
+	ITEM(Label, dv___4, SetLabel(t_("Enter your password to use PikaCRM")).LeftPosZ(52, 192).TopPosZ(12, 20))
+END_LAYOUT
+
