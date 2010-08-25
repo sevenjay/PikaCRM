@@ -58,10 +58,10 @@ void PikaCRM::OpenMainFrom()
 		if(mConfig.IsRememberPW)
 		{
 			SysLog.Debug("Remeber the PW\n");
-			String key=GetSystemKey();
+			String key=CombineKey(GetSystemKey(), mConfig.Password);
 			SysLog.Debug("key:"+key+"\n");
 			//PromptOK(key);
-			if(mConfig.SystemKey.IsEmpty() || GetSystemKey()!=mConfig.SystemKey)//use different PC
+			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
 				InputPWCheck();
 			/*	else
 				;//just using mConfig.Password;
@@ -200,7 +200,8 @@ void PikaCRM::SetupDB(String config_file_path)
 			String tempPW=d.esPassword.GetData();
 			mConfig.IsDBEncrypt=true;
 			mConfig.Password=getMD5(tempPW<<PW_MAGIC_WORD);
-			mConfig.IsRememberPW=!(bool)d.optRequire;		
+			mConfig.IsRememberPW=!(bool)d.optRequire;	
+			mConfig.SystemPWKey=CombineKey(GetSystemKey(), mConfig.Password);	
 		}
 
 		SaveConfig(config_file_path);
@@ -259,7 +260,7 @@ void PikaCRM::LoadConfig(String config_file_path)
 		mConfig.IsDBEncrypt=false;
 		mConfig.Password="";
 		mConfig.IsRememberPW=false;
-		mConfig.SystemKey=GetSystemKey();
+		mConfig.SystemPWKey="";
 		SaveConfig(config_file_path);
 	}
 }
@@ -288,7 +289,7 @@ void PikaCRM::InputPWCheck()
 	d.optRememberPW = mConfig.IsRememberPW;
 	if(d.Run() == IDOK) {
 		mConfig.IsRememberPW=(bool)d.optRememberPW;
-		if(d.optRememberPW) mConfig.SystemKey=GetSystemKey();
+		if(d.optRememberPW) mConfig.SystemPWKey=CombineKey(GetSystemKey(), mConfig.Password);
 		SaveConfig(getConfigDirPath()+FILE_CONFIG);
 	}
 	else
@@ -342,6 +343,17 @@ String PikaCRM::GetSystemKey()
 	
 	
 	return key;
+}
+
+String PikaCRM::CombineKey(String key1, String key2) //avoid hacker copy system key and run
+{
+	String temp;
+	if(!key1.IsEmpty() && !key2.IsEmpty())
+	{
+		key1.Cat(key2);
+		temp=getMD5(key1);
+	}
+	return temp;
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================

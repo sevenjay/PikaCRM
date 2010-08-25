@@ -52,14 +52,14 @@ struct Config {
 	bool	IsDBEncrypt;
 	String	Password;
 	bool	IsRememberPW;
-	String	SystemKey;
+	String	SystemPWKey;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
 			("Encrypted", IsDBEncrypt)
 			("Password", Password)
 			("RememberPW", IsRememberPW)
-			("SystemKey", SystemKey)
+			("SystemPWKey", SystemPWKey)
 		;
 	}
 	
@@ -114,6 +114,7 @@ private :
 	void InputPWCheck();
 		void CheckPWRight(WithInputPWLayout<TopWindow> * d, String & pw);
 	String GetSystemKey();
+	String CombineKey(String key1, String key2);
 	
 	void LoadConfig(String config_file_path);
 	void SetConfig();
