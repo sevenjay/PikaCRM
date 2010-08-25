@@ -59,12 +59,12 @@ void PikaCRM::OpenMainFrom()
 		{
 			SysLog.Debug("Remeber the PW\n");
 			String key=GetSystemKey();
-			SysLog.Info(key);
-			PromptOK(key);
-			//if(GetSystemKey()==mConfig.SystemKey)
-				;//just using mConfig.Password;
-			/*	else//use different PC
+			SysLog.Debug("key:"+key+"\n");
+			//PromptOK(key);
+			if(mConfig.SystemKey.IsEmpty() || GetSystemKey()!=mConfig.SystemKey)//use different PC
 				InputPWCheck();
+			/*	else
+				;//just using mConfig.Password;
 			*/
 		}
 		else//not Remember PW 
@@ -154,7 +154,7 @@ void PikaCRM::CreateOrOpenDB(String database_file_path)
 	
 	if(!mConfig.Password.IsEmpty())
 	{
-		SysLog.Info("setting database encrypted\n");
+		SysLog.Info("setting database encrypted key.\n");
 		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
 		{
 			SysLog.Error("sqlite3 set key error\n");
@@ -259,7 +259,7 @@ void PikaCRM::LoadConfig(String config_file_path)
 		mConfig.IsDBEncrypt=false;
 		mConfig.Password="";
 		mConfig.IsRememberPW=false;
-		mConfig.SystemKey="";
+		mConfig.SystemKey=GetSystemKey();
 		SaveConfig(config_file_path);
 	}
 }
@@ -285,10 +285,10 @@ void PikaCRM::InputPWCheck()
 	WithInputPWLayout<TopWindow> d;
 	CtrlLayoutOK(d,t_("Pika Customer Relationship Management"));
 	d.ok.WhenPush = THISBACK2(CheckPWRight, &d, mConfig.Password);
-	
+	d.optRememberPW = mConfig.IsRememberPW;
 	if(d.Run() == IDOK) {
 		mConfig.IsRememberPW=(bool)d.optRememberPW;
-
+		if(d.optRememberPW) mConfig.SystemKey=GetSystemKey();
 		SaveConfig(getConfigDirPath()+FILE_CONFIG);
 	}
 	else
@@ -307,35 +307,41 @@ void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, String & pw)
 
 String PikaCRM::GetSystemKey()
 {
-#ifdef PLATFORM_POSIX
-
+	int		pos;
+	String 	output;
+	String	key;
 	
+#ifdef PLATFORM_POSIX
 	FILE * 	p_process;
 	char  	buf[101]={};
-	int		pos;
-	const char	process_cmd[] = "pwd";
-	String 	output;
+	const char	process_cmd[] = "./hdsn 2>&1";
 		if ( NULL != (p_process=popen(process_cmd,"r")) ) 
 		{
 			if ( fread(buf,sizeof(char),100,p_process) > 0) 
 			{
 				output=buf;
-				printf("printf %s\n",buf);
+				//printf("printf %s\n",buf);
 			}
 			pclose(p_process);
-			return output;
 		}
 		else 
 		{
-		    perror("fail to popen process");
-		    //return FAIL;
+		    //perror("fail to execute hdsn");
+		    output="fail to execute hdsn";
 		}
 
 #elif defined(PLATFORM_WIN32)
 	///@todo include SystemInfo
 
 #endif
+
+	if( -1 != (pos=output.Find("serial_no:")) )
+		key=getMD5(output);
+	else
+		SysLog.Error(output+"\n");///@remark throw error?
 	
+	
+	return key;
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================

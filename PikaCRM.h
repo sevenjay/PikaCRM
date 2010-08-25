@@ -27,7 +27,7 @@ using namespace Upp;
 #endif
 //end platform dependent------------------------------------------------
 
-#include <string>
+//#include <string>
 //#include <vector>
 
 
