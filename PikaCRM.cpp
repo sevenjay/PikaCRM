@@ -134,12 +134,12 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 	MainFrom.Close();
 }
 
-bool PikaCRM::IsHaveDBFile(String database_file_path)
+bool PikaCRM::IsHaveDBFile(const String & database_file_path)
 {	
 	return FileExists(database_file_path);
 }
 
-void PikaCRM::CreateOrOpenDB(String database_file_path)
+void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 {
 	if(!mSqlite3Session.Open(database_file_path))
 	{
@@ -178,7 +178,7 @@ void PikaCRM::InitialDB()
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name
 }
-void PikaCRM::SetupDB(String config_file_path)
+void PikaCRM::SetupDB(const String config_file_path)
 {
 	WithInitialDBLayout<TopWindow> d;
 	CtrlLayoutOK(d, t_("Setup your database"));
@@ -240,7 +240,7 @@ void PikaCRM::CheckPWSame(WithInitialDBLayout<TopWindow> * d)
 		PromptOK(t_("Re-Enter Password does correspond to the new Password."));
 }
 
-void PikaCRM::LoadConfig(String config_file_path)
+void PikaCRM::LoadConfig(const String & config_file_path)
 {
 	if(FileExists(config_file_path))
 	{
@@ -267,7 +267,7 @@ void PikaCRM::LoadConfig(String config_file_path)
 void PikaCRM::SetConfig()
 {
 }
-void PikaCRM::SaveConfig(String config_file_path)
+void PikaCRM::SaveConfig(const String & config_file_path)
 {
 	if(mConfig.Save(config_file_path))
 	{
@@ -283,6 +283,7 @@ void PikaCRM::SaveConfig(String config_file_path)
 
 void PikaCRM::InputPWCheck()
 {
+	String config_file_path=getConfigDirPath()+FILE_CONFIG;
 	WithInputPWLayout<TopWindow> d;
 	CtrlLayoutOK(d,t_("Pika Customer Relationship Management"));
 	d.ok.WhenPush = THISBACK2(CheckPWRight, &d, mConfig.Password);
@@ -290,7 +291,7 @@ void PikaCRM::InputPWCheck()
 	if(d.Run() == IDOK) {
 		mConfig.IsRememberPW=(bool)d.optRememberPW;
 		if(d.optRememberPW) mConfig.SystemPWKey=CombineKey(GetSystemKey(), mConfig.Password);
-		SaveConfig(getConfigDirPath()+FILE_CONFIG);
+		SaveConfig(config_file_path);
 	}
 	else
 	{
@@ -298,7 +299,7 @@ void PikaCRM::InputPWCheck()
 	}
 }
 
-void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, String & pw)
+void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw)
 {
 	String p1=d->esPassword;
 	String pwMD5=getMD5(p1<<PW_MAGIC_WORD);
@@ -345,15 +346,15 @@ String PikaCRM::GetSystemKey()
 	return key;
 }
 
-String PikaCRM::CombineKey(String key1, String key2) //avoid hacker copy system key and run
+String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hacker copy system key and run
 {
-	String temp;
+	String ckey;
 	if(!key1.IsEmpty() && !key2.IsEmpty())
 	{
-		key1.Cat(key2);
-		temp=getMD5(key1);
+		String temp=key1+key2;
+		ckey=getMD5(temp);
 	}
-	return temp;
+	return ckey;
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================
@@ -409,7 +410,7 @@ Image PikaCRM::getLangLogo()
 							
 	return image;
 }
-String PikaCRM::getMD5(String & text)
+String PikaCRM::getMD5(const String & text)
 {
 	unsigned char digest[16];
 	MD5(digest, ~text, text.GetLength());
@@ -421,7 +422,7 @@ String PikaCRM::getMD5(String & text)
 		
 	return r;
 }
-String PikaCRM::getSwap1st2ndChar(String & text)
+String PikaCRM::getSwap1st2ndChar(const String & text)
 {
 	String r(text);
 	//String r2=text;

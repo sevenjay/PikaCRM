@@ -96,29 +96,29 @@ private :
 	String  getConfigDirPath();
 	String	getLang4Char();
 	Image	getLangLogo();
-	String	getMD5(String & text);
-	String	getSwap1st2ndChar(String & text);
+	String	getMD5(const String & text);
+	String	getSwap1st2ndChar(const String & text);
 	
 
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
 	//used in initial====================================================
-	bool IsHaveDBFile(String database_file_path);
-	void CreateOrOpenDB(String database_file_path);
+	bool IsHaveDBFile(const String & database_file_path);
+	void CreateOrOpenDB(const String & database_file_path);
 	void InitialDB();
-	void SetupDB(String config_file_path);
+	void SetupDB(const String config_file_path);
 		void OnOptPWAction(WithInitialDBLayout<TopWindow> * d);
 		void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
 	bool IsDBWork();
 	
 	void InputPWCheck();
-		void CheckPWRight(WithInputPWLayout<TopWindow> * d, String & pw);
+		void CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw);
 	String GetSystemKey();
-	String CombineKey(String key1, String key2);
+	String CombineKey(const String & key1, const String & key2);
 	
-	void LoadConfig(String config_file_path);
+	void LoadConfig(const String & config_file_path);
 	void SetConfig();
-	void SaveConfig(String config_file_path);
+	void SaveConfig(const String & config_file_path);
 	//end used in initial================================================
 	
 public:
