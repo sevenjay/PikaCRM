@@ -80,7 +80,9 @@ class PikaCRM
 	
 private :
 	WithPikaCRMLayout<TopWindow> MainFrom;
-	
+	WithCustomerLayout<ParentCtrl> Customer;
+	WithContactLayout<ParentCtrl> Contact;
+	ArrayCtrl GridCustomer;
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 

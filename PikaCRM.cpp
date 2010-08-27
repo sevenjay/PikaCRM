@@ -22,13 +22,16 @@ PikaCRM::PikaCRM()
 	int QtfHigh=20;
 	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(),SrcImages::Logo(),mLanguage);
 	
-	//WithSplashLayout<TopWindow> splash;
-	//CtrlLayout(splash, t_("Application Setup"));
-	//splash.OpenMain();
-	//Splash();
+	//TabCtrl------------------------------------------
+	CtrlLayout(Customer);
+	MainFrom.tabMain.Add(Customer, t_("Costomer"));
+	CtrlLayout(Contact);
+	MainFrom.tabMain.Add(Contact, t_("Contact"));
+	
 	
 	//splash.Close();
 	MainFrom.WhenClose=THISBACK(CloseMainFrom);
+	MainFrom.Sizeable().Zoomable();
 	//MainFrom.lbOne=t_("Setting");
 }
 
@@ -304,7 +307,8 @@ void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw)
 	String p1=d->esPassword;
 	String pwMD5=getMD5(p1<<PW_MAGIC_WORD);
 	if(!pw.IsEqual(pwMD5))
-		PromptOK(t_("The Password is incorrect!"));
+		Exclamation(t_("The Password is incorrect!"));
+		//PromptOK(t_("The Password is incorrect!"));
 }
 
 String PikaCRM::GetSystemKey()
