@@ -1,7 +1,7 @@
 LAYOUT(PikaCRMLayout, 600, 400)
 	ITEM(TabCtrl, tabMain, HSizePosZ(2, 2).TopPosZ(0, 80))
-	ITEM(ParentCtrl, dv___1, LeftPosZ(4, 564).TopPosZ(84, 296))
-	ITEM(LabelBox, dv___2, HSizePosZ(2, 2).VSizePosZ(82, 2))
+	ITEM(ParentCtrl, pcMainBox, HSizePosZ(4, 4).VSizePosZ(84, 4))
+	ITEM(LabelBox, lbMain, HSizePosZ(2, 2).VSizePosZ(82, 2))
 END_LAYOUT
 
 LAYOUT(InitialDBLayout, 412, 204)

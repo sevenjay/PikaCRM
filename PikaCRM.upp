@@ -3,7 +3,8 @@ uses
 	Sql,
 	plugin/sqlite3,
 	SplashSV,
-	SystemLog;
+	SystemLog,
+	GridCtrl;
 
 file
 	PikaCRM.h,

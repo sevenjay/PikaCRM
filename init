@@ -5,4 +5,5 @@
 #include "plugin/sqlite3/init"
 #include "SplashSV/init"
 #include "SystemLog/init"
+#include "GridCtrl/init"
 #endif

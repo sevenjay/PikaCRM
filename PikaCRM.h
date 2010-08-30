@@ -5,22 +5,23 @@
 
 using namespace Upp;
 
-#define LAYOUTFILE <PikaCRM/PikaCRM.lay>
-#include <CtrlCore/lay.h>
-
 //useful library------------------------------------------------------
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
 #include <plugin/sqlite3/Sqlite3.h>
 #include "boost/smart_ptr.hpp"
+#include <GridCtrl/GridCtrl.h> //must include before *.lay
 //end useful library---------------------------------------------------
+
+#define LAYOUTFILE <PikaCRM/PikaCRM.lay>
+#include <CtrlCore/lay.h>
 
 //platform dependent---------------------------------------------------
 #ifdef PLATFORM_POSIX
 
-#include <sys/ioctl.h>//for open
-#include <sys/fcntl.h>
-#include <linux/hdreg.h>
+//#include <sys/ioctl.h>//for open
+//#include <sys/fcntl.h>
+//#include <linux/hdreg.h>
 
 #elif defined(PLATFORM_WIN32)
 
@@ -33,9 +34,9 @@ using namespace Upp;
 
 
 #define SOFTWARE_NAME					"PikaCRM"
-#define SOFTWARE_VERSION				"0.0.1"
+#define SOFTWARE_VERSION				"0.8"
 #define DATABASE_VERSION				"1"
-#define BUILD_DATE						Date(2010, 7, 25)
+#define BUILD_DATE						Date(2010, 9, 1)
 
 #define PW_MAGIC_WORD					"sevenjay777"
 //we let PW SETKEY ROLL by getSwap1st2ndChar
@@ -82,7 +83,8 @@ private :
 	WithPikaCRMLayout<TopWindow> MainFrom;
 	WithCustomerLayout<ParentCtrl> Customer;
 	WithContactLayout<ParentCtrl> Contact;
-	ArrayCtrl GridCustomer;
+	
+	GridCtrl GridCustomer;
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 
@@ -92,8 +94,7 @@ private :
 	
 	Sqlite3Session mSqlite3Session;
 	boost::shared_ptr<Sql> mSql;
-	//Sql * mSql;
-	//-------------------------------------------------------------------------------
+
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
 	String	getLang4Char();
@@ -101,10 +102,14 @@ private :
 	String	getMD5(const String & text);
 	String	getSwap1st2ndChar(const String & text);
 	
-
+	//database control------------------------------------------------------------
+	void LoadCustomer();
+	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
+	
 	//used in initial====================================================
+	void SetupUI();
 	bool IsHaveDBFile(const String & database_file_path);
 	void CreateOrOpenDB(const String & database_file_path);
 	void InitialDB();

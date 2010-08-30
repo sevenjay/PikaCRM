@@ -10,7 +10,12 @@
 #define TOPICFILE <PikaCRM/srcdoc.tpp/all.i>	// Adding QTF for splash (and for other aims)
 #include <Core/topic_group.h>					//
 
+#include <Sql/sch_schema.h>
 
+#include <Sql/sch_source.h>
+	SqlId C_title("C_title");
+	SqlId ALL("*");
+	SqlId CustomerQ("Customer");
 PikaCRM::PikaCRM()
 {
 	mLanguage=LNG_('Z','H','T','W');
@@ -22,24 +27,114 @@ PikaCRM::PikaCRM()
 	int QtfHigh=20;
 	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(),SrcImages::Logo(),mLanguage);
 	
-	//TabCtrl------------------------------------------
-	CtrlLayout(Customer);
-	MainFrom.tabMain.Add(Customer, t_("Costomer"));
-	CtrlLayout(Contact);
-	MainFrom.tabMain.Add(Contact, t_("Contact"));
-	
-	
-	//splash.Close();
+	SetupUI();
+
+
 	MainFrom.WhenClose=THISBACK(CloseMainFrom);
 	MainFrom.Sizeable().Zoomable();
-	//MainFrom.lbOne=t_("Setting");
 }
 
 PikaCRM::~PikaCRM()
 {
 }
 
+void PikaCRM::SetupUI()
+{
+	//TabCtrl------------------------------------------
+	CtrlLayout(Customer);
+	MainFrom.tabMain.Add(Customer, t_("Costomer"));
+	CtrlLayout(Contact);
+	MainFrom.tabMain.Add(Contact, t_("Contact"));
+	//end TabCtrl--------------------------------------
+	
+	/*
+	CtrlLayout(CustomerBox);
+	MainFrom.pcMainBox.Add(CustomerBox);
+	CustomerBox.Grid.AddColumn("Name");
+	CustomerBox.Grid.AddColumn("Age");
+	CustomerBox.Grid.Add("Ann", 21).Add("Jack", 34).Add("David", 15);
+	*/
 
+	MainFrom.pcMainBox.Add(GridCustomer.SizePos());
+	GridCustomer.AddIndex("Index");
+	GridCustomer.AddColumn(C_title,"Title");
+	GridCustomer.AddColumn("Phone");
+	GridCustomer.AddColumn("Address");
+	GridCustomer.AddColumn("Email");
+	GridCustomer.AddColumn("Web site");
+	//GridCustomer.AddColumn("Number of contacts");
+	
+	//money.AddColumn(CAT_ID, t_("Category")).Edit(category).SetConvert(category);
+	//money.AddColumn(PM, t_("Plus / Minus")).SetDisplay(Single<DispPM>()).Edit(plusminus);
+	//money.AddColumn(VALUE, t_("Value")).Edit(val).Default(0).SetConvert(Single<ConvDouble>());
+	//money.AddColumn(DT, t_("When")).Edit(dt).Default(GetSysDate());
+	//money.AddColumn(DESC, t_("Describe")).Edit(es);
+	//money.Appending().Removing().Editing().Accepting().Canceling();
+	//money.RejectNullRow();
+	//money.WhenInsertRow = THISBACK(InsertMoney);
+	//money.WhenUpdateRow = THISBACK(UpdateMoney);
+	//money.WhenRemoveRow = THISBACK(RemoveMoney);
+	//money.SetToolBar();
+	/*
+	money.AddIndex(ID);
+	money.AddColumn(CAT_ID, t_("Category")).Edit(category).SetConvert(category);
+	money.AddColumn(PM, t_("Plus / Minus")).SetDisplay(Single<DispPM>()).Edit(plusminus);
+	money.AddColumn(VALUE, t_("Value")).Edit(val).Default(0).SetConvert(Single<ConvDouble>());
+	money.AddColumn(DT, t_("When")).Edit(dt).Default(GetSysDate());
+	money.AddColumn(DESC, t_("Describe")).Edit(es);
+	money.Appending().Removing().Editing().Accepting().Canceling();
+	money.RejectNullRow();
+	money.WhenInsertRow = THISBACK(InsertMoney);
+	money.WhenUpdateRow = THISBACK(UpdateMoney);
+	money.WhenRemoveRow = THISBACK(RemoveMoney);
+	money.SetToolBar();
+	*/
+
+}
+//database control------------------------------------------------------------
+void PikaCRM::LoadCustomer()
+{
+	
+	GridCustomer.Clear();
+	//bool is_sql_ok=mSql->Execute("select * from Customer;");
+	//Sql sql;
+	(*mSql) * Select(ALL).From(CustomerQ);
+	//if(is_sql_ok)
+	{
+		while(mSql->Fetch())
+		{
+			//GridCustomer.Add((*mSql)[0],(*mSql)[1]);
+			GridCustomer.Add();
+			GridCustomer(0)=(*mSql)[0];
+			GridCustomer(C_title)=(*mSql)[C_title];
+			/*
+				GridCustomer.AddIndex("Index");
+	GridCustomer.AddColumn("Title");
+	GridCustomer.AddColumn("Phone");
+	GridCustomer.AddColumn("Address");
+	GridCustomer.AddColumn("Email");
+	GridCustomer.AddColumn("Web site");
+			*/
+		}
+	}
+	//else
+	{
+		SysLog.Error(mSql->GetLastError()+"\n");
+	}
+	/*
+	SQL * Select(ID, CAT_ID, PM, VALUE, DT, DESC).From(MONEY).Where(DT_ID == dtid);
+	while(SQL.Fetch())
+	{
+		money.Add();
+		money(ID) = SQL[ID];
+		money(CAT_ID) = SQL[CAT_ID];
+		money(PM) = SQL[PM];
+		money(VALUE) = SQL[VALUE];
+		money(DT) = SQL[DT];
+		money(DESC) = SQL[DESC];
+	}
+	*/
+}
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -130,6 +225,9 @@ void PikaCRM::OpenMainFrom()
 	{
 		SysLog.Error(mSql->GetLastError()+"\n");
 	}
+	
+	
+	LoadCustomer();//test
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
