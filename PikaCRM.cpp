@@ -10,9 +10,6 @@
 #define TOPICFILE <PikaCRM/srcdoc.tpp/all.i>	// Adding QTF for splash (and for other aims)
 #include <Core/topic_group.h>					//
 
-#include <Sql/sch_schema.h>
-
-#include <Sql/sch_source.h>
 	SqlId C_title("C_title");
 	SqlId ALL("*");
 	SqlId CustomerQ("Customer");
@@ -96,17 +93,17 @@ void PikaCRM::LoadCustomer()
 {
 	
 	GridCustomer.Clear();
-	//bool is_sql_ok=mSql->Execute("select * from Customer;");
-	//Sql sql;
-	(*mSql) * Select(ALL).From(CustomerQ);
-	//if(is_sql_ok)
+	bool is_sql_ok=mSql->Execute("select * from Customer;");
+	if(is_sql_ok)
 	{
 		while(mSql->Fetch())
 		{
+			int k='a'-'A';
 			//GridCustomer.Add((*mSql)[0],(*mSql)[1]);
 			GridCustomer.Add();
 			GridCustomer(0)=(*mSql)[0];
 			GridCustomer(C_title)=(*mSql)[C_title];
+			//GridCustomer(C_title)=sql[C_title];//this will be a bug for cn->info[i].name = ToUpper(cn->info[i].name); inSql.cpp
 			/*
 				GridCustomer.AddIndex("Index");
 	GridCustomer.AddColumn("Title");
@@ -117,7 +114,7 @@ void PikaCRM::LoadCustomer()
 			*/
 		}
 	}
-	//else
+	else
 	{
 		SysLog.Error(mSql->GetLastError()+"\n");
 	}
@@ -252,6 +249,8 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 #ifdef _DEBUG
 	mSqlite3Session.SetTrace();
 #endif
+	
+	//SQL = mSqlite3Session;//this is Upp default globe 
 	
 	if(!mConfig.Password.IsEmpty())
 	{
