@@ -1,23 +1,23 @@
 /*PikaCRM database version 1*/
 
-CREATE TABLE "BuyItem" ("O_id" INTEGER NOT NULL , "B_id" INTEGER NOT NULL , "M_id" INTEGER NOT NULL , "B_price" FLOAT NOT NULL , "B_number" INTEGER NOT NULL , PRIMARY KEY ("O_id", "B_id"));
+CREATE TABLE "BuyItem" ("o_id" INTEGER NOT NULL , "b_id" INTEGER NOT NULL , "m_id" INTEGER NOT NULL , "b_price" FLOAT NOT NULL , "b_number" INTEGER NOT NULL , PRIMARY KEY ("o_id", "b_id"));
 
-CREATE TABLE "Contact" ("Co_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "C_id" INTEGER, "Co_name" CHAR NOT NULL , "Co_phone" CHAR, "Co_address" CHAR, "Co_email" CHAR, "Co_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "Co_profile" BLOB, "Co_card" BLOB, "Co_1" BLOB, "Co_2" BLOB, "Co_3" BLOB);
+CREATE TABLE "Contact" ("co_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER, "co_name" CHAR NOT NULL , "co_phone" CHAR, "co_address" CHAR, "co_email" CHAR, "co_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "co_profile" BLOB, "co_card" BLOB, "co_1" BLOB, "co_2" BLOB, "co_3" BLOB);
 
-CREATE TABLE "Customer" ("C_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "C_title" CHAR NOT NULL , "C_phone" CHAR, "C_address" CHAR, "C_email" CHAR, "C_website" CHAR, "C_ccount" INTEGER NOT NULL  DEFAULT 0, "C_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "C_1" BLOB, "C_2" BLOB, "C_3" BLOB);
+CREATE TABLE "Customer" ("c_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_title" CHAR NOT NULL , "c_phone" CHAR, "c_address" CHAR, "c_email" CHAR, "c_website" CHAR, "c_ccount" INTEGER NOT NULL  DEFAULT 0, "c_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "c_1" BLOB, "c_2" BLOB, "c_3" BLOB);
 
-CREATE TABLE "Event" ("E_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "C_id" INTEGER NOT NULL , "E_ask" TEXT NOT NULL , "E_status" CHAR, "E_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "E_note" TEXT);
+CREATE TABLE "Event" ("e_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER NOT NULL , "e_ask" TEXT NOT NULL , "e_status" CHAR, "e_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "e_note" TEXT);
 
-CREATE TABLE "Field" ("F_table" CHAR NOT NULL , "F_idname" CHAR NOT NULL , "F_name" CHAR NOT NULL , PRIMARY KEY ("F_table", "F_idname"));
+CREATE TABLE "Field" ("f_table" CHAR NOT NULL , "f_idname" CHAR NOT NULL , "f_name" CHAR NOT NULL , PRIMARY KEY ("f_table", "f_idname"));
 
-CREATE TABLE "LinkContact" ("O_id" INTEGER NOT NULL , "Co_id" INTEGER NOT NULL , PRIMARY KEY ("O_id", "Co_id"));
+CREATE TABLE "LinkContact" ("o_id" INTEGER NOT NULL , "co_id" INTEGER NOT NULL , PRIMARY KEY ("o_id", "co_id"));
 
-CREATE TABLE "Merchandise" ("M_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "M_name" CHAR NOT NULL , "M_price" INTEGER, "M_1" BLOB, "M_2" BLOB, "M_3" BLOB);
+CREATE TABLE "Merchandise" ("m_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "m_name" CHAR NOT NULL , "m_price" INTEGER, "m_1" BLOB, "m_2" BLOB, "m_3" BLOB);
 
-CREATE TABLE "Order" ("O_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "C_id" INTEGER NOT NULL , "O_ship_add" CHAR, "O_bill_add" CHAR, "O_date" DATETIME, "O_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "O_mtime" DATETIME, "O_note" TEXT);
+CREATE TABLE "Order" ("o_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER NOT NULL , "o_ship_add" CHAR, "o_bill_add" CHAR, "o_date" DATETIME, "o_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "o_mtime" DATETIME, "o_note" TEXT);
 
 CREATE TABLE "System" ("user" CHAR NOT NULL , "ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "ap_ver" CHAR NOT NULL , "sqlite_ver" CHAR NOT NULL , "db_ver" CHAR NOT NULL );
 
-CREATE TABLE "Unlimited" ("U_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "U_name" CHAR NOT NULL );
+CREATE TABLE "Unlimited" ("u_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "u_name" CHAR NOT NULL );
 
-CREATE TABLE "UserCustomize" ("U_id" INTEGER NOT NULL , "C_id" INTEGER NOT NULL , "Us_content" BLOB NOT NULL , PRIMARY KEY ("U_id", "C_id"));
+CREATE TABLE "UserCustomize" ("u_id" INTEGER NOT NULL , "c_id" INTEGER NOT NULL , "us_content" BLOB NOT NULL , PRIMARY KEY ("u_id", "c_id"));
