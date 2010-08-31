@@ -10,9 +10,8 @@
 #define TOPICFILE <PikaCRM/srcdoc.tpp/all.i>	// Adding QTF for splash (and for other aims)
 #include <Core/topic_group.h>					//
 
-	SqlId C_title("C_title");
-	SqlId ALL("*");
-	SqlId CustomerQ("Customer");
+#include <PikaCRM/sql/sql.ids>	//for convenient use tables/columns name
+
 PikaCRM::PikaCRM()
 {
 	mLanguage=LNG_('Z','H','T','W');
@@ -54,7 +53,7 @@ void PikaCRM::SetupUI()
 
 	MainFrom.pcMainBox.Add(GridCustomer.SizePos());
 	GridCustomer.AddIndex("Index");
-	GridCustomer.AddColumn(C_title,"Title");
+	GridCustomer.AddColumn(C_TITLE,"Title");
 	GridCustomer.AddColumn("Phone");
 	GridCustomer.AddColumn("Address");
 	GridCustomer.AddColumn("Email");
@@ -93,16 +92,16 @@ void PikaCRM::LoadCustomer()
 {
 	
 	GridCustomer.Clear();
-	bool is_sql_ok=mSql->Execute("select * from Customer;");
+	bool is_sql_ok=SQL.Execute("select * from Customer;");
 	if(is_sql_ok)
 	{
-		while(mSql->Fetch())
+		while(SQL.Fetch())
 		{
 			int k='a'-'A';
 			//GridCustomer.Add((*mSql)[0],(*mSql)[1]);
 			GridCustomer.Add();
-			GridCustomer(0)=(*mSql)[0];
-			GridCustomer(C_title)=(*mSql)[C_title];
+			GridCustomer(0)=SQL[0];
+			GridCustomer(C_TITLE)=SQL[C_TITLE];
 			//GridCustomer(C_title)=sql[C_title];//this will be a bug for cn->info[i].name = ToUpper(cn->info[i].name); inSql.cpp
 			/*
 				GridCustomer.AddIndex("Index");
@@ -222,7 +221,12 @@ void PikaCRM::OpenMainFrom()
 	{
 		SysLog.Error(mSql->GetLastError()+"\n");
 	}
+
 	
+	String out=ExportSch(mSqlite3Session, "main");						
+	SaveFile("test.sch", out);	
+	SaveFile("test.ids", ExportIds(mSqlite3Session, "main"));
+
 	
 	LoadCustomer();//test
 }
@@ -250,7 +254,7 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 	mSqlite3Session.SetTrace();
 #endif
 	
-	//SQL = mSqlite3Session;//this is Upp default globe 
+	SQL = mSqlite3Session;//this is Upp default globe 
 	
 	if(!mConfig.Password.IsEmpty())
 	{
