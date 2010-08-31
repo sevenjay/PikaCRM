@@ -115,7 +115,7 @@ void PikaCRM::LoadCustomer()
 	}
 	else
 	{
-		SysLog.Error(mSql->GetLastError()+"\n");
+		SysLog.Error(SQL.GetLastError()+"\n");
 	}
 	/*
 	SQL * Select(ID, CAT_ID, PM, VALUE, DT, DESC).From(MONEY).Where(DT_ID == dtid);
@@ -213,19 +213,16 @@ void PikaCRM::OpenMainFrom()
 	mSplash.SetSplashTimer(1500);
 	
 	//test if database OK
-	bool is_sql_ok=mSql->Execute("select * from System;");
+	bool is_sql_ok=SQL.Execute("select * from System;");
 	if(is_sql_ok)
-		while(mSql->Fetch())//user,ap_ver,sqlite_ver,db_ver
-			SysLog.Debug("") << (*mSql)[0]<<", "<<(*mSql)[1]<<", "<<(*mSql)[2]<<", "<<(*mSql)[3]<<"\n";
+		while(SQL.Fetch())//user,ap_ver,sqlite_ver,db_ver
+			SysLog.Debug("") << SQL[USER]<<", "<<SQL[CTIME]<<", "<<
+								SQL[AP_VER]<<", "<<SQL[SQLITE_VER]<<", "<<SQL[DB_VER]<<"\n";
 	else
 	{
-		SysLog.Error(mSql->GetLastError()+"\n");
+		SysLog.Error(SQL.GetLastError()+"\n");
 	}
 
-	
-	String out=ExportSch(mSqlite3Session, "main");						
-	SaveFile("test.sch", out);	
-	SaveFile("test.ids", ExportIds(mSqlite3Session, "main"));
 
 	
 	LoadCustomer();//test
@@ -265,8 +262,6 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 			///@note we dont know how to deal this error, undefine		
 		}
 	}
-
-	mSql.reset(new Sql(mSqlite3Session));//mSql=mSqlite3Session will error
 }
 void PikaCRM::InitialDB()
 {
@@ -278,9 +273,17 @@ void PikaCRM::InitialDB()
 	}
 	bool is_sql_ok = SqlPerformScript(mSqlite3Session,initial);
 	
-	is_sql_ok=mSql->Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
+	is_sql_ok=SQL.Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name
+	//@todo handel is_sql_ok						
+#ifdef _DEBUG
+	//in ebug
+	String out=ExportSch(mSqlite3Session, "main");						
+	SaveFile("sql.sch", out);	
+	SaveFile("sql.ids", ExportIds(mSqlite3Session, "main"));
+
+#endif
 }
 void PikaCRM::SetupDB(const String config_file_path)
 {

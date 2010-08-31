@@ -93,7 +93,6 @@ private :
 	Config mConfig;
 	
 	Sqlite3Session mSqlite3Session;
-	boost::shared_ptr<Sql> mSql;
 
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
