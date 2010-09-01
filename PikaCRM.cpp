@@ -37,6 +37,8 @@ PikaCRM::~PikaCRM()
 void PikaCRM::SetupUI()
 {
 	//TabCtrl------------------------------------------
+	MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
+	InTab=0;
 	CtrlLayout(Customer);
 	MainFrom.tabMain.Add(Customer, t_("Costomer"));
 	CtrlLayout(Contact);
@@ -44,6 +46,7 @@ void PikaCRM::SetupUI()
 	//end TabCtrl--------------------------------------
 
 	MainFrom.pcMainBox.Add(GridCustomer.SizePos());
+	MainBoxList.Add(&GridCustomer);
 	GridCustomer.AddIndex(C_ID);
 	GridCustomer.AddColumn(C_TITLE,"Title");
 	GridCustomer.AddColumn(C_PHONE,"Phone");
@@ -53,6 +56,7 @@ void PikaCRM::SetupUI()
 	//GridCustomer.AddColumn("Number of contacts");
 	
 	MainFrom.pcMainBox.Add(GridContact.SizePos());
+	MainBoxList.Add(&GridContact);
 	GridContact.AddIndex(CO_ID);
 	GridContact.AddColumn(CO_NAME,"Title");
 	GridContact.AddColumn(CO_PHONE,"Phone");
@@ -85,7 +89,10 @@ void PikaCRM::SetupUI()
 	money.WhenRemoveRow = THISBACK(RemoveMoney);
 	money.SetToolBar();
 	*/
-
+	for(int i=0;i<MainBoxList.GetCount();++i)
+		MainBoxList[i]->Hide();
+	
+	MainBoxList[0]->Show();
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
@@ -253,6 +260,18 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
 	mSplash.~SplashSV();
 	MainFrom.Close();
+}
+
+void PikaCRM::TabChange(int past)
+{
+	SysLog.Debug("TabChange()\n");
+	int now_in_tab=MainFrom.tabMain.Get();
+	if(MainBoxList.GetCount()>0)
+	{
+		MainBoxList[InTab]->Hide();
+		MainBoxList[now_in_tab]->Show();
+		InTab=now_in_tab;
+	}
 }
 
 bool PikaCRM::IsHaveDBFile(const String & database_file_path)
