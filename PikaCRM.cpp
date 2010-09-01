@@ -42,23 +42,23 @@ void PikaCRM::SetupUI()
 	CtrlLayout(Contact);
 	MainFrom.tabMain.Add(Contact, t_("Contact"));
 	//end TabCtrl--------------------------------------
-	
-	/*
-	CtrlLayout(CustomerBox);
-	MainFrom.pcMainBox.Add(CustomerBox);
-	CustomerBox.Grid.AddColumn("Name");
-	CustomerBox.Grid.AddColumn("Age");
-	CustomerBox.Grid.Add("Ann", 21).Add("Jack", 34).Add("David", 15);
-	*/
 
 	MainFrom.pcMainBox.Add(GridCustomer.SizePos());
-	GridCustomer.AddIndex("Index");
+	GridCustomer.AddIndex(C_ID);
 	GridCustomer.AddColumn(C_TITLE,"Title");
-	GridCustomer.AddColumn("Phone");
-	GridCustomer.AddColumn("Address");
-	GridCustomer.AddColumn("Email");
-	GridCustomer.AddColumn("Web site");
+	GridCustomer.AddColumn(C_PHONE,"Phone");
+	GridCustomer.AddColumn(C_ADDRESS,"Address");
+	GridCustomer.AddColumn(C_EMAIL,"Email");
+	GridCustomer.AddColumn(C_WEBSITE,"Web site");
 	//GridCustomer.AddColumn("Number of contacts");
+	
+	MainFrom.pcMainBox.Add(GridContact.SizePos());
+	GridContact.AddIndex(CO_ID);
+	GridContact.AddColumn(CO_NAME,"Title");
+	GridContact.AddColumn(CO_PHONE,"Phone");
+	GridContact.AddColumn(CO_ADDRESS,"Address");
+	GridContact.AddColumn(CO_EMAIL,"Email");
+	//GridContact.AddColumn(CO_PROFILE,"Web site");
 	
 	//money.AddColumn(CAT_ID, t_("Category")).Edit(category).SetConvert(category);
 	//money.AddColumn(PM, t_("Plus / Minus")).SetDisplay(Single<DispPM>()).Edit(plusminus);
@@ -97,20 +97,41 @@ void PikaCRM::LoadCustomer()
 	{
 		while(SQL.Fetch())
 		{
-			int k='a'-'A';
-			//GridCustomer.Add((*mSql)[0],(*mSql)[1]);
-			GridCustomer.Add();
-			GridCustomer(0)=SQL[0];
-			GridCustomer(C_TITLE)=SQL[C_TITLE];
-			//GridCustomer(C_title)=sql[C_title];//this will be a bug for cn->info[i].name = ToUpper(cn->info[i].name); inSql.cpp
-			/*
-				GridCustomer.AddIndex("Index");
-	GridCustomer.AddColumn("Title");
-	GridCustomer.AddColumn("Phone");
-	GridCustomer.AddColumn("Address");
-	GridCustomer.AddColumn("Email");
-	GridCustomer.AddColumn("Web site");
-			*/
+			GridCustomer.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
+			//GridCustomer(0)=SQL[0];
+			//GridCustomer(C_TITLE)=SQL[C_TITLE];
+		}
+	}
+	else
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+	}
+	/*
+	SQL * Select(ID, CAT_ID, PM, VALUE, DT, DESC).From(MONEY).Where(DT_ID == dtid);
+	while(SQL.Fetch())
+	{
+		money.Add();
+		money(ID) = SQL[ID];
+		money(CAT_ID) = SQL[CAT_ID];
+		money(PM) = SQL[PM];
+		money(VALUE) = SQL[VALUE];
+		money(DT) = SQL[DT];
+		money(DESC) = SQL[DESC];
+	}
+	*/
+}
+void PikaCRM::LoadContact()
+{
+	
+	GridContact.Clear();
+	bool is_sql_ok=SQL.Execute("select * from Contact;");
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			GridContact.Add(SQL[CO_ID],SQL[CO_NAME],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
+			//GridCustomer(0)=SQL[0];
+			//GridCustomer(C_TITLE)=SQL[C_TITLE];
 		}
 	}
 	else
@@ -226,6 +247,7 @@ void PikaCRM::OpenMainFrom()
 
 	
 	LoadCustomer();//test
+	LoadContact();
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
