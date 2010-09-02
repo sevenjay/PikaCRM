@@ -53,27 +53,26 @@ void PikaCRM::SetupUI()
 	//end TabCtrl--------------------------------------
 
 	Customer.Grid.AddIndex(C_ID);
-	Customer.Grid.AddColumn(C_TITLE,"Title");
-	Customer.Grid.AddColumn(C_PHONE,"Phone");
-	Customer.Grid.AddColumn(C_ADDRESS,"Address");
-	Customer.Grid.AddColumn(C_EMAIL,"Email");
-	Customer.Grid.AddColumn(C_WEBSITE,"Web site");
-	//GridCustomer.AddColumn("Number of contacts");
+	Customer.Grid.AddColumn(C_TITLE,"Title").Edit(cesn);
+	Customer.Grid.AddColumn(C_PHONE,"Phone").Edit(ces1);
+	Customer.Grid.AddColumn(C_ADDRESS,"Address").Edit(ces2);
+	Customer.Grid.AddColumn(C_EMAIL,"Email").Edit(ces3);
+	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
+	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
+	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
+	//Customer.Grid.GetDisplay().SetTheme(2);
+	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
+	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
+	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
 	
 	Contact.Grid.AddIndex(CO_ID);
-	Contact.Grid.AddColumn(CO_NAME,"Title");
-	Contact.Grid.AddColumn(CO_PHONE,"Phone");
-	Contact.Grid.AddColumn(CO_ADDRESS,"Address");
-	Contact.Grid.AddColumn(CO_EMAIL,"Email");
-	//GridContact.AddColumn(CO_PROFILE,"Web site");
+	Contact.Grid.AddColumn(CO_NAME,"Title").Edit(coesn);
+	Contact.Grid.AddColumn(CO_PHONE,"Phone").Edit(coes1);
+	Contact.Grid.AddColumn(CO_ADDRESS,"Address").Edit(coes2);
+	Contact.Grid.AddColumn(CO_EMAIL,"Email").Edit(coes3);
+	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
 	
-	//money.AddColumn(CAT_ID, t_("Category")).Edit(category).SetConvert(category);
-	//money.AddColumn(PM, t_("Plus / Minus")).SetDisplay(Single<DispPM>()).Edit(plusminus);
-	//money.AddColumn(VALUE, t_("Value")).Edit(val).Default(0).SetConvert(Single<ConvDouble>());
-	//money.AddColumn(DT, t_("When")).Edit(dt).Default(GetSysDate());
-	//money.AddColumn(DESC, t_("Describe")).Edit(es);
-	//money.Appending().Removing().Editing().Accepting().Canceling();
-	//money.RejectNullRow();
+
 	//money.WhenInsertRow = THISBACK(InsertMoney);
 	//money.WhenUpdateRow = THISBACK(UpdateMoney);
 	//money.WhenRemoveRow = THISBACK(RemoveMoney);
@@ -126,6 +125,42 @@ void PikaCRM::LoadCustomer()
 	}
 	*/
 }
+void PikaCRM::InsertCustomer()
+{
+	/*
+		Customer.Grid.AddColumn(C_TITLE,"Title").Edit(cesn);
+	Customer.Grid.AddColumn(C_PHONE,"Phone").Edit(ces1);
+	Customer.Grid.AddColumn(C_ADDRESS,"Address").Edit(ces2);
+	Customer.Grid.AddColumn(C_EMAIL,"Email").Edit(ces3);
+	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
+	*/
+	
+	//	try
+	//{
+		SQL & Insert(CUSTOMER)
+			(C_TITLE,  Customer.Grid(C_TITLE))
+			(C_PHONE,  Customer.Grid(C_PHONE))
+			(C_ADDRESS,Customer.Grid(C_ADDRESS))
+			(C_EMAIL,  Customer.Grid(C_EMAIL))
+			(C_WEBSITE,Customer.Grid(C_WEBSITE));
+
+		Customer.Grid(C_ID) = SQL.GetInsertedId();
+
+		//UpdateSummary();
+	//}
+	//catch(SqlExc &e)
+	//{
+	//	Customer.Grid.CancelInsert();
+	//	Exclamation("[* " + DeQtfLf(e) + "]");
+	//}
+}
+void PikaCRM::UpdateCustomer()
+{
+}
+void PikaCRM::RemoveCustomer()
+{
+}
+
 void PikaCRM::LoadContact()
 {
 	
@@ -144,19 +179,6 @@ void PikaCRM::LoadContact()
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
 	}
-	/*
-	SQL * Select(ID, CAT_ID, PM, VALUE, DT, DESC).From(MONEY).Where(DT_ID == dtid);
-	while(SQL.Fetch())
-	{
-		money.Add();
-		money(ID) = SQL[ID];
-		money(CAT_ID) = SQL[CAT_ID];
-		money(PM) = SQL[PM];
-		money(VALUE) = SQL[VALUE];
-		money(DT) = SQL[DT];
-		money(DESC) = SQL[DESC];
-	}
-	*/
 }
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
@@ -237,7 +259,7 @@ void PikaCRM::OpenMainFrom()
 	mSplash.ShowSplashStatus(t_("Normal Running..."));
 	SysLog.Info(t_("Normal Running..."))<<"\n";
 	
-	mSplash.SetSplashTimer(1500);
+	mSplash.SetSplashTimer(500);
 	
 	//test if database OK
 	bool is_sql_ok=SQL.Execute("select * from System;");

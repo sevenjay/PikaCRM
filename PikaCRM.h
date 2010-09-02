@@ -80,17 +80,21 @@ class PikaCRM
 	typedef PikaCRM CLASSNAME;
 	
 private :
+	//UI--------------------------------------------------------------------------
 	WithPikaCRMLayout<TopWindow> MainFrom;
 	WithCustomerLayout<ParentCtrl> Customer;
 	WithContactLayout<ParentCtrl> Contact;
-	
 	WithEventLayout<ParentCtrl> Event;
 	WithOrderLayout<ParentCtrl> Order;
 	WithMerchandiseLayout<ParentCtrl> Merchandise;
 	WithSetupLayout<ParentCtrl> Setup;
-	//Array<Ctrl*> MainBoxList;
-	//GridCtrl GridCustomer;
-	//GridCtrl GridContact;
+
+	//Customer.Grid
+	EditStringNotNull cesn;
+	EditString ces1,ces2,ces3,ces4,ces5;
+	//Contact.Grid
+	EditStringNotNull coesn;
+	EditString coes1,coes2,coes3;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
@@ -110,6 +114,10 @@ private :
 	
 	//database control------------------------------------------------------------
 	void LoadCustomer();
+	void InsertCustomer();
+	void UpdateCustomer();
+	void RemoveCustomer();
+
 	void LoadContact();
 	
 	//application control--------------------------------------------------------------
