@@ -84,6 +84,10 @@ private :
 	WithCustomerLayout<ParentCtrl> Customer;
 	WithContactLayout<ParentCtrl> Contact;
 	
+	WithEventLayout<ParentCtrl> Event;
+	WithOrderLayout<ParentCtrl> Order;
+	WithMerchandiseLayout<ParentCtrl> Merchandise;
+	WithSetupLayout<ParentCtrl> Setup;
 	//Array<Ctrl*> MainBoxList;
 	//GridCtrl GridCustomer;
 	//GridCtrl GridContact;

@@ -39,13 +39,19 @@ void PikaCRM::SetupUI()
 	//TabCtrl------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
-	MainFrom.tabMain.Add(Customer.SizePos(), t_("Costomer"));
+	MainFrom.tabMain.Add(Customer.SizePos(), t_("Costomers"));
 	CtrlLayout(Contact);
-	MainFrom.tabMain.Add(Contact.SizePos(), t_("Contact"));
+	MainFrom.tabMain.Add(Contact.SizePos(), t_("Contacts"));
+	CtrlLayout(Event);
+	MainFrom.tabMain.Add(Event.SizePos(), t_("Events"));
+	CtrlLayout(Order);
+	MainFrom.tabMain.Add(Order.SizePos(), t_("Orders"));
+	CtrlLayout(Merchandise);
+	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
+	CtrlLayout(Setup);
+	MainFrom.tabMain.Add(Setup.SizePos(), t_("Setup"));
 	//end TabCtrl--------------------------------------
 
-	//MainFrom.pcMainBox.Add(GridCustomer.SizePos());
-	//MainBoxList.Add(&GridCustomer);
 	Customer.Grid.AddIndex(C_ID);
 	Customer.Grid.AddColumn(C_TITLE,"Title");
 	Customer.Grid.AddColumn(C_PHONE,"Phone");
@@ -54,8 +60,6 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(C_WEBSITE,"Web site");
 	//GridCustomer.AddColumn("Number of contacts");
 	
-	//MainFrom.pcMainBox.Add(GridContact.SizePos());
-	//MainBoxList.Add(&GridContact);
 	Contact.Grid.AddIndex(CO_ID);
 	Contact.Grid.AddColumn(CO_NAME,"Title");
 	Contact.Grid.AddColumn(CO_PHONE,"Phone");
