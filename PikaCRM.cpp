@@ -37,31 +37,30 @@ PikaCRM::~PikaCRM()
 void PikaCRM::SetupUI()
 {
 	//TabCtrl------------------------------------------
-	MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
-	InTab=0;
+	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
-	MainFrom.tabMain.Add(Customer, t_("Costomer"));
+	MainFrom.tabMain.Add(Customer.SizePos(), t_("Costomer"));
 	CtrlLayout(Contact);
-	MainFrom.tabMain.Add(Contact, t_("Contact"));
+	MainFrom.tabMain.Add(Contact.SizePos(), t_("Contact"));
 	//end TabCtrl--------------------------------------
 
-	MainFrom.pcMainBox.Add(GridCustomer.SizePos());
-	MainBoxList.Add(&GridCustomer);
-	GridCustomer.AddIndex(C_ID);
-	GridCustomer.AddColumn(C_TITLE,"Title");
-	GridCustomer.AddColumn(C_PHONE,"Phone");
-	GridCustomer.AddColumn(C_ADDRESS,"Address");
-	GridCustomer.AddColumn(C_EMAIL,"Email");
-	GridCustomer.AddColumn(C_WEBSITE,"Web site");
+	//MainFrom.pcMainBox.Add(GridCustomer.SizePos());
+	//MainBoxList.Add(&GridCustomer);
+	Customer.Grid.AddIndex(C_ID);
+	Customer.Grid.AddColumn(C_TITLE,"Title");
+	Customer.Grid.AddColumn(C_PHONE,"Phone");
+	Customer.Grid.AddColumn(C_ADDRESS,"Address");
+	Customer.Grid.AddColumn(C_EMAIL,"Email");
+	Customer.Grid.AddColumn(C_WEBSITE,"Web site");
 	//GridCustomer.AddColumn("Number of contacts");
 	
-	MainFrom.pcMainBox.Add(GridContact.SizePos());
-	MainBoxList.Add(&GridContact);
-	GridContact.AddIndex(CO_ID);
-	GridContact.AddColumn(CO_NAME,"Title");
-	GridContact.AddColumn(CO_PHONE,"Phone");
-	GridContact.AddColumn(CO_ADDRESS,"Address");
-	GridContact.AddColumn(CO_EMAIL,"Email");
+	//MainFrom.pcMainBox.Add(GridContact.SizePos());
+	//MainBoxList.Add(&GridContact);
+	Contact.Grid.AddIndex(CO_ID);
+	Contact.Grid.AddColumn(CO_NAME,"Title");
+	Contact.Grid.AddColumn(CO_PHONE,"Phone");
+	Contact.Grid.AddColumn(CO_ADDRESS,"Address");
+	Contact.Grid.AddColumn(CO_EMAIL,"Email");
 	//GridContact.AddColumn(CO_PROFILE,"Web site");
 	
 	//money.AddColumn(CAT_ID, t_("Category")).Edit(category).SetConvert(category);
@@ -89,22 +88,18 @@ void PikaCRM::SetupUI()
 	money.WhenRemoveRow = THISBACK(RemoveMoney);
 	money.SetToolBar();
 	*/
-	for(int i=0;i<MainBoxList.GetCount();++i)
-		MainBoxList[i]->Hide();
-	
-	MainBoxList[0]->Show();
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
 {
 	
-	GridCustomer.Clear();
+	Customer.Grid.Clear();
 	bool is_sql_ok=SQL.Execute("select * from Customer;");
 	if(is_sql_ok)
 	{
 		while(SQL.Fetch())
 		{
-			GridCustomer.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
+			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
 			//GridCustomer(0)=SQL[0];
 			//GridCustomer(C_TITLE)=SQL[C_TITLE];
 		}
@@ -130,13 +125,13 @@ void PikaCRM::LoadCustomer()
 void PikaCRM::LoadContact()
 {
 	
-	GridContact.Clear();
+	Contact.Grid.Clear();
 	bool is_sql_ok=SQL.Execute("select * from Contact;");
 	if(is_sql_ok)
 	{
 		while(SQL.Fetch())
 		{
-			GridContact.Add(SQL[CO_ID],SQL[CO_NAME],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
+			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
 			//GridCustomer(0)=SQL[0];
 			//GridCustomer(C_TITLE)=SQL[C_TITLE];
 		}
@@ -260,18 +255,6 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
 	mSplash.~SplashSV();
 	MainFrom.Close();
-}
-
-void PikaCRM::TabChange(int past)
-{
-	SysLog.Debug("TabChange()\n");
-	int now_in_tab=MainFrom.tabMain.Get();
-	if(MainBoxList.GetCount()>0)
-	{
-		MainBoxList[InTab]->Hide();
-		MainBoxList[now_in_tab]->Show();
-		InTab=now_in_tab;
-	}
 }
 
 bool PikaCRM::IsHaveDBFile(const String & database_file_path)

@@ -84,10 +84,9 @@ private :
 	WithCustomerLayout<ParentCtrl> Customer;
 	WithContactLayout<ParentCtrl> Contact;
 	
-	Array<Ctrl*> MainBoxList;
-	GridCtrl GridCustomer;
-	GridCtrl GridContact;
-	int InTab;
+	//Array<Ctrl*> MainBoxList;
+	//GridCtrl GridCustomer;
+	//GridCtrl GridContact;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
@@ -110,7 +109,6 @@ private :
 	void LoadContact();
 	
 	//application control--------------------------------------------------------------
-	void TabChange(int past);
 	void CloseMainFrom();
 	
 	//used in initial====================================================
