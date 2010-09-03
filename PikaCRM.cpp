@@ -36,7 +36,7 @@ PikaCRM::~PikaCRM()
 
 void PikaCRM::SetupUI()
 {
-	//TabCtrl------------------------------------------
+	//TabCtrl----------------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
 	MainFrom.tabMain.Add(Customer.SizePos(), t_("Costomers"));
@@ -50,7 +50,11 @@ void PikaCRM::SetupUI()
 	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
 	CtrlLayout(Setup);
 	MainFrom.tabMain.Add(Setup.SizePos(), t_("Setup"));
-	//end TabCtrl--------------------------------------
+	//end TabCtrl------------------------------------------------
+	//Customer Tab-----------------------------------------------
+	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
+	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
+	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 
 	Customer.Grid.AddIndex(C_ID);
 	Customer.Grid.AddColumn(C_TITLE,"Title").Edit(cesn);
@@ -62,8 +66,15 @@ void PikaCRM::SetupUI()
 	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
 	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
+	Customer.Grid.WhenDuplicateRow=THISBACK(InsertCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
+	Customer.Grid.SetToolBar();
+	
+	//Contact Tab-----------------------------------------------
+	Contact.btnCreate <<= callback(&(Contact.Grid),&GridCtrl::DoAppend);
+	Contact.btnModify <<= callback(&(Contact.Grid),&GridCtrl::DoEdit);
+	Contact.btnDelete <<= callback(&(Contact.Grid),&GridCtrl::DoRemove);
 	
 	Contact.Grid.AddIndex(CO_ID);
 	Contact.Grid.AddColumn(CO_NAME,"Title").Edit(coesn);
@@ -75,7 +86,6 @@ void PikaCRM::SetupUI()
 	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
-	
 
 	//money.WhenInsertRow = THISBACK(InsertMoney);
 	//money.WhenUpdateRow = THISBACK(UpdateMoney);
