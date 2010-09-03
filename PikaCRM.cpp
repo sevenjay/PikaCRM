@@ -71,6 +71,10 @@ void PikaCRM::SetupUI()
 	Contact.Grid.AddColumn(CO_ADDRESS,"Address").Edit(coes2);
 	Contact.Grid.AddColumn(CO_EMAIL,"Email").Edit(coes3);
 	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
+	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
+	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
+	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
+	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
 	
 
 	//money.WhenInsertRow = THISBACK(InsertMoney);
@@ -110,6 +114,7 @@ void PikaCRM::LoadCustomer()
 	else
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
+		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 	/*
 	SQL * Select(ID, CAT_ID, PM, VALUE, DT, DESC).From(MONEY).Where(DT_ID == dtid);
@@ -135,8 +140,8 @@ void PikaCRM::InsertCustomer()
 	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
 	*/
 	
-	//	try
-	//{
+	try
+	{
 		SQL & Insert(CUSTOMER)
 			(C_TITLE,  Customer.Grid(C_TITLE))
 			(C_PHONE,  Customer.Grid(C_PHONE))
@@ -144,21 +149,45 @@ void PikaCRM::InsertCustomer()
 			(C_EMAIL,  Customer.Grid(C_EMAIL))
 			(C_WEBSITE,Customer.Grid(C_WEBSITE));
 
-		Customer.Grid(C_ID) = SQL.GetInsertedId();
+		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
 
 		//UpdateSummary();
-	//}
-	//catch(SqlExc &e)
-	//{
-	//	Customer.Grid.CancelInsert();
-	//	Exclamation("[* " + DeQtfLf(e) + "]");
-	//}
+	}
+	catch(SqlExc &e)
+	{
+		Customer.Grid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
 }
 void PikaCRM::UpdateCustomer()
 {
+	try
+	{
+		SQL & ::Update(CUSTOMER)
+			(C_TITLE,  Customer.Grid(C_TITLE))
+			(C_PHONE,  Customer.Grid(C_PHONE))
+			(C_ADDRESS,Customer.Grid(C_ADDRESS))
+			(C_EMAIL,  Customer.Grid(C_EMAIL))
+			(C_WEBSITE,Customer.Grid(C_WEBSITE))
+			.Where(C_ID == Customer.Grid(C_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Customer.Grid.CancelUpdate();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
 }
 void PikaCRM::RemoveCustomer()
 {
+	try
+	{
+		SQL & Delete(CUSTOMER).Where(C_ID == Customer.Grid(C_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Customer.Grid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
 }
 
 void PikaCRM::LoadContact()
@@ -171,13 +200,58 @@ void PikaCRM::LoadContact()
 		while(SQL.Fetch())
 		{
 			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
-			//GridCustomer(0)=SQL[0];
-			//GridCustomer(C_TITLE)=SQL[C_TITLE];
 		}
 	}
 	else
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
+	}
+}
+void PikaCRM::InsertContact()
+{	
+	try
+	{
+		SQL & Insert(CONTACT)
+			(CO_NAME,  Contact.Grid(CO_NAME))
+			(CO_PHONE,  Contact.Grid(CO_PHONE))
+			(CO_ADDRESS,Contact.Grid(CO_ADDRESS))
+			(CO_EMAIL,  Contact.Grid(CO_EMAIL));
+
+		Contact.Grid(CO_ID) = SQL.GetInsertedId();//it will return only one int primary key
+	}
+	catch(SqlExc &e)
+	{
+		Contact.Grid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::UpdateContact()
+{
+	try
+	{
+		SQL & ::Update(CONTACT)
+			(CO_NAME,  Contact.Grid(CO_NAME))
+			(CO_PHONE,  Contact.Grid(CO_PHONE))
+			(CO_ADDRESS,Contact.Grid(CO_ADDRESS))
+			(CO_EMAIL,  Contact.Grid(CO_EMAIL))
+			.Where(CO_ID == Contact.Grid(CO_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Contact.Grid.CancelUpdate();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::RemoveContact()
+{
+	try
+	{
+		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Contact.Grid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
 //application control-----------------------------------------------------------

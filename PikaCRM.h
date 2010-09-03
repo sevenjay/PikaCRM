@@ -119,6 +119,9 @@ private :
 	void RemoveCustomer();
 
 	void LoadContact();
+	void InsertContact();
+	void UpdateContact();
+	void RemoveContact();
 	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
