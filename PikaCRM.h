@@ -10,6 +10,7 @@ using namespace Upp;
 #include <SplashSV/splash-sv.h>						//this is   for Splash
 #include <plugin/sqlite3/Sqlite3.h>
 //#include "boost/smart_ptr.hpp"
+#include <DropGrid/DropGrid.h>
 #include <GridCtrl/GridCtrl.h> //must include before *.lay
 //end useful library---------------------------------------------------
 
@@ -92,6 +93,9 @@ private :
 	//Customer.Grid
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;
+	MultiButton cmbtn;
+	//DropGrid dg_contact;
+	//ColumnList ttt;
 	//Contact.Grid
 	EditStringNotNull coesn;
 	EditString coes1,coes2,coes3;
@@ -111,6 +115,7 @@ private :
 	Image	getLangLogo();
 	String	getMD5(const String & text);
 	String	getSwap1st2ndChar(const String & text);
+	void	test(){PromptOK("test");};
 	
 	//database control------------------------------------------------------------
 	void LoadCustomer();
@@ -122,6 +127,7 @@ private :
 	void InsertContact();
 	void UpdateContact();
 	void RemoveContact();
+	void Update_dg_contact();
 	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();

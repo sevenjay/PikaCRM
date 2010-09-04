@@ -57,11 +57,15 @@ void PikaCRM::SetupUI()
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 
 	Customer.Grid.AddIndex(C_ID);
-	Customer.Grid.AddColumn(C_TITLE,"Title").Edit(cesn);
-	Customer.Grid.AddColumn(C_PHONE,"Phone").Edit(ces1);
-	Customer.Grid.AddColumn(C_ADDRESS,"Address").Edit(ces2);
-	Customer.Grid.AddColumn(C_EMAIL,"Email").Edit(ces3);
-	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
+	Customer.Grid.AddColumn(C_TITLE,t_("Title")).Edit(cesn);
+	Customer.Grid.AddColumn(C_PHONE,t_("Phone")).Edit(ces1);
+	Customer.Grid.AddColumn(C_ADDRESS,t_("Address")).Edit(ces2);
+	Customer.Grid.AddColumn(C_EMAIL,t_("Email")).Edit(ces3);
+	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4);
+	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(cmbtn);//.SetConvert(dg_contact);
+	//Customer.Grid.AddColumn("test").Edit(cmbtn);
+
+	cmbtn.AddButton().SetLabel("...");
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
 	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
@@ -116,7 +120,7 @@ void PikaCRM::LoadCustomer()
 	{
 		while(SQL.Fetch())
 		{
-			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
+			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE],6,"lololo\npopopo\nuiuiui");
 			//GridCustomer(0)=SQL[0];
 			//GridCustomer(C_TITLE)=SQL[C_TITLE];
 		}
@@ -149,7 +153,11 @@ void PikaCRM::InsertCustomer()
 	Customer.Grid.AddColumn(C_EMAIL,"Email").Edit(ces3);
 	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
 	*/
-	
+	/*String yyy;
+				for(int i = 0; i < ttt.GetCount(); i++)
+				if(ttt.IsSel(i))
+					yyy = yyy+String(ttt[i])+", ";
+	*/
 	try
 	{
 		SQL & Insert(CUSTOMER)
@@ -264,6 +272,18 @@ void PikaCRM::RemoveContact()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
+void PikaCRM::Update_dg_contact()
+{
+	/*dg_contact.Clear();
+	SQL & Select(CO_ID, CO_NAME)
+		.From(CONTACT)
+		.Where(IsNull(C_ID));
+
+	while(SQL.Fetch())
+		dg_contact.Add(SQL[C_ID], SQL[CO_NAME]);//C_ID: "CO_NAME1\nCO_NAME2\nCO_NAME3...
+	*/
+	//dg_contact.SetEditable(false);
+}
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -360,6 +380,7 @@ void PikaCRM::OpenMainFrom()
 	
 	LoadCustomer();//test
 	LoadContact();
+	Update_dg_contact();
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {

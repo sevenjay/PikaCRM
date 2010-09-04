@@ -4,7 +4,8 @@ uses
 	plugin/sqlite3,
 	SplashSV,
 	SystemLog,
-	GridCtrl;
+	GridCtrl,
+	DropGrid;
 
 file
 	sql/sql.ids,

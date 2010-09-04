@@ -6,4 +6,5 @@
 #include "SplashSV/init"
 #include "SystemLog/init"
 #include "GridCtrl/init"
+#include "DropGrid/init"
 #endif
