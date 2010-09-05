@@ -93,8 +93,8 @@ private :
 	//Customer.Grid
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;
-	MultiButton cmbtn;
-	VectorMap< int, VectorMap<int, String> > cco_id_map;
+	MultiButton mCustomerGridContactBtn;
+	VectorMap< int, VectorMap<int, String> > mCustomerContactIdMap;
 
 	//DropGrid dg_contact;
 	//ColumnList ttt;
@@ -163,6 +163,7 @@ public:
 	void   OpenMainFrom();
 	
 	//interactive with GUI==============================================================
+	void   CustomerGridContactBtnClick();
 };
 
 #endif

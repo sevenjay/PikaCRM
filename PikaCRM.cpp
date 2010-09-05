@@ -62,8 +62,8 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(C_ADDRESS,t_("Address")).Edit(ces2);
 	Customer.Grid.AddColumn(C_EMAIL,t_("Email")).Edit(ces3);
 	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4);
-	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(cmbtn);//.SetConvert(dg_contact);
-		cmbtn.AddButton().SetLabel("...").WhenPush=THISBACK(test);
+	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(dg_contact);
+		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
 	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
@@ -119,16 +119,14 @@ void PikaCRM::LoadCustomer()
 		while(SQL.Fetch())
 		{
 			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
-			//GridCustomer(0)=SQL[0];
-			//GridCustomer(C_TITLE)=SQL[C_TITLE];
+			
 			String all_name;
 			Sql sql2;
+			VectorMap<int, String> &temp = mCustomerContactIdMap.Add(SQL[C_ID]);
 			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
 			while(sql2.Fetch())
 			{
-				VectorMap<int, String> temp;
 				temp.Add(sql2[CO_ID], sql2[CO_NAME]);
-				cco_id_map.Add(SQL[C_ID],temp);
 				String one_name(sql2[CO_NAME]);
 				all_name+=one_name+"\n";
 			}
@@ -167,11 +165,7 @@ void PikaCRM::InsertCustomer()
 	Customer.Grid.AddColumn(C_EMAIL,"Email").Edit(ces3);
 	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
 	*/
-	/*String yyy;
-				for(int i = 0; i < ttt.GetCount(); i++)
-				if(ttt.IsSel(i))
-					yyy = yyy+String(ttt[i])+", ";
-	*/
+
 	try
 	{
 		SQL & Insert(CUSTOMER)
@@ -635,7 +629,85 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================
+void PikaCRM::CustomerGridContactBtnClick()
+{
+	TopWindow d;
+	Button ok, cancel;
 
+    d.SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+	ok.Ok() <<= d.Acceptor(IDOK);
+	cancel.Cancel() <<= d.Rejector(IDCANCEL);
+	
+	ColumnList list;
+	d.Add(list);
+	list.SetRect(0, 0, 400, 325);
+	list.Columns(3);
+	list.MultiSelect();
+
+	//Customer.Grid.AddIndex(C_ID);
+	int tet = Customer.Grid.GetCurrentRow();
+	int fff = Customer.Grid.Get(tet,C_ID);
+	for(int i = 0; i < 500; i++)
+			list.Add(AsString(i));
+	
+	VectorMap<int, String> & temp=mCustomerContactIdMap.Get(fff);
+	
+	int cc=temp.GetCount();
+	for(int i = 0; i < temp.GetCount(); i++)
+	{
+		int x=temp.GetKey(i);
+		list.Add(x,temp.Get(x),true);
+	}
+	/*
+		if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
+			
+			String all_name;
+			Sql sql2;
+			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
+			while(sql2.Fetch())
+			{
+				VectorMap<int, String> temp;
+				temp.Add(sql2[CO_ID], sql2[CO_NAME]);
+				mCustomerContactIdMap.Add(SQL[C_ID],temp);
+				String one_name(sql2[CO_NAME]);
+				all_name+=one_name+"\n";
+			}
+			if(all_name.GetLength()>0)
+			{
+				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+				Customer.Grid(CO_NAME)=all_name;
+			}
+		}
+	}
+	
+	
+	*/
+	
+	if(d.Run()==IDOK) {
+
+	/*String yyy;
+				for(int i = 0; i < ttt.GetCount(); i++)
+				if(ttt.IsSel(i))
+					yyy = yyy+String(ttt[i])+", ";
+	*/
+    }
+	
+	/*
+	CtrlLayoutOKCancel(d, t_("Puzzle setup"));
+	
+	if(d.Run() == IDOK) {
+
+	}
+	*/
+	//if(PromptOKCancel("Exit MyApp?"))
+	//	test();
+}
 
 
 //end interactive with GUI==========================================================
