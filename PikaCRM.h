@@ -94,6 +94,8 @@ private :
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;
 	MultiButton cmbtn;
+	VectorMap< int, VectorMap<int, String> > cco_id_map;
+
 	//DropGrid dg_contact;
 	//ColumnList ttt;
 	//Contact.Grid
