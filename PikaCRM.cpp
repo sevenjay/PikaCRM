@@ -629,6 +629,29 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================
+/*void ColumnList::GetItemStyle(int i, Color& ink, Color& paper, dword& style)
+{
+	ink = SColorText;
+	paper = SColorPaper;
+	const Item& m = item[i];
+	style = 0;
+	if(i == cursor) {
+		style = item[i].sel ? Display::CURSOR : Display::CURSOR|Display::SELECT;
+		paper = item[i].sel ? Blend(SColorHighlight, SColorFace) : SColorFace;
+		if(HasFocus()) {
+			style |= Display::FOCUS;
+			paper = item[i].sel ? Blend(SColorHighlight, SColorPaper) : SColorHighlight;
+			ink = SColorPaper;
+		}
+	}
+	if(m.sel) {
+		style |= Display::SELECT;
+		paper = SColorShadow;
+		if(HasFocus())
+			style |= Display::FOCUS;
+	}
+}*/
+
 void PikaCRM::CustomerGridContactBtnClick()
 {
 	TopWindow d;
@@ -645,12 +668,11 @@ void PikaCRM::CustomerGridContactBtnClick()
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);
 	list.MultiSelect();
-
-	//Customer.Grid.AddIndex(C_ID);
-	int tet = Customer.Grid.GetCurrentRow();
-	int fff = Customer.Grid.Get(tet,C_ID);
-	for(int i = 0; i < 500; i++)
+		for(int i = 0; i < 500; i++)
 			list.Add(AsString(i));
+	//Customer.Grid.AddIndex(C_ID);
+	//int tet = Customer.Grid.GetCurrentRow();
+	int fff = Customer.Grid.Get(C_ID);//get C_ID value of the row
 	
 	VectorMap<int, String> & temp=mCustomerContactIdMap.Get(fff);
 	
@@ -659,6 +681,10 @@ void PikaCRM::CustomerGridContactBtnClick()
 	{
 		int x=temp.GetKey(i);
 		list.Add(x,temp.Get(x),true);
+		
+		int y=list.Find(x);//use key find index
+		list.SelectOne(y,true);
+		list.SetCursor(y);
 	}
 	/*
 		if(is_sql_ok)
@@ -689,16 +715,36 @@ void PikaCRM::CustomerGridContactBtnClick()
 	
 	*/
 	
+	String all_name;
 	if(d.Run()==IDOK) {
-
-	/*String yyy;
-				for(int i = 0; i < ttt.GetCount(); i++)
-				if(ttt.IsSel(i))
-					yyy = yyy+String(ttt[i])+", ";
-	*/
+		for(int i = 0; i < list.GetCount(); i++)
+		{
+			if(list.IsSel(i))
+			{
+				String one_name=String(list.GetValue(i));
+				all_name+=one_name+"\n";
+			}
+		}
+		if(all_name.GetLength()>0)
+		{
+			all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+			Customer.Grid.Set(CO_NAME,all_name);
+		}
     }
-	
+    
+    
+    
 	/*
+	
+					all_name+=one_name+"\n";
+			}
+			if(all_name.GetLength()>0)
+			{
+				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+				Customer.Grid(CO_NAME)=all_name;
+			}
+	
+	
 	CtrlLayoutOKCancel(d, t_("Puzzle setup"));
 	
 	if(d.Run() == IDOK) {
@@ -706,7 +752,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 	}
 	*/
 	//if(PromptOKCancel("Exit MyApp?"))
-	//	test();
+		test();
 }
 
 
