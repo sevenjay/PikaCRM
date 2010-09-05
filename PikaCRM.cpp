@@ -683,8 +683,8 @@ void PikaCRM::CustomerGridContactBtnClick()
 		list.Add(x,temp.Get(x),true);
 		
 		int y=list.Find(x);//use key find index
+		if(0==i) list.SetCursor(y);///@important must set cursor once and first, or it will clear all selected
 		list.SelectOne(y,true);
-		list.SetCursor(y);
 	}
 	/*
 		if(is_sql_ok)
