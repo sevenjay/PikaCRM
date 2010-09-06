@@ -70,7 +70,7 @@ void PikaCRM::SetupUI()
 	//Customer.Grid.GetDisplay().SetTheme(2);
 	//Customer.Grid.WhenCreateRow = THISBACK(test);
 	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
-	Customer.Grid.WhenDuplicateRow=THISBACK(InsertCustomer);
+	Customer.Grid.WhenDuplicateRow=THISBACK(DuplicateCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
 	Customer.Grid.SetToolBar();
@@ -160,14 +160,6 @@ void PikaCRM::LoadCustomer()
 }
 void PikaCRM::InsertCustomer()
 {
-	/*
-		Customer.Grid.AddColumn(C_TITLE,"Title").Edit(cesn);
-	Customer.Grid.AddColumn(C_PHONE,"Phone").Edit(ces1);
-	Customer.Grid.AddColumn(C_ADDRESS,"Address").Edit(ces2);
-	Customer.Grid.AddColumn(C_EMAIL,"Email").Edit(ces3);
-	Customer.Grid.AddColumn(C_WEBSITE,"Web site").Edit(ces4);
-	*/
-
 	try
 	{
 		SQL & Insert(CUSTOMER)
@@ -206,6 +198,11 @@ void PikaCRM::InsertCustomer()
 		Customer.Grid.CancelInsert();
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
+}
+void PikaCRM::DuplicateCustomer()
+{
+	Customer.Grid(CO_NAME)="";
+	InsertCustomer();
 }
 void PikaCRM::UpdateCustomer()
 {
