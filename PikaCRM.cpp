@@ -65,7 +65,7 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4);
 	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(dg_contact);
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
-	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
+	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows().Searching();
 	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
 	//Customer.Grid.WhenCreateRow = THISBACK(test);
@@ -678,7 +678,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
-	ColumnList list;
+	ColumnListAlwaysCTRL list;
 	d.Add(list);
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);

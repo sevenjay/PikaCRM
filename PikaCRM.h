@@ -74,7 +74,18 @@ struct Config {
 	}
 
 };
-
+class ColumnListAlwaysCTRL : public ColumnList {
+public:
+	virtual void  LeftDown(Point p, dword keyflags) {
+		keyflags = keyflags|K_CTRL;
+		ColumnList::LeftDown(p, keyflags);
+	};
+	virtual void  LeftUp(Point p, dword keyflags) {
+		keyflags = keyflags|K_CTRL;
+		ColumnList::LeftUp(p, keyflags);
+	};
+	
+};
 
 class PikaCRM
 {
