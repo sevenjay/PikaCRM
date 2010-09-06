@@ -629,31 +629,9 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================
-/*void ColumnList::GetItemStyle(int i, Color& ink, Color& paper, dword& style)
-{
-	ink = SColorText;
-	paper = SColorPaper;
-	const Item& m = item[i];
-	style = 0;
-	if(i == cursor) {
-		style = item[i].sel ? Display::CURSOR : Display::CURSOR|Display::SELECT;
-		paper = item[i].sel ? Blend(SColorHighlight, SColorFace) : SColorFace;
-		if(HasFocus()) {
-			style |= Display::FOCUS;
-			paper = item[i].sel ? Blend(SColorHighlight, SColorPaper) : SColorHighlight;
-			ink = SColorPaper;
-		}
-	}
-	if(m.sel) {
-		style |= Display::SELECT;
-		paper = SColorShadow;
-		if(HasFocus())
-			style |= Display::FOCUS;
-	}
-}*/
-
 void PikaCRM::CustomerGridContactBtnClick()
 {
+	//UI--------------------------------------------
 	TopWindow d;
 	Button ok, cancel;
 
@@ -668,61 +646,68 @@ void PikaCRM::CustomerGridContactBtnClick()
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);
 	list.MultiSelect();
-		for(int i = 0; i < 500; i++)
-			list.Add(AsString(i));
-	//Customer.Grid.AddIndex(C_ID);
-	//int tet = Customer.Grid.GetCurrentRow();
-	int fff = Customer.Grid.Get(C_ID);//get C_ID value of the row
+	//end UI--------------------------------------------
+	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the row
 	
-	VectorMap<int, String> & temp=mCustomerContactIdMap.Get(fff);
+	VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
 	
-	int cc=temp.GetCount();
-	for(int i = 0; i < temp.GetCount(); i++)
+	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
 	{
-		int x=temp.GetKey(i);
-		list.Add(x,temp.Get(x),true);
+		int contact_id=contact_map.GetKey(i);
+		list.Add(contact_id, contact_map.Get(contact_id), true);
 		
-		int y=list.Find(x);//use key find index
-		if(0==i) list.SetCursor(y);///@important must set cursor once and first, or it will clear all selected
-		list.SelectOne(y,true);
-	}
-	/*
-		if(is_sql_ok)
-	{
-		while(SQL.Fetch())
-		{
-			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
-			
-			String all_name;
-			Sql sql2;
-			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
-			while(sql2.Fetch())
-			{
-				VectorMap<int, String> temp;
-				temp.Add(sql2[CO_ID], sql2[CO_NAME]);
-				mCustomerContactIdMap.Add(SQL[C_ID],temp);
-				String one_name(sql2[CO_NAME]);
-				all_name+=one_name+"\n";
-			}
-			if(all_name.GetLength()>0)
-			{
-				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-				Customer.Grid(CO_NAME)=all_name;
-			}
-		}
+		int list_index=list.Find(contact_id);//use key find index
+		if(0==i) list.SetCursor(list_index);///@important must set cursor once and first, or it will clear all selected
+		list.SelectOne(list_index,true);
 	}
 	
+	//add no costomer contact to select
+	SQL & Select(CO_ID, CO_NAME).From(CONTACT).Where(IsNull(C_ID));
+	while(SQL.Fetch())
+		list.Add(SQL[CO_ID], SQL[CO_NAME]);
 	
-	*/
 	
 	String all_name;
 	if(d.Run()==IDOK) {
+		///@remark just clear costomer in contact, this will be a performance issue
+		for(int i = 0; i < contact_map.GetCount(); i++)
+		{
+			int contact_id=contact_map.GetKey(i);
+			
+			try
+			{
+				//SQL & ::Update(CONTACT) (C_ID, NULL).Where(CO_ID == contact_id);//fail, NULL will be 0
+				SQL.Execute("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+			}
+			catch(SqlExc &e)
+			{
+				continue;
+				Exclamation("[* " + DeQtfLf(e) + "]");
+			}			
+		}
+		contact_map.Clear();
+		
 		for(int i = 0; i < list.GetCount(); i++)
 		{
 			if(list.IsSel(i))
 			{
+				//update in the database
+				try
+				{
+					SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == list.Get(i));
+				}
+				catch(SqlExc &e)
+				{
+					continue;//Contact.Grid.CancelUpdate();
+					Exclamation("[* " + DeQtfLf(e) + "]");
+				}
+				
+				//show on the grid
 				String one_name=String(list.GetValue(i));
 				all_name+=one_name+"\n";
+				
+				//record in the map
+				contact_map.Add(list.Get(i),list.GetValue(i));///@note if list i has no key, it will assert fail
 			}
 		}
 		if(all_name.GetLength()>0)
@@ -731,28 +716,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 			Customer.Grid.Set(CO_NAME,all_name);
 		}
     }
-    
-    
-    
-	/*
-	
-					all_name+=one_name+"\n";
-			}
-			if(all_name.GetLength()>0)
-			{
-				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-				Customer.Grid(CO_NAME)=all_name;
-			}
-	
-	
-	CtrlLayoutOKCancel(d, t_("Puzzle setup"));
-	
-	if(d.Run() == IDOK) {
-
-	}
-	*/
-	//if(PromptOKCancel("Exit MyApp?"))
-		test();
 }
 
 
