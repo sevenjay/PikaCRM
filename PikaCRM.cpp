@@ -669,8 +669,9 @@ void PikaCRM::CustomerGridContactBtnClick()
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);
 	list.MultiSelect();
+	list.Add(-1,t_("No Contact"),true);
 	//end UI--------------------------------------------
-	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the row
+	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
 	
 	VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
 	
@@ -687,7 +688,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 	//add no costomer contact to select
 	SQL & Select(CO_ID, CO_NAME).From(CONTACT).Where(IsNull(C_ID));
 	while(SQL.Fetch())
-		list.Add(SQL[CO_ID], SQL[CO_NAME]);
+		list.Add(SQL[CO_ID], SQL[CO_NAME],true);
 	
 	
 	String all_name;
@@ -714,10 +715,12 @@ void PikaCRM::CustomerGridContactBtnClick()
 		{
 			if(list.IsSel(i))
 			{
+				int contact_id=list.Get(i);
+				if(-1==contact_id) break;
 				//update in the database
 				try
 				{
-					SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == list.Get(i));
+					SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == contact_id);
 				}
 				catch(SqlExc &e)
 				{
@@ -730,13 +733,17 @@ void PikaCRM::CustomerGridContactBtnClick()
 				all_name+=one_name+"\n";
 				
 				//record in the map
-				contact_map.Add(list.Get(i),list.GetValue(i));///@note if list i has no key, it will assert fail
+				contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
 			}
 		}
 		if(all_name.GetLength()>0)
 		{
 			all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
 			Customer.Grid.Set(CO_NAME,all_name);
+		}
+		else
+		{
+			Customer.Grid.Set(CO_NAME, "");
 		}
     }
 }
