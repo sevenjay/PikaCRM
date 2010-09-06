@@ -81,10 +81,10 @@ void PikaCRM::SetupUI()
 	Contact.btnDelete <<= callback(&(Contact.Grid),&GridCtrl::DoRemove);
 	
 	Contact.Grid.AddIndex(CO_ID);
-	Contact.Grid.AddColumn(CO_NAME,"Title").Edit(coesn);
-	Contact.Grid.AddColumn(CO_PHONE,"Phone").Edit(coes1);
-	Contact.Grid.AddColumn(CO_ADDRESS,"Address").Edit(coes2);
-	Contact.Grid.AddColumn(CO_EMAIL,"Email").Edit(coes3);
+	Contact.Grid.AddColumn(CO_NAME,t_("Name_")).Edit(coesn);
+	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1);
+	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2);
+	Contact.Grid.AddColumn(CO_EMAIL,t_("Email")).Edit(coes3);
 	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
 	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
 	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
@@ -224,16 +224,33 @@ void PikaCRM::UpdateCustomer()
 }
 void PikaCRM::RemoveCustomer()
 {
+	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row	
+	VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
 	try
 	{
 		SQL & Delete(CUSTOMER).Where(C_ID == Customer.Grid(C_ID));
+		///@remark just clear costomer in contact, this will be a performance issue
+		for(int i = 0; i < contact_map.GetCount(); i++)
+		{
+			int contact_id=contact_map.GetKey(i);
+			
+			try
+			{
+				SQL.Execute("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+			}
+			catch(SqlExc &e)
+			{
+				continue;
+				Exclamation("[* " + DeQtfLf(e) + "]");
+			}			
+		}
+		mCustomerContactIdMap.RemoveKey(costomer_id);
 	}
 	catch(SqlExc &e)
 	{
 		Customer.Grid.CancelRemove();
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
-	mCustomerContactIdMap.RemoveKey(Customer.Grid(C_ID));
 }
 
 void PikaCRM::LoadContact()
