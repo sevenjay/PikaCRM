@@ -39,7 +39,7 @@ void PikaCRM::SetupUI()
 	//TabCtrl----------------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
-	MainFrom.tabMain.Add(Customer.SizePos(), t_("Costomers"));
+	MainFrom.tabMain.Add(Customer.SizePos(), t_("Customers"));
 	CtrlLayout(Contact);
 	MainFrom.tabMain.Add(Contact.SizePos(), t_("Contacts"));
 	CtrlLayout(Event);
@@ -82,6 +82,7 @@ void PikaCRM::SetupUI()
 	
 	Contact.Grid.AddIndex(CO_ID);
 	Contact.Grid.AddColumn(CO_NAME,t_("Name_")).Edit(coesn);
+	Contact.Grid.AddColumn(C_TITLE,t_("Customer"));
 	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1);
 	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2);
 	Contact.Grid.AddColumn(CO_EMAIL,t_("Email")).Edit(coes3);
@@ -173,7 +174,7 @@ void PikaCRM::InsertCustomer()
 		
 		//database change C_ID -1(default) to now
 		VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(-1);	
-		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
+		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to customer
 		{
 			int contact_id=contact_map.GetKey(i);
 				try
@@ -229,7 +230,7 @@ void PikaCRM::RemoveCustomer()
 	try
 	{
 		SQL & Delete(CUSTOMER).Where(C_ID == Customer.Grid(C_ID));
-		///@remark just clear costomer in contact, this will be a performance issue
+		///@remark just clear customer in contact, this will be a performance issue
 		for(int i = 0; i < contact_map.GetCount(); i++)
 		{
 			int contact_id=contact_map.GetKey(i);
@@ -254,15 +255,14 @@ void PikaCRM::RemoveCustomer()
 }
 
 void PikaCRM::LoadContact()
-{
-	
+{	
 	Contact.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select * from Contact;");
+	bool is_sql_ok=SQL.Execute("select co_id, c_title, co_name, co_phone, co_address, co_email from Contact left outer join Customer on Contact.c_id = Customer.c_id;");
 	if(is_sql_ok)
 	{
 		while(SQL.Fetch())
 		{
-			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
+			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[C_TITLE],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
 		}
 	}
 	else
