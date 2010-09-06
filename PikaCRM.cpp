@@ -179,10 +179,27 @@ void PikaCRM::InsertCustomer()
 
 		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
 		
-		//database change C_ID -1 to now
-		//set C_ID -1 data to now//mCustomerContactIdMap.Add(Customer.Grid(C_ID));
-		//add C_ID -1
+		//database change C_ID -1(default) to now
+		VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(-1);	
+		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
+		{
+			int contact_id=contact_map.GetKey(i);
+				try
+				{
+					SQL & ::Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);
+				}
+				catch(SqlExc &e)
+				{
+					continue;//Contact.Grid.CancelUpdate();
+					Exclamation("[* " + DeQtfLf(e) + "]");
+				}
+		}		
 		
+		//set mCustomerContactIdMap's key -1 to now//mCustomerContactIdMap.Add(Customer.Grid(C_ID));
+		mCustomerContactIdMap.SetKey(mCustomerContactIdMap.Find(-1),Customer.Grid(C_ID));
+		
+		//add C_ID -1(default) for creat row before insert
+		mCustomerContactIdMap.Add(-1);		
 	}
 	catch(SqlExc &e)
 	{
