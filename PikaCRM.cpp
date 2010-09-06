@@ -56,7 +56,8 @@ void PikaCRM::SetupUI()
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 
-	Customer.Grid.AddIndex(C_ID);
+	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
+		mCustomerContactIdMap.Add(-1);
 	Customer.Grid.AddColumn(C_TITLE,t_("Title")).Edit(cesn);
 	Customer.Grid.AddColumn(C_PHONE,t_("Phone")).Edit(ces1);
 	Customer.Grid.AddColumn(C_ADDRESS,t_("Address")).Edit(ces2);
@@ -67,6 +68,7 @@ void PikaCRM::SetupUI()
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
 	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
+	//Customer.Grid.WhenCreateRow = THISBACK(test);
 	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
 	Customer.Grid.WhenDuplicateRow=THISBACK(InsertCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
@@ -176,8 +178,11 @@ void PikaCRM::InsertCustomer()
 			(C_WEBSITE,Customer.Grid(C_WEBSITE));
 
 		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
-
-		//UpdateSummary();
+		
+		//database change C_ID -1 to now
+		//set C_ID -1 data to now//mCustomerContactIdMap.Add(Customer.Grid(C_ID));
+		//add C_ID -1
+		
 	}
 	catch(SqlExc &e)
 	{
@@ -214,6 +219,7 @@ void PikaCRM::RemoveCustomer()
 		Customer.Grid.CancelRemove();
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
+	mCustomerContactIdMap.RemoveKey(Customer.Grid(C_ID));
 }
 
 void PikaCRM::LoadContact()
