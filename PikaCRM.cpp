@@ -65,11 +65,12 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4);
 	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(dg_contact);
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
-	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows().Searching();
-	//Customer.Grid.RejectNullRow();.Accepting().Clipboard()//.Absolute() for horizontal scroll
+	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows().Searching();
+	//Customer.Grid.RejectNullRow();.Duplicating().Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
 	//Customer.Grid.WhenCreateRow = THISBACK(test);
 	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
+	Customer.Grid.WhenCancelNewRow = THISBACK(test);///@todo cancel and clear contact with customer_id -1
 	Customer.Grid.WhenDuplicateRow=THISBACK(DuplicateCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
@@ -86,7 +87,7 @@ void PikaCRM::SetupUI()
 	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1);
 	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2);
 	Contact.Grid.AddColumn(CO_EMAIL,t_("Email")).Edit(coes3);
-	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().Duplicating().ColorRows();
+	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows().Searching();
 	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
 	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
@@ -200,7 +201,7 @@ void PikaCRM::InsertCustomer()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
-void PikaCRM::DuplicateCustomer()
+void PikaCRM::DuplicateCustomer()///@note not use, because not support multiselect duplicate
 {
 	Customer.Grid(CO_NAME)="";
 	InsertCustomer();
@@ -668,6 +669,11 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 //interactive with GUI==============================================================
 void PikaCRM::CustomerGridContactBtnClick()
 {
+	if(Customer.Grid(C_TITLE).ToString().IsEmpty())
+	{
+		Exclamation(t_("You must input Customer Title first!"));
+		return;
+	}
 	//UI--------------------------------------------
 	TopWindow d;
 	Button ok, cancel;
@@ -715,6 +721,10 @@ void PikaCRM::CustomerGridContactBtnClick()
 			{
 				//SQL & ::Update(CONTACT) (C_ID, NULL).Where(CO_ID == contact_id);//fail, NULL will be 0
 				SQL.Execute("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+				
+				//clear Contact.Grid(C_TITLE);
+				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+				Contact.Grid.Set(contact_row,C_TITLE,"");
 			}
 			catch(SqlExc &e)
 			{
@@ -746,6 +756,10 @@ void PikaCRM::CustomerGridContactBtnClick()
 				
 				//record in the map
 				contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
+				
+				//update Contact.Grid(C_TITLE);
+				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
 			}
 		}
 		if(all_name.GetLength()>0)
