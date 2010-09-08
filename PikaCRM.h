@@ -85,6 +85,12 @@ public:
 		ColumnList::LeftUp(p, keyflags);
 	};
 	
+	void GotFocus()	{
+	//if(cursor < 0 && GetCount())
+		//SetCursor(GetSbPos());
+		Refresh();
+		//SyncInfo();
+	}
 };
 
 class PikaCRM

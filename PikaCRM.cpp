@@ -683,7 +683,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);
 	list.MultiSelect();
-	list.Add(-1,t_("No Contact"),true);
 	//end UI--------------------------------------------
 	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
 	
@@ -730,7 +729,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 			if(list.IsSel(i))
 			{
 				int contact_id=list.Get(i);
-				if(-1==contact_id) break;
 				//update in the database
 				try
 				{
