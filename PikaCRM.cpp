@@ -83,6 +83,7 @@ void PikaCRM::SetupUI()
 	
 	Contact.Grid.AddIndex(CO_ID);
 	Contact.Grid.AddColumn(CO_NAME,t_("Name_")).Edit(coesn);
+	Contact.Grid.AddIndex(C_ID);
 	Contact.Grid.AddColumn(C_TITLE,t_("Customer"));
 	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1);
 	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2);
@@ -250,6 +251,7 @@ void PikaCRM::RemoveCustomer()
 				//clear Contact.Grid(C_TITLE);
 				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 				Contact.Grid.Set(contact_row,C_TITLE,"");
+				Contact.Grid.Set(contact_row,C_ID,NULL);
 			}
 			catch(SqlExc &e)
 			{
@@ -269,12 +271,12 @@ void PikaCRM::RemoveCustomer()
 void PikaCRM::LoadContact()
 {	
 	Contact.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select co_id, c_title, co_name, co_phone, co_address, co_email from Contact left outer join Customer on Contact.c_id = Customer.c_id;");
+	bool is_sql_ok=SQL.Execute("select co_id, Contact.c_id, c_title, co_name, co_phone, co_address, co_email from Contact left outer join Customer on Contact.c_id = Customer.c_id;");
 	if(is_sql_ok)
 	{
 		while(SQL.Fetch())
 		{
-			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[C_TITLE],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
+			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[C_ID],SQL[C_TITLE],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL]);
 		}
 	}
 	else
@@ -322,6 +324,54 @@ void PikaCRM::RemoveContact()
 	try
 	{
 		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
+		//UpdateCustomerContact(Contact.Grid(CO_ID));
+		int customer_id=Contact.Grid(C_ID);
+		VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(Contact.Grid(C_ID));
+		contact_map.RemoveKey(Contact.Grid(CO_ID));
+		//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
+		String all_name;
+		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
+		{
+			int contact_id=contact_map.GetKey(i);
+			
+				String one_name(contact_map.Get(contact_id));
+				all_name+=one_name+"\n";
+		}
+		int row=Customer.Grid.Find(customer_id,C_ID);
+		if(all_name.GetLength()>0)
+		{
+				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+				Customer.Grid.Set(row,CO_NAME,all_name);
+		}
+		else
+		{
+			Customer.Grid.Set(row,CO_NAME,"");
+		}
+		/*
+		while(SQL.Fetch())
+		{
+			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
+			
+			String all_name;
+			Sql sql2;
+			VectorMap<int, String> &temp = mCustomerContactIdMap.Add(SQL[C_ID]);
+			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
+			while(sql2.Fetch())
+			{
+				temp.Add(sql2[CO_ID], sql2[CO_NAME]);
+				String one_name(sql2[CO_NAME]);
+				all_name+=one_name+"\n";
+			}
+			if(all_name.GetLength()>0)
+			{
+				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+				Customer.Grid(CO_NAME)=all_name;
+			}
+		}
+		*/
+		
+		
+		
 	}
 	catch(SqlExc &e)
 	{
@@ -736,6 +786,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 				//clear Contact.Grid(C_TITLE);
 				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 				Contact.Grid.Set(contact_row,C_TITLE,"");
+				Contact.Grid.Set(contact_row,C_ID,NULL);
 			}
 			catch(SqlExc &e)
 			{
@@ -771,6 +822,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 				//update Contact.Grid(C_TITLE);
 				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
+				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
 			}
 		}
 		if(all_name.GetLength()>0)
