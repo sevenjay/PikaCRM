@@ -217,6 +217,14 @@ void PikaCRM::UpdateCustomer()
 			(C_EMAIL,  Customer.Grid(C_EMAIL))
 			(C_WEBSITE,Customer.Grid(C_WEBSITE))
 			.Where(C_ID == Customer.Grid(C_ID));
+		//update Contact.Grid(C_TITLE)	
+		VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(Customer.Grid(C_ID));
+		for(int i = 0; i < contact_map.GetCount(); i++)
+		{
+			int contact_id=contact_map.GetKey(i);
+			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+			Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
+		}
 	}
 	catch(SqlExc &e)
 	{
@@ -239,6 +247,9 @@ void PikaCRM::RemoveCustomer()
 			try
 			{
 				SQL.Execute("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+				//clear Contact.Grid(C_TITLE);
+				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+				Contact.Grid.Set(contact_row,C_TITLE,"");
 			}
 			catch(SqlExc &e)
 			{
