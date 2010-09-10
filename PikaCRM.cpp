@@ -12,6 +12,31 @@
 
 #include <PikaCRM/sql/sql.ids>	//for convenient use tables/columns name
 
+struct ConvContactNames : Convert
+{
+	Value Format(const Value &q) const
+	{
+		//VectorMap<int, String> qq;
+		//const Value v=RawToValue(qq);
+		//Value vv=q;
+		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(q);
+		String all_name;
+		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
+		{
+			int contact_id=contact_map.GetKey(i);
+			String one_name(contact_map.Get(contact_id));
+			all_name+=one_name+"\n";
+		}
+		
+		if(all_name.GetLength()>0)
+		{
+			all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+		}
+		
+		return all_name;
+	}
+};
+
 PikaCRM::PikaCRM()
 {
 	mLanguage=LNG_('Z','H','T','W');
@@ -63,8 +88,10 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(C_ADDRESS,t_("Address")).Edit(ces2);
 	Customer.Grid.AddColumn(C_EMAIL,t_("Email")).Edit(ces3);
 	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4);
-	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(dg_contact);
+	///@important when SetConvert(), it will Convert when you add, so must add the type like RawToValue(temp) in LoadCustomer()
+	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(Single<ConvContactNames>());
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
+	Customer.Grid.AddIndex(CONTACTS_MAP);
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows().Searching();
 	//Customer.Grid.RejectNullRow();.Duplicating().Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
@@ -123,23 +150,25 @@ void PikaCRM::LoadCustomer()
 	{
 		while(SQL.Fetch())
 		{
-			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);
-			
+			//-VectorMap<int, String> &temp = mCustomerContactIdMap.Add(SQL[C_ID]);
+			VectorMap<int, String> temp_contact_map;
 			String all_name;
 			Sql sql2;
-			VectorMap<int, String> &temp = mCustomerContactIdMap.Add(SQL[C_ID]);
 			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
 			while(sql2.Fetch())
 			{
-				temp.Add(sql2[CO_ID], sql2[CO_NAME]);
-				String one_name(sql2[CO_NAME]);
-				all_name+=one_name+"\n";
+				temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
+				//String one_name(sql2[CO_NAME]);
+				//all_name+=one_name+"\n";
 			}
-			if(all_name.GetLength()>0)
-			{
-				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-				Customer.Grid(CO_NAME)=all_name;
-			}
+			//if(all_name.GetLength()>0)
+			//{
+			//	all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+				//Customer.Grid(CO_NAME)==RawToValue(temp);
+			//}
+			const Value & raw_map = RawDeepToValue(temp_contact_map);
+			all_name = ConvContactNames().Format(raw_map);
+			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE],all_name,raw_map);
 		}
 	}
 	else
@@ -753,7 +782,10 @@ void PikaCRM::CustomerGridContactBtnClick()
 	//end UI--------------------------------------------
 	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
 	
-	VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
+	//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
+	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid.Get(CO_NAME));
+	VectorMap<int, String> new_contact_map;
+	//VectorMap<int, String> ff(contact_map);
 	
 	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
 	{
@@ -773,6 +805,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 	
 	String all_name;
 	if(d.Run()==IDOK) {
+		
 		///@remark just clear costomer in contact, this will be a performance issue
 		for(int i = 0; i < contact_map.GetCount(); i++)
 		{
@@ -794,7 +827,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 				Exclamation("[* " + DeQtfLf(e) + "]");
 			}			
 		}
-		contact_map.Clear();
+		//contact_map.Clear();
 		
 		for(int i = 0; i < list.GetCount(); i++)
 		{
@@ -812,12 +845,12 @@ void PikaCRM::CustomerGridContactBtnClick()
 					Exclamation("[* " + DeQtfLf(e) + "]");
 				}
 				
-				//show on the grid
-				String one_name=String(list.GetValue(i));
-				all_name+=one_name+"\n";
+				//-show on the grid
+				//-String one_name=String(list.GetValue(i));
+				//-all_name+=one_name+"\n";
 				
 				//record in the map
-				contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
+				new_contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
 				
 				//update Contact.Grid(C_TITLE);
 				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
@@ -825,15 +858,19 @@ void PikaCRM::CustomerGridContactBtnClick()
 				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
 			}
 		}
-		if(all_name.GetLength()>0)
-		{
-			all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-			Customer.Grid.Set(CO_NAME,all_name);
-		}
-		else
-		{
-			Customer.Grid.Set(CO_NAME, "");
-		}
+		//if(all_name.GetLength()>0)
+		//{
+		//	all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
+		//	Customer.Grid.Set(CO_NAME,all_name);
+		//}
+		//else
+		//{
+		//	Customer.Grid.Set(CO_NAME, "");
+		//}
+		Customer.Grid.Set(CO_NAME, RawDeepToValue(new_contact_map));
+		//Customer.Grid(CO_NAME)=RawDeepToValue(new_contact_map);
+		//Customer.Grid.Refresh();
+		//Customer.Grid.Add(99,"ttt","","","","shit",RawDeepToValue(new_contact_map));
     }
 }
 

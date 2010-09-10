@@ -111,6 +111,7 @@ private :
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;
 	MultiButton mCustomerGridContactBtn;
+	Id CONTACTS_MAP;
 	VectorMap< int, VectorMap<int, String> > mCustomerContactIdMap;
 
 	//DropGrid dg_contact;
