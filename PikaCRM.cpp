@@ -16,9 +16,6 @@ struct ConvContactNames : Convert
 {
 	Value Format(const Value &q) const
 	{
-		//VectorMap<int, String> qq;
-		//const Value v=RawToValue(qq);
-		//Value vv=q;
 		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(q);
 		String all_name;
 		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
@@ -150,7 +147,6 @@ void PikaCRM::LoadCustomer()
 	{
 		while(SQL.Fetch())
 		{
-			//-VectorMap<int, String> &temp = mCustomerContactIdMap.Add(SQL[C_ID]);
 			VectorMap<int, String> temp_contact_map;
 			String all_name;
 			Sql sql2;
@@ -158,17 +154,12 @@ void PikaCRM::LoadCustomer()
 			while(sql2.Fetch())
 			{
 				temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
-				//String one_name(sql2[CO_NAME]);
-				//all_name+=one_name+"\n";
 			}
-			//if(all_name.GetLength()>0)
-			//{
-			//	all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-				//Customer.Grid(CO_NAME)==RawToValue(temp);
-			//}
 			const Value & raw_map = RawDeepToValue(temp_contact_map);
-			all_name = ConvContactNames().Format(raw_map);
-			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE],all_name,raw_map);
+			////all_name = ConvContactNames().Format(raw_map);
+			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);//,all_name);
+			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+			Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
 		}
 	}
 	else
@@ -783,11 +774,13 @@ void PikaCRM::CustomerGridContactBtnClick()
 	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
 	
 	//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
-	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid.Get(CO_NAME));
+	//const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid.Get(CO_NAME));
 	VectorMap<int, String> new_contact_map;
+	const Value & vv=RawDeepToValue(new_contact_map);//Customer.Grid.Get(CONTACTS_MAP);
+	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(vv);
 	//VectorMap<int, String> ff(contact_map);
 	
-	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer
+	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer column list
 	{
 		int contact_id=contact_map.GetKey(i);
 		list.Add(contact_id, contact_map.Get(contact_id), true);
@@ -827,7 +820,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 				Exclamation("[* " + DeQtfLf(e) + "]");
 			}			
 		}
-		//contact_map.Clear();
 		
 		for(int i = 0; i < list.GetCount(); i++)
 		{
@@ -867,8 +859,9 @@ void PikaCRM::CustomerGridContactBtnClick()
 		//{
 		//	Customer.Grid.Set(CO_NAME, "");
 		//}
-		Customer.Grid.Set(CO_NAME, RawDeepToValue(new_contact_map));
-		//Customer.Grid(CO_NAME)=RawDeepToValue(new_contact_map);
+		//Customer.Grid.Set(CO_NAME, RawDeepToValue(new_contact_map));
+		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(new_contact_map);
+		Customer.Grid(CO_NAME)=ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));;
 		//Customer.Grid.Refresh();
 		//Customer.Grid.Add(99,"ttt","","","","shit",RawDeepToValue(new_contact_map));
     }
