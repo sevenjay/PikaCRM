@@ -111,10 +111,8 @@ private :
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;
 	MultiButton mCustomerGridContactBtn;
-	VectorMap< int, VectorMap<int, String> > mCustomerContactIdMap;
+	Id CONTACTS_MAP;
 
-	//DropGrid dg_contact;
-	//ColumnList ttt;
 	//Contact.Grid
 	EditStringNotNull coesn;
 	EditString coes1,coes2,coes3;
@@ -138,6 +136,7 @@ private :
 	
 	//database control------------------------------------------------------------
 	void LoadCustomer();
+	void NewCustomer();
 	void InsertCustomer();
 	void DuplicateCustomer();
 	void UpdateCustomer();
