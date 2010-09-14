@@ -94,7 +94,8 @@ void PikaCRM::SetupUI()
 	//Customer.Grid.GetDisplay().SetTheme(2);
 	//Customer.Grid.WhenCreateRow = THISBACK(test);
 	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
-	Customer.Grid.WhenCancelNewRow = THISBACK(test);///@todo cancel and clear contact with customer_id -1
+	Customer.Grid.WhenNewRow = THISBACK(NewCustomer);
+	Customer.Grid.WhenCancelNewRow = THISBACK(test);
 	Customer.Grid.WhenDuplicateRow=THISBACK(DuplicateCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
@@ -180,6 +181,17 @@ void PikaCRM::LoadCustomer()
 		money(DESC) = SQL[DESC];
 	}
 	*/
+}
+void PikaCRM::NewCustomer()
+{
+	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
+	
+	if(-1==costomer_id)//no use in Customer.Grid.AddIndex(CONTACTS_MAP).Default(RawDeepToValue(temp_contact_map));
+	{					//so this is set the same typeid for Value of GridCtrl with RawDeepToValue
+						//to avoid "Invalid value conversion: "
+		VectorMap<int, String> temp_contact_map;
+		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(temp_contact_map);
+	}
 }
 void PikaCRM::InsertCustomer()
 {
@@ -770,13 +782,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 	list.MultiSelect();
 	//end UI--------------------------------------------
 	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
-	
-	if(-1==costomer_id)//no use in Customer.Grid.AddIndex(CONTACTS_MAP).Default(RawDeepToValue(temp_contact_map));
-	{					//so this is set the same typeid for Value of GridCtrl with RawDeepToValue
-						//to avoid "Invalid value conversion: "
-		VectorMap<int, String> temp_contact_map;
-		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(temp_contact_map);
-	}
+
 	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 	
 	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer column list

@@ -139,6 +139,7 @@ private :
 	
 	//database control------------------------------------------------------------
 	void LoadCustomer();
+	void NewCustomer();
 	void InsertCustomer();
 	void DuplicateCustomer();
 	void UpdateCustomer();
