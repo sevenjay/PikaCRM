@@ -239,7 +239,7 @@ void PikaCRM::UpdateCustomer()
 			(C_WEBSITE,Customer.Grid(C_WEBSITE))
 			.Where(C_ID == Customer.Grid(C_ID));
 		//update Contact.Grid(C_TITLE)	
-		VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(Customer.Grid(C_ID));
+		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 		for(int i = 0; i < contact_map.GetCount(); i++)
 		{
 			int contact_id=contact_map.GetKey(i);
@@ -255,8 +255,8 @@ void PikaCRM::UpdateCustomer()
 }
 void PikaCRM::RemoveCustomer()
 {
-	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row	
-	VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
+	//int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row	
+	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 	try
 	{
 		SQL & Delete(CUSTOMER).Where(C_ID == Customer.Grid(C_ID));
@@ -279,7 +279,6 @@ void PikaCRM::RemoveCustomer()
 				Exclamation("[* " + DeQtfLf(e) + "]");
 			}			
 		}
-		mCustomerContactIdMap.RemoveKey(costomer_id);
 	}
 	catch(SqlExc &e)
 	{
