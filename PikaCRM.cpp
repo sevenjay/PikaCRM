@@ -195,7 +195,7 @@ void PikaCRM::InsertCustomer()
 		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
 		
 		//database change C_ID -1(default) to now
-		VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(-1);	
+		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to customer
 		{
 			int contact_id=contact_map.GetKey(i);
@@ -208,13 +208,12 @@ void PikaCRM::InsertCustomer()
 					continue;//Contact.Grid.CancelUpdate();
 					Exclamation("[* " + DeQtfLf(e) + "]");
 				}
-		}		
-		
-		//set mCustomerContactIdMap's key -1 to now//mCustomerContactIdMap.Add(Customer.Grid(C_ID));
-		mCustomerContactIdMap.SetKey(mCustomerContactIdMap.Find(-1),Customer.Grid(C_ID));
-		
-		//add C_ID -1(default) for creat row before insert
-		mCustomerContactIdMap.Add(-1);		
+				
+				//update Contact.Grid(C_TITLE);
+				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
+				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
+		}			
 	}
 	catch(SqlExc &e)
 	{
@@ -749,7 +748,6 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 //interactive with GUI==============================================================
 void PikaCRM::CustomerGridContactBtnClick()
 {
-	Customer.Grid(CO_NAME)="asdadhdfh";
 	if(Customer.Grid(C_TITLE).ToString().IsEmpty())
 	{
 		Exclamation(t_("You must input Customer Title first!"));
@@ -773,7 +771,12 @@ void PikaCRM::CustomerGridContactBtnClick()
 	//end UI--------------------------------------------
 	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
 	
-	//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
+	if(-1==costomer_id)//no use in Customer.Grid.AddIndex(CONTACTS_MAP).Default(RawDeepToValue(temp_contact_map));
+	{					//so this is set the same typeid for Value of GridCtrl with RawDeepToValue
+						//to avoid "Invalid value conversion: "
+		VectorMap<int, String> temp_contact_map;
+		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(temp_contact_map);
+	}
 	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 	
 	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer column list
@@ -823,10 +826,11 @@ void PikaCRM::CustomerGridContactBtnClick()
 			if(list.IsSel(i))
 			{
 				int contact_id=list.Get(i);
-				//update in the database
+				//update in the database. if costomer_id ==-1, no need to do, it will do in InsertCustomer()
 				try
 				{
-					SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == contact_id);
+					if(-1 != costomer_id)
+						SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == contact_id);
 				}
 				catch(SqlExc &e)
 				{
@@ -836,11 +840,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 				
 				//record in the map
 				new_contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
-				
-				//update Contact.Grid(C_TITLE);
-				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
-				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
-				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
 			}
 		}
 		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(new_contact_map);
