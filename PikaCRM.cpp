@@ -750,6 +750,7 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 //interactive with GUI==============================================================
 void PikaCRM::CustomerGridContactBtnClick()
 {
+	Customer.Grid(CO_NAME)="asdadhdfh";
 	if(Customer.Grid(C_TITLE).ToString().IsEmpty())
 	{
 		Exclamation(t_("You must input Customer Title first!"));
@@ -775,7 +776,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 	
 	//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
 	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
-	VectorMap<int, String> new_contact_map;
 	
 	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer column list
 	{
@@ -818,6 +818,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 			}			
 		}
 		
+		VectorMap<int, String> new_contact_map;
 		for(int i = 0; i < list.GetCount(); i++)
 		{
 			if(list.IsSel(i))
@@ -834,10 +835,6 @@ void PikaCRM::CustomerGridContactBtnClick()
 					Exclamation("[* " + DeQtfLf(e) + "]");
 				}
 				
-				//-show on the grid
-				//-String one_name=String(list.GetValue(i));
-				//-all_name+=one_name+"\n";
-				
 				//record in the map
 				new_contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
 				
@@ -847,20 +844,10 @@ void PikaCRM::CustomerGridContactBtnClick()
 				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
 			}
 		}
-		//if(all_name.GetLength()>0)
-		//{
-		//	all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-		//	Customer.Grid.Set(CO_NAME,all_name);
-		//}
-		//else
-		//{
-		//	Customer.Grid.Set(CO_NAME, "");
-		//}
-		//Customer.Grid.Set(CO_NAME, RawDeepToValue(new_contact_map));
 		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(new_contact_map);
-		Customer.Grid(CO_NAME)=ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));;
-		//Customer.Grid.Refresh();
-		//Customer.Grid.Add(99,"ttt","","","","shit",RawDeepToValue(new_contact_map));
+		String hh = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
+		
+		Customer.Grid.Set(CO_NAME,hh);//Customer.Grid(CO_NAME)=hh;//must use Set to refresh and show
     }
 }
 
