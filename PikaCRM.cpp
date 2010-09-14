@@ -353,35 +353,20 @@ void PikaCRM::RemoveContact()
 	try
 	{
 		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
-		//UpdateCustomerContact(Contact.Grid(CO_ID));
+		
+		//UpdateCustomerContact(Contact.Grid(CO_ID));----------------------------
 		if(Contact.Grid(C_ID).IsNull()) return;
+		
 		int customer_id=Contact.Grid(C_ID);
 		int customer_row=Customer.Grid.Find(customer_id,C_ID);
 		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
 		VectorMap<int, String> new_contact_map = contact_map;
 		new_contact_map.RemoveKey(Contact.Grid(CO_ID));
-		Customer.Grid.Set(customer_row,C_EMAIL,"pppp");
 		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawDeepToValue(new_contact_map));
-		const VectorMap<int, String> & contact_map2 = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
-		//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
+
 		String all_name;
-		for(int i = 0; i < new_contact_map.GetCount(); i++)//add already select contact to costomer
-		{
-			int contact_id=new_contact_map.GetKey(i);
-			
-				String one_name(new_contact_map.Get(contact_id));
-				all_name+=one_name+"\n";
-		}
-		
-		if(all_name.GetLength()>0)
-		{
-				all_name.Remove(all_name.GetLength()-1,1);//remove last "\n"
-				Customer.Grid.Set(customer_row,CO_NAME,all_name);
-		}
-		else
-		{
-			Customer.Grid.Set(customer_row,CO_NAME,"");
-		}
+		all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		Customer.Grid.Set(customer_row,CO_NAME,all_name);
 	}
 	catch(SqlExc &e)
 	{
