@@ -135,7 +135,7 @@ void PikaCRM::LoadCustomer()
 			{
 				temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
 			}
-			const Value & raw_map = RawDeepToValue(temp_contact_map);
+			const Value & raw_map = RawToValue(temp_contact_map);
 			
 			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);//,all_name);
 			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
@@ -156,7 +156,7 @@ void PikaCRM::NewCustomer()
 	{					//so this is set the same typeid for Value of GridCtrl with RawDeepToValue
 						//to avoid "Invalid value conversion: "
 		VectorMap<int, String> temp_contact_map;
-		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(temp_contact_map);
+		Customer.Grid(CONTACTS_MAP)=RawToValue(temp_contact_map);
 	}
 }
 void PikaCRM::InsertCustomer()
@@ -177,20 +177,19 @@ void PikaCRM::InsertCustomer()
 		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to customer
 		{
 			int contact_id=contact_map.GetKey(i);
-				try
-				{
-					SQL & ::Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);
-				}
-				catch(SqlExc &e)
-				{
-					Exclamation("[* " + DeQtfLf(e) + "]");
-					continue;
-				}
-				
+			try
+			{
+				SQL & ::Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);				
 				//update Contact.Grid(C_TITLE);
 				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
 				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
+			}
+			catch(SqlExc &e)
+			{
+				Exclamation("[* " + DeQtfLf(e) + "]");
+				continue;
+			}
 		}			
 	}
 	catch(SqlExc &e)
@@ -328,7 +327,7 @@ void PikaCRM::RemoveContact()
 		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
 		VectorMap<int, String> new_contact_map = contact_map;
 		new_contact_map.RemoveKey(Contact.Grid(CO_ID));
-		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawDeepToValue(new_contact_map));
+		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
 
 		String all_name;
 		all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
@@ -783,7 +782,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 				new_contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
 			}
 		}
-		Customer.Grid(CONTACTS_MAP)=RawDeepToValue(new_contact_map);
+		Customer.Grid(CONTACTS_MAP)=RawToValue(new_contact_map);
 		String all_name = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
 		
 		Customer.Grid.Set(CO_NAME,all_name);//Customer.Grid(CO_NAME)=hh;//must use Set to refresh and show
