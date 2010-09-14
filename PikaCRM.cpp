@@ -774,11 +774,8 @@ void PikaCRM::CustomerGridContactBtnClick()
 	int costomer_id = Customer.Grid.Get(C_ID);//get C_ID value of the current row
 	
 	//VectorMap<int, String> & contact_map=mCustomerContactIdMap.Get(costomer_id);
-	//const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid.Get(CO_NAME));
+	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 	VectorMap<int, String> new_contact_map;
-	const Value & vv=RawDeepToValue(new_contact_map);//Customer.Grid.Get(CONTACTS_MAP);
-	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(vv);
-	//VectorMap<int, String> ff(contact_map);
 	
 	for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to costomer column list
 	{
