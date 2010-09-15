@@ -88,7 +88,7 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(Single<ConvContactNames>());
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
 	Customer.Grid.AddIndex(CONTACTS_MAP);
-	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows().Searching();
+	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();//.Searching();
 	//Customer.Grid.RejectNullRow();.Duplicating().Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
 	//Customer.Grid.WhenCreateRow = THISBACK(test);
@@ -98,7 +98,9 @@ void PikaCRM::SetupUI()
 	Customer.Grid.WhenDuplicateRow=THISBACK(DuplicateCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
-	Customer.Grid.SetToolBar();
+	//Customer.Grid.SetToolBar();
+	Customer.Add(search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Customer.Grid.FindBar(search_bar, 140);
 	
 	//Contact Tab-----------------------------------------------
 	Contact.btnCreate <<= callback(&(Contact.Grid),&GridCtrl::DoAppend);
