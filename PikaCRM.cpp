@@ -306,6 +306,21 @@ void PikaCRM::UpdateContact()
 			(CO_ADDRESS,Contact.Grid(CO_ADDRESS))
 			(CO_EMAIL,  Contact.Grid(CO_EMAIL))
 			.Where(CO_ID == Contact.Grid(CO_ID));
+			
+		//UpdateCustomerContact2(Contact.Grid(C_ID));----------------------------
+		if(Contact.Grid(C_ID).IsNull()) return;
+		
+		int customer_id=Contact.Grid(C_ID);
+		int customer_row=Customer.Grid.Find(customer_id,C_ID);
+		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		VectorMap<int, String> new_contact_map = contact_map;
+		new_contact_map.UnlinkKey(Contact.Grid(CO_ID));
+		new_contact_map.Put(Contact.Grid(CO_ID), Contact.Grid(CO_NAME));
+		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+
+		String all_name;
+		all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		Customer.Grid.Set(customer_row,CO_NAME,all_name);
 	}
 	catch(SqlExc &e)
 	{
@@ -319,7 +334,7 @@ void PikaCRM::RemoveContact()
 	{
 		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
 		
-		//UpdateCustomerContact(Contact.Grid(C_ID));----------------------------
+		//UpdateCustomerContact1(Contact.Grid(C_ID));----------------------------
 		if(Contact.Grid(C_ID).IsNull()) return;
 		
 		int customer_id=Contact.Grid(C_ID);
