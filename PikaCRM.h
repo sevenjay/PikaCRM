@@ -112,7 +112,7 @@ private :
 	EditString ces1,ces2,ces3,ces4,ces5;
 	MultiButton mCustomerGridContactBtn;
 	Id CONTACTS_MAP;
-	ToolBar search_bar;
+	ToolBar customer_search_bar;
 
 	//Contact.Grid
 	EditStringNotNull coesn;
@@ -181,7 +181,12 @@ public:
 	void   OpenMainFrom();
 	
 	//interactive with GUI==============================================================
-	void   CustomerGridContactBtnClick();
+	void	CustomerGridContactBtnClick();
+	
+	void	BtnSearchClearClick(){ Customer.Grid.ClearFound(); };
+	void	BtnSearchGoClick(){ Customer.Grid.DoFind(); };
+			
+			
 };
 
 #endif

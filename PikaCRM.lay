@@ -41,8 +41,8 @@ LAYOUT(CustomerLayout, 596, 400)
 	ITEM(Button, dv___15, SetLabel(t_("Create")).LeftPosZ(148, 40).TopPosZ(4, 28))
 	ITEM(Button, dv___16, SetLabel(t_("Modify")).LeftPosZ(192, 40).TopPosZ(4, 28))
 	ITEM(Button, dv___17, SetLabel(t_("Delete")).LeftPosZ(236, 40).TopPosZ(4, 28))
-	ITEM(Button, dv___18, SetLabel(t_("Go")).LeftPosZ(288, 36).TopPosZ(24, 15))
-	ITEM(Button, dv___19, SetLabel(t_("Reset")).LeftPosZ(332, 36).TopPosZ(24, 15))
+	ITEM(Button, btnSearchGo, SetLabel(t_("Go")).LeftPosZ(288, 36).TopPosZ(24, 15))
+	ITEM(Button, btnSearchClear, SetLabel(t_("Clear")).LeftPosZ(332, 36).TopPosZ(24, 15))
 	ITEM(GridCtrl, Grid, HSizePosZ(0, 2).VSizePosZ(60, 2))
 END_LAYOUT
 

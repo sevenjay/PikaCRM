@@ -58,7 +58,7 @@ PikaCRM::~PikaCRM()
 
 void PikaCRM::SetupUI()
 {
-	//TabCtrl----------------------------------------------------
+	//TabCtrl----------------------------------------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
 	MainFrom.tabMain.Add(Customer.SizePos(), t_("Customers"));
@@ -72,8 +72,8 @@ void PikaCRM::SetupUI()
 	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
 	CtrlLayout(Setup);
 	MainFrom.tabMain.Add(Setup.SizePos(), t_("Setup"));
-	//end TabCtrl------------------------------------------------
-	//Customer Tab-----------------------------------------------
+	//end TabCtrl------------------------------------------------------------------------
+	//Customer Tab-----------------------------------------------------------------------
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
@@ -99,10 +99,13 @@ void PikaCRM::SetupUI()
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
 	//Customer.Grid.SetToolBar();
-	Customer.Add(search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
-		Customer.Grid.FindBar(search_bar, 140);
+	//Customer Search------------------------------------------
+	Customer.Add(customer_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Customer.Grid.FindBar(customer_search_bar, 140);
+	Customer.btnSearchClear <<= THISBACK(BtnSearchClearClick);
+	Customer.btnSearchGo <<= THISBACK(BtnSearchGoClick);
 	
-	//Contact Tab-----------------------------------------------
+	//Contact Tab-----------------------------------------------------------------------
 	Contact.btnCreate <<= callback(&(Contact.Grid),&GridCtrl::DoAppend);
 	Contact.btnModify <<= callback(&(Contact.Grid),&GridCtrl::DoEdit);
 	Contact.btnDelete <<= callback(&(Contact.Grid),&GridCtrl::DoRemove);
@@ -119,6 +122,7 @@ void PikaCRM::SetupUI()
 	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
+	Contact.Grid.SetToolBar();
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
