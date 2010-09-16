@@ -117,12 +117,17 @@ void PikaCRM::SetupUI()
 	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1);
 	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2);
 	Contact.Grid.AddColumn(CO_EMAIL,t_("Email")).Edit(coes3);
-	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows().Searching();
+	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
+	//.Searching() will take the partent of Grid.FindBar then take away GridFind, so don't use
 	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
 	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
-	Contact.Grid.SetToolBar();
+	//Contact Search------------------------------------------
+	Contact.Add(contact_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Contact.Grid.FindBar(contact_search_bar, 140);
+	Contact.btnSearchClear <<= callback2(&(Contact.Grid),&GridCtrl::ClearFound,true,true);
+	Contact.btnSearchGo <<= callback(&(Contact.Grid),&GridCtrl::DoFind);
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()

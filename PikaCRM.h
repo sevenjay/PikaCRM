@@ -117,6 +117,7 @@ private :
 	//Contact.Grid
 	EditStringNotNull coesn;
 	EditString coes1,coes2,coes3;
+	ToolBar contact_search_bar;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
