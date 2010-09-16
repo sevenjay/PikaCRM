@@ -394,6 +394,99 @@ void PikaCRM::Update_dg_contact()
 	*/
 	//dg_contact.SetEditable(false);
 }
+
+void PikaCRM::LoadEvent()
+{	
+	Event.Grid.Clear();
+	bool is_sql_ok=SQL.Execute("select e_id, Event.c_id, c_title, e_ask, e_status, e_ctime, e_note from Event left outer join Customer on Event.c_id = Customer.c_id;");
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			Event.Grid.Add(SQL[E_ID],SQL[C_ID],SQL[C_TITLE],SQL[E_ASK],SQL[E_STATUS],SQL[E_CTIME],SQL[E_NOTE]);
+		}
+	}
+	else
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+	}
+}/*
+void PikaCRM::InsertEvent()
+{	
+	try
+	{
+		SQL & Insert(CONTACT)
+			(CO_NAME,  Event.Grid(CO_NAME))
+			(CO_PHONE,  Event.Grid(CO_PHONE))
+			(CO_ADDRESS,Event.Grid(CO_ADDRESS))
+			(CO_EMAIL,  Event.Grid(CO_EMAIL));
+
+		Event.Grid(CO_ID) = SQL.GetInsertedId();//it will return only one int primary key
+	}
+	catch(SqlExc &e)
+	{
+		Event.Grid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::UpdateEvent()
+{
+	try
+	{
+		SQL & ::Update(CONTACT)
+			(CO_NAME,  Event.Grid(CO_NAME))
+			(CO_PHONE,  Event.Grid(CO_PHONE))
+			(CO_ADDRESS,Event.Grid(CO_ADDRESS))
+			(CO_EMAIL,  Event.Grid(CO_EMAIL))
+			.Where(CO_ID == Event.Grid(CO_ID));
+			
+		//UpdateCustomerEvent2(Event.Grid(C_ID));----------------------------
+		if(Event.Grid(C_ID).IsNull()) return;
+		
+		int customer_id=Event.Grid(C_ID);
+		int customer_row=Customer.Grid.Find(customer_id,C_ID);
+		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		VectorMap<int, String> new_contact_map = contact_map;
+		new_contact_map.UnlinkKey(Event.Grid(CO_ID));
+		new_contact_map.Put(Event.Grid(CO_ID), Event.Grid(CO_NAME));
+		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+
+		String all_name;
+		all_name = ConvEventNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		Customer.Grid.Set(customer_row,CO_NAME,all_name);
+	}
+	catch(SqlExc &e)
+	{
+		Event.Grid.CancelUpdate();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::RemoveEvent()
+{
+	try
+	{
+		SQL & Delete(CONTACT).Where(CO_ID == Event.Grid(CO_ID));
+		
+		//UpdateCustomerEvent1(Event.Grid(C_ID));----------------------------
+		if(Event.Grid(C_ID).IsNull()) return;
+		
+		int customer_id=Event.Grid(C_ID);
+		int customer_row=Customer.Grid.Find(customer_id,C_ID);
+		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		VectorMap<int, String> new_contact_map = contact_map;
+		new_contact_map.RemoveKey(Event.Grid(CO_ID));
+		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+
+		String all_name;
+		all_name = ConvEventNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+		Customer.Grid.Set(customer_row,CO_NAME,all_name);
+	}
+	catch(SqlExc &e)
+	{
+		Event.Grid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}*/
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -490,6 +583,7 @@ void PikaCRM::OpenMainFrom()
 	
 	LoadCustomer();
 	LoadContact();
+	LoadEvent();
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {

@@ -156,6 +156,11 @@ private :
 	void RemoveContact();
 	void Update_dg_contact();
 	
+	void LoadEvent();
+	void InsertEvent();
+	void UpdateEvent();
+	void RemoveEvent();
+	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
 	
