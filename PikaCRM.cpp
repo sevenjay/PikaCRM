@@ -134,9 +134,10 @@ void PikaCRM::SetupUI()
 	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
 	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
 	
-	Event.Grid.AddIndex(E_ID);
+	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
 	Event.Grid.AddIndex(C_ID);
-	Event.Grid.AddColumn(C_TITLE,t_("Customer"));
+	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mEventGridCustomerBtn);
+		mEventGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(EventGridCustomerBtnClick);
 	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
 	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(ees1);
@@ -831,7 +832,73 @@ void PikaCRM::CustomerGridContactBtnClick()
     }
 }
 
+void PikaCRM::EventGridCustomerBtnClick()
+{
+	//UI--------------------------------------------
+	TopWindow d;
+	Button ok, cancel;
 
+    d.SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+	ok.Ok() <<= d.Acceptor(IDOK);
+	cancel.Cancel() <<= d.Rejector(IDCANCEL);
+	
+	ColumnList list;
+	d.Add(list);
+	list.SetRect(0, 0, 400, 325);
+	list.Columns(3);
+	//list.MultiSelect();
+	//end UI--------------------------------------------
+	//add costomer to select
+	SQL & Select(C_ID, C_TITLE).From(CUSTOMER);
+	while(SQL.Fetch())
+	{
+		list.Add(SQL[C_ID], SQL[C_TITLE],true);
+	}
+	
+	if(Event.Grid(C_ID).IsNull())
+	{
+		int list_index=list.Find(Customer.Grid(C_ID));
+		list.SetCursor(list_index);
+	}
+	else
+	{
+		int list_index=list.Find(Event.Grid(C_ID));
+		list.SetCursor(list_index);
+	}
+	
+	int costomer_id;
+	String title;
+	if(d.Run()==IDOK) {
+		for(int i = 0; i < list.GetCount(); i++)
+		{
+			if(list.IsSel(i))
+			{
+				costomer_id=list.Get(i);
+								
+				//show on the grid
+				title=String(list.GetValue(i));
+				
+				//update in the database
+				try
+				{
+					if(-1 != Event.Grid(E_ID))
+					{
+						SQL & ::Update(EVENT) (C_ID,  costomer_id).Where(E_ID == Event.Grid(E_ID));
+					}
+				}
+				catch(SqlExc &e)
+				{
+					continue;//Contact.Grid.CancelUpdate();
+					Exclamation("[* " + DeQtfLf(e) + "]");
+				}
+			}
+		}
+		Event.Grid.Set(C_ID,costomer_id);		
+		Event.Grid.Set(C_TITLE,title);
+    }
+}
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------
 String PikaCRM::getConfigDirPath()

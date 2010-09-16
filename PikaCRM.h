@@ -122,7 +122,7 @@ private :
 	//Event.Grid
 	EditStringNotNull eesn;
 	EditString ees1,ees2,ees3;
-	ColumnList clist;
+	MultiButton mEventGridCustomerBtn;
 	ToolBar event_search_bar;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
@@ -193,7 +193,7 @@ public:
 	void	BtnSearchClearClick(){ Customer.Grid.ClearFound(); };
 	void	BtnSearchGoClick(){ Customer.Grid.DoFind(); };
 			
-			
+	void	EventGridCustomerBtnClick();
 };
 
 #endif
