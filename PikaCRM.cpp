@@ -128,6 +128,22 @@ void PikaCRM::SetupUI()
 		Contact.Grid.FindBar(contact_search_bar, 140);
 	Contact.btnSearchClear <<= callback2(&(Contact.Grid),&GridCtrl::ClearFound,true,true);
 	Contact.btnSearchGo <<= callback(&(Contact.Grid),&GridCtrl::DoFind);
+	
+	//Event Tab-----------------------------------------------------------------------
+	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
+	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
+	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
+	
+	Event.Grid.AddIndex(E_ID);
+	Event.Grid.AddIndex(C_ID);
+	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(ces1);
+	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(coesn);
+	//content
+	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(coes1);
+	//request date, when
+	Event.Grid.AddColumn(E_CTIME,t_("Date")).Edit(coes2);
+	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(coes3);
+	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
