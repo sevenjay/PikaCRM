@@ -136,13 +136,13 @@ void PikaCRM::SetupUI()
 	
 	Event.Grid.AddIndex(E_ID);
 	Event.Grid.AddIndex(C_ID);
-	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(ces1);
-	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(coesn);
+	Event.Grid.AddColumn(C_TITLE,t_("Customer"));
+	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
-	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(coes1);
+	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(ees1);
 	//request date, when
-	Event.Grid.AddColumn(E_CTIME,t_("Date")).Edit(coes2);
-	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(coes3);
+	Event.Grid.AddColumn(E_CTIME,t_("Date")).Edit(ees2);
+	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees3);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 }
 //database control------------------------------------------------------------

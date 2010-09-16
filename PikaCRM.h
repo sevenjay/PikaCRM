@@ -119,6 +119,12 @@ private :
 	EditString coes1,coes2,coes3;
 	ToolBar contact_search_bar;
 	
+	//Event.Grid
+	EditStringNotNull eesn;
+	EditString ees1,ees2,ees3;
+	ColumnList clist;
+	ToolBar event_search_bar;
+	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 
