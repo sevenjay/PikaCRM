@@ -94,7 +94,6 @@ void PikaCRM::SetupUI()
 	//Customer.Grid.WhenCreateRow = THISBACK(test);
 	Customer.Grid.WhenInsertRow = THISBACK(InsertCustomer);
 	Customer.Grid.WhenNewRow = THISBACK(NewCustomer);
-	Customer.Grid.WhenCancelNewRow = THISBACK(test);
 	Customer.Grid.WhenDuplicateRow=THISBACK(DuplicateCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
@@ -120,7 +119,6 @@ void PikaCRM::SetupUI()
 	Contact.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	//.Searching() will take the partent of Grid.FindBar then take away GridFind, so don't use
 	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
-	Contact.Grid.WhenDuplicateRow=THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
 	//Contact Search------------------------------------------
@@ -137,6 +135,9 @@ void PikaCRM::SetupUI()
 	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
 	Event.Grid.AddIndex(C_ID);
 	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mEventGridCustomerBtn);
+	MultiButtonNotNULL::Style NotNULLStyle=MultiButtonNotNULL::StyleDefault();
+	//NotNULLStyle.
+		//mEventGridCustomerBtn.SetDisplay();
 		mEventGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(EventGridCustomerBtnClick);
 	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
@@ -145,6 +146,9 @@ void PikaCRM::SetupUI()
 	Event.Grid.AddColumn(E_CTIME,t_("Date")).Edit(ees2);
 	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees3);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
+	Event.Grid.WhenInsertRow = THISBACK(InsertEvent);
+	//Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
+	//Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
@@ -410,22 +414,62 @@ void PikaCRM::LoadEvent()
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
 	}
-}/*
+}
 void PikaCRM::InsertEvent()
 {	
 	try
 	{
-		SQL & Insert(CONTACT)
-			(CO_NAME,  Event.Grid(CO_NAME))
-			(CO_PHONE,  Event.Grid(CO_PHONE))
-			(CO_ADDRESS,Event.Grid(CO_ADDRESS))
-			(CO_EMAIL,  Event.Grid(CO_EMAIL));
+		SQL & Insert(EVENT)
+			(C_ID,		Event.Grid(C_ID))
+			(E_ASK,		Event.Grid(E_ASK))
+			(E_STATUS,  Event.Grid(E_STATUS))
+			(E_NOTE,	Event.Grid(E_NOTE));
 
-		Event.Grid(CO_ID) = SQL.GetInsertedId();//it will return only one int primary key
+		Event.Grid(E_ID) = SQL.GetInsertedId();//it will return only one int primary key
 	}
 	catch(SqlExc &e)
 	{
 		Event.Grid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+/*
+void PikaCRM::InsertCustomer()
+{
+	try
+	{
+		SQL & Insert(CUSTOMER)
+			(C_TITLE,  Customer.Grid(C_TITLE))
+			(C_PHONE,  Customer.Grid(C_PHONE))
+			(C_ADDRESS,Customer.Grid(C_ADDRESS))
+			(C_EMAIL,  Customer.Grid(C_EMAIL))
+			(C_WEBSITE,Customer.Grid(C_WEBSITE));
+
+		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
+		
+		//database set C_ID of CONTACTS_MAP's Contact to now
+		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
+		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to customer
+		{
+			int contact_id=contact_map.GetKey(i);
+			try
+			{
+				SQL & ::Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);				
+				//update Contact.Grid(C_TITLE);
+				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
+				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
+			}
+			catch(SqlExc &e)
+			{
+				Exclamation("[* " + DeQtfLf(e) + "]");
+				continue;
+			}
+		}			
+	}
+	catch(SqlExc &e)
+	{
+		Customer.Grid.CancelInsert();
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }

@@ -92,6 +92,19 @@ public:
 		//SyncInfo();
 	}
 };
+class MultiButtonNotNULL : public MultiButton {
+	virtual Value GetData() const{
+		if(IsNull(Get()))
+			return ErrorValue(t_("ssNull value not allowed."));
+	//return notnull && IsNull(value) ? NotNullError() : value;
+		else
+			return MultiButton::GetData();
+	};
+	
+	
+	
+	
+};
 
 class PikaCRM
 {
@@ -122,7 +135,7 @@ private :
 	//Event.Grid
 	EditStringNotNull eesn;
 	EditString ees1,ees2,ees3;
-	MultiButton mEventGridCustomerBtn;
+	MultiButtonNotNULL mEventGridCustomerBtn;
 	ToolBar event_search_bar;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
