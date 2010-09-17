@@ -95,7 +95,7 @@ public:
 class MultiButtonNotNULL : public MultiButton {
 	virtual Value GetData() const{
 		if(IsNull(Get()))
-			return ErrorValue(t_("ssNull value not allowed."));
+			return ErrorValue(t_("Please select one customer."));
 	//return notnull && IsNull(value) ? NotNullError() : value;
 		else
 			return MultiButton::GetData();
