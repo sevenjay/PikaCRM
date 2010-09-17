@@ -150,9 +150,9 @@ void PikaCRM::SetupUI()
 	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
 	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(ees1);
-	//request date, when
-	Event.Grid.AddColumn(E_CTIME,t_("Date")).Edit(ees2);
-	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees3);
+	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edd);
+	Event.Grid.AddColumn(E_CTIME,t_("Create Time"));
+	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees2);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Event.Grid.WhenInsertRow = THISBACK(InsertEvent);
 	Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
@@ -415,12 +415,16 @@ void PikaCRM::Update_dg_contact()
 void PikaCRM::LoadEvent()
 {	
 	Event.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select e_id, Event.c_id, c_title, e_ask, e_status, e_ctime, e_note from Event left outer join Customer on Event.c_id = Customer.c_id;");
+	String sql="select e_id, Event.c_id, c_title, e_ask, e_status, \
+				strftime('%m/%d/%Y %H:%M',e_rtime) as e_rtime, \
+				strftime('%m/%d/%Y %H:%M',e_ctime) as e_ctime, \
+				e_note from Event left outer join Customer on Event.c_id = Customer.c_id;";
+	bool is_sql_ok=SQL.Execute(sql);
 	if(is_sql_ok)
 	{
 		while(SQL.Fetch())
 		{
-			Event.Grid.Add(SQL[E_ID],SQL[C_ID],SQL[C_TITLE],SQL[E_ASK],SQL[E_STATUS],SQL[E_CTIME],SQL[E_NOTE]);
+			Event.Grid.Add(SQL[E_ID],SQL[C_ID],SQL[C_TITLE],SQL[E_ASK],SQL[E_STATUS],SQL[E_RTIME],SQL[E_CTIME],SQL[E_NOTE]);
 		}
 	}
 	else
@@ -436,9 +440,11 @@ void PikaCRM::InsertEvent()
 			(C_ID,		Event.Grid(C_ID))
 			(E_ASK,		Event.Grid(E_ASK))
 			(E_STATUS,  Event.Grid(E_STATUS))
+			(E_RTIME,	Event.Grid(E_RTIME))
 			(E_NOTE,	Event.Grid(E_NOTE));
 
 		Event.Grid(E_ID) = SQL.GetInsertedId();//it will return only one int primary key
+		Event.Grid(E_CTIME) = GetSysTime();
 	}
 	catch(SqlExc &e)
 	{
@@ -454,6 +460,7 @@ void PikaCRM::UpdateEvent()
 			(C_ID,		Event.Grid(C_ID))
 			(E_ASK,		Event.Grid(E_ASK))
 			(E_STATUS,  Event.Grid(E_STATUS))
+			(E_RTIME,	Event.Grid(E_RTIME))
 			(E_NOTE,	Event.Grid(E_NOTE))
 			.Where(E_ID == Event.Grid(E_ID));
 	}
@@ -939,6 +946,7 @@ void PikaCRM::EventGridCustomerBtnClick()
 		list.Add(SQL[C_ID], SQL[C_TITLE],true);
 	}
 	
+	if(list.GetCount()<=0)	return;//there is no any customer
 	if(Event.Grid(C_ID).IsNull())
 	{
 		int list_index=list.Find(Customer.Grid(C_ID));

@@ -129,9 +129,10 @@ private :
 	
 	//Event.Grid
 	EditStringNotNull eesn;
-	EditString ees1,ees2,ees3;
+	EditString ees1,ees2,ees3,ees4;
 	MultiButtonNotNULL mEventGridCustomerBtn;
 	ToolBar event_search_bar;
+	DropTime edd;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
