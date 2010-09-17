@@ -173,18 +173,18 @@ void PikaCRM::SetupUI()
 	Merchandise.btnDelete <<= callback(&(Merchandise.Grid),&GridCtrl::DoRemove);
 	
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
-	Merchandise.Grid.AddColumn(M_MODEL,t_("Product Model")).Edit(mes1);
 	Merchandise.Grid.AddColumn(M_NAME,t_("Product Name")).Edit(mesn);
+	Merchandise.Grid.AddColumn(M_MODEL,t_("Product Model")).Edit(mes1);
 	Merchandise.Grid.AddColumn(M_PRICE,t_("Price")).Edit(med);
 	Merchandise.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
-	/*Merchandise.Grid.WhenInsertRow = THISBACK(InsertMerchandise);
+	Merchandise.Grid.WhenInsertRow = THISBACK(InsertMerchandise);
 	Merchandise.Grid.WhenUpdateRow = THISBACK(UpdateMerchandise);
 	Merchandise.Grid.WhenRemoveRow = THISBACK(RemoveMerchandise);
 	//Merchandise Search------------------------------------------
-	Merchandise.Add(Merchandise_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
-		Merchandise.Grid.FindBar(Merchandise_search_bar, 140);
+	Merchandise.Add(merchandise_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Merchandise.Grid.FindBar(merchandise_search_bar, 140);
 	Merchandise.btnSearchClear <<= callback2(&(Merchandise.Grid),&GridCtrl::ClearFound,true,true);
-	Merchandise.btnSearchGo <<= callback(&(Merchandise.Grid),&GridCtrl::DoFind);*/
+	Merchandise.btnSearchGo <<= callback(&(Merchandise.Grid),&GridCtrl::DoFind);
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
@@ -515,6 +515,68 @@ void PikaCRM::UpdateEventDropStatus()
 		mEventDropStatus.Add(SQL[0]);
 }
 
+void PikaCRM::LoadMerchandise()
+{
+	Merchandise.Grid.Clear();
+	bool is_sql_ok=SQL.Execute("select * from Merchandise;");
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			Merchandise.Grid.Add(SQL[M_ID],SQL[M_NAME],SQL[M_MODEL],SQL[M_PRICE]);
+		}
+	}
+	else
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+	}
+}
+void PikaCRM::InsertMerchandise()
+{	
+	try
+	{
+		SQL & Insert(MERCHANDISE)
+			(M_NAME,	Merchandise.Grid(M_NAME))
+			(M_MODEL,	Merchandise.Grid(M_MODEL))
+			(M_PRICE,	Merchandise.Grid(M_PRICE));
+
+		Merchandise.Grid(M_ID) = SQL.GetInsertedId();//it will return only one int primary key
+	}
+	catch(SqlExc &e)
+	{
+		Merchandise.Grid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::UpdateMerchandise()
+{
+	try
+	{
+		SQL & ::Update(MERCHANDISE)
+			(M_NAME,	Merchandise.Grid(M_NAME))
+			(M_MODEL,	Merchandise.Grid(M_MODEL))
+			(M_PRICE,	Merchandise.Grid(M_PRICE))
+			.Where(M_ID == Merchandise.Grid(M_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Merchandise.Grid.CancelUpdate();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::RemoveMerchandise()
+{
+	try
+	{
+		SQL & Delete(MERCHANDISE).Where(M_ID == Merchandise.Grid(M_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Merchandise.Grid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -612,6 +674,8 @@ void PikaCRM::OpenMainFrom()
 	LoadCustomer();
 	LoadContact();
 	LoadEvent();
+	
+	LoadMerchandise();
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {

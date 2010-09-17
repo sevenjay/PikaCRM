@@ -139,6 +139,7 @@ private :
 	EditStringNotNull mesn;
 	EditString mes1,mes2,mes3,mes4;
 	EditDouble med;
+	ToolBar merchandise_search_bar;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
@@ -176,6 +177,11 @@ private :
 	void UpdateEvent();
 	void RemoveEvent();
 	void UpdateEventDropStatus();
+		
+	void LoadMerchandise();
+	void InsertMerchandise();
+	void UpdateMerchandise();
+	void RemoveMerchandise();
 	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
