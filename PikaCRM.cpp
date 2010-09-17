@@ -33,7 +33,27 @@ struct ConvContactNames : Convert
 		return all_name;
 	}
 };
-
+class ColoredNotNull : public GridDisplay
+{
+public:
+    virtual void Paint(Draw &w, int x, int y, int cx, int cy, const Value &val, dword style,
+				           Color &fg, Color &bg, Font &fnt, bool found, int fs, int fe)
+	{
+    	if( IsNull(val) )	bg = Color(0, 255, 0);
+    	else bg = Color(255, 0, 0);	
+    	GridDisplay::Paint(w, x, y, cx, cy, val, style, fg, bg, fnt, found, fs, fe);
+	};
+};
+class ColorNotNull : public Display
+{
+public:
+	virtual void PaintBackground(Draw& w, const Rect& r, const Value& q,
+	                             Color ink, Color paper, dword style) const
+	{
+    	if( IsNull(q) )	paper = Color(255, 223, 223);
+    	Display::PaintBackground(w, r, q, ink, paper, style);
+	};
+};
 PikaCRM::PikaCRM()
 {
 	mLanguage=LNG_('Z','H','T','W');
@@ -134,10 +154,9 @@ void PikaCRM::SetupUI()
 	
 	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
 	Event.Grid.AddIndex(C_ID);
-	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mEventGridCustomerBtn);
+	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mEventGridCustomerBtn);//.SetDisplay(Single<ColoredNotNull>());
 	MultiButtonNotNULL::Style NotNULLStyle=MultiButtonNotNULL::StyleDefault();
-	//NotNULLStyle.
-		//mEventGridCustomerBtn.SetDisplay();
+		mEventGridCustomerBtn.SetDisplay(Single<ColorNotNull>());
 		mEventGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(EventGridCustomerBtnClick);
 	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
