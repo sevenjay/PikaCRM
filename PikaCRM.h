@@ -133,6 +133,7 @@ private :
 	MultiButtonNotNULL mEventGridCustomerBtn;
 	ToolBar event_search_bar;
 	DropTime edd;
+	DropGrid mEventDropStatus;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
@@ -169,6 +170,7 @@ private :
 	void InsertEvent();
 	void UpdateEvent();
 	void RemoveEvent();
+	void UpdateEventDropStatus();
 	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
@@ -208,6 +210,7 @@ public:
 	void	BtnSearchGoClick(){ Customer.Grid.DoFind(); };
 			
 	void	EventGridCustomerBtnClick();
+	void	EventNewStatusClick();
 };
 
 #endif

@@ -149,7 +149,8 @@ void PikaCRM::SetupUI()
 		mEventGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(EventGridCustomerBtnClick);
 	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
-	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(ees1);
+	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(mEventDropStatus);
+		mEventDropStatus.AddPlus(THISBACK(EventNewStatusClick));
 	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edd);
 	Event.Grid.AddColumn(E_CTIME,t_("Create Time"));
 	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees2);
@@ -415,10 +416,10 @@ void PikaCRM::Update_dg_contact()
 void PikaCRM::LoadEvent()
 {	
 	Event.Grid.Clear();
-	String sql="select e_id, Event.c_id, c_title, e_ask, e_status, \
-				strftime('%m/%d/%Y %H:%M',e_rtime) as e_rtime, \
-				strftime('%m/%d/%Y %H:%M',e_ctime) as e_ctime, \
-				e_note from Event left outer join Customer on Event.c_id = Customer.c_id;";
+	String sql ="select e_id, Event.c_id, c_title, e_ask, e_status, "
+				"strftime('%m/%d/%Y %H:%M',e_rtime) as e_rtime, "
+				"strftime('%m/%d/%Y %H:%M',e_ctime) as e_ctime, "
+				"e_note from Event left outer join Customer on Event.c_id = Customer.c_id;";
 	bool is_sql_ok=SQL.Execute(sql);
 	if(is_sql_ok)
 	{
@@ -426,6 +427,7 @@ void PikaCRM::LoadEvent()
 		{
 			Event.Grid.Add(SQL[E_ID],SQL[C_ID],SQL[C_TITLE],SQL[E_ASK],SQL[E_STATUS],SQL[E_RTIME],SQL[E_CTIME],SQL[E_NOTE]);
 		}
+		UpdateEventDropStatus();
 	}
 	else
 	{
@@ -482,6 +484,15 @@ void PikaCRM::RemoveEvent()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
+void PikaCRM::UpdateEventDropStatus()
+{
+	mEventDropStatus.Clear();
+	SQL & Select(E_STATUS).From(EVENT).GroupBy(E_STATUS);
+
+	while(SQL.Fetch())
+		mEventDropStatus.Add(SQL[0]);
+}
+
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -988,6 +999,29 @@ void PikaCRM::EventGridCustomerBtnClick()
 		Event.Grid.Set(C_ID,costomer_id);		
 		Event.Grid.Set(C_TITLE,title);
     }
+}
+void PikaCRM::EventNewStatusClick()
+{
+	//UI--------------------------------------------
+	TopWindow d;
+	Button ok, cancel;
+
+    d.SetRect(0, 0, 200, 200);
+	d.Add(ok.SetLabel("OK").LeftPosZ(8, 45).TopPosZ(50, 16));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(60, 45).TopPosZ(50, 16));
+	ok.Ok() <<= d.Acceptor(IDOK);
+	cancel.Cancel() <<= d.Rejector(IDCANCEL);
+	
+	EditString edit;
+	d.Add(edit.LeftPosZ(15, 75).TopPosZ(20, 16));
+	//end UI--------------------------------------------
+	if(d.Run()==IDOK) {
+		if(!IsNull(edit.GetData()))
+		{
+			mEventDropStatus.Add(edit.GetData());
+			mEventDropStatus.SetData(edit.GetData());
+		}
+	}
 }
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------
