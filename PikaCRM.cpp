@@ -155,8 +155,13 @@ void PikaCRM::SetupUI()
 	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees3);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Event.Grid.WhenInsertRow = THISBACK(InsertEvent);
-	//Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
-	//Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
+	Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
+	Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
+	//Event Search------------------------------------------
+	Event.Add(event_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Event.Grid.FindBar(event_search_bar, 140);
+	Event.btnSearchClear <<= callback2(&(Event.Grid),&GridCtrl::ClearFound,true,true);
+	Event.btnSearchGo <<= callback(&(Event.Grid),&GridCtrl::DoFind);
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
@@ -441,71 +446,16 @@ void PikaCRM::InsertEvent()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
-/*
-void PikaCRM::InsertCustomer()
-{
-	try
-	{
-		SQL & Insert(CUSTOMER)
-			(C_TITLE,  Customer.Grid(C_TITLE))
-			(C_PHONE,  Customer.Grid(C_PHONE))
-			(C_ADDRESS,Customer.Grid(C_ADDRESS))
-			(C_EMAIL,  Customer.Grid(C_EMAIL))
-			(C_WEBSITE,Customer.Grid(C_WEBSITE));
-
-		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
-		
-		//database set C_ID of CONTACTS_MAP's Contact to now
-		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
-		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to customer
-		{
-			int contact_id=contact_map.GetKey(i);
-			try
-			{
-				SQL & ::Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);				
-				//update Contact.Grid(C_TITLE);
-				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
-				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
-				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
-			}
-			catch(SqlExc &e)
-			{
-				Exclamation("[* " + DeQtfLf(e) + "]");
-				continue;
-			}
-		}			
-	}
-	catch(SqlExc &e)
-	{
-		Customer.Grid.CancelInsert();
-		Exclamation("[* " + DeQtfLf(e) + "]");
-	}
-}
 void PikaCRM::UpdateEvent()
 {
 	try
 	{
-		SQL & ::Update(CONTACT)
-			(CO_NAME,  Event.Grid(CO_NAME))
-			(CO_PHONE,  Event.Grid(CO_PHONE))
-			(CO_ADDRESS,Event.Grid(CO_ADDRESS))
-			(CO_EMAIL,  Event.Grid(CO_EMAIL))
-			.Where(CO_ID == Event.Grid(CO_ID));
-			
-		//UpdateCustomerEvent2(Event.Grid(C_ID));----------------------------
-		if(Event.Grid(C_ID).IsNull()) return;
-		
-		int customer_id=Event.Grid(C_ID);
-		int customer_row=Customer.Grid.Find(customer_id,C_ID);
-		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
-		VectorMap<int, String> new_contact_map = contact_map;
-		new_contact_map.UnlinkKey(Event.Grid(CO_ID));
-		new_contact_map.Put(Event.Grid(CO_ID), Event.Grid(CO_NAME));
-		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
-
-		String all_name;
-		all_name = ConvEventNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
-		Customer.Grid.Set(customer_row,CO_NAME,all_name);
+		SQL & ::Update(EVENT)
+			(C_ID,		Event.Grid(C_ID))
+			(E_ASK,		Event.Grid(E_ASK))
+			(E_STATUS,  Event.Grid(E_STATUS))
+			(E_NOTE,	Event.Grid(E_NOTE))
+			.Where(E_ID == Event.Grid(E_ID));
 	}
 	catch(SqlExc &e)
 	{
@@ -517,28 +467,14 @@ void PikaCRM::RemoveEvent()
 {
 	try
 	{
-		SQL & Delete(CONTACT).Where(CO_ID == Event.Grid(CO_ID));
-		
-		//UpdateCustomerEvent1(Event.Grid(C_ID));----------------------------
-		if(Event.Grid(C_ID).IsNull()) return;
-		
-		int customer_id=Event.Grid(C_ID);
-		int customer_row=Customer.Grid.Find(customer_id,C_ID);
-		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
-		VectorMap<int, String> new_contact_map = contact_map;
-		new_contact_map.RemoveKey(Event.Grid(CO_ID));
-		Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
-
-		String all_name;
-		all_name = ConvEventNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
-		Customer.Grid.Set(customer_row,CO_NAME,all_name);
+		SQL & Delete(EVENT).Where(E_ID == Event.Grid(E_ID));
 	}
 	catch(SqlExc &e)
 	{
 		Event.Grid.CancelRemove();
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
-}*/
+}
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
