@@ -135,6 +135,11 @@ private :
 	DropTime edd;
 	DropGrid mEventDropStatus;
 	
+	//Merchandise.Grid
+	EditStringNotNull mesn;
+	EditString mes1,mes2,mes3,mes4;
+	EditDouble med;
+	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 

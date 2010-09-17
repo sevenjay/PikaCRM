@@ -153,7 +153,7 @@ void PikaCRM::SetupUI()
 		mEventDropStatus.AddPlus(THISBACK(EventNewStatusClick));
 	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edd);
 	Event.Grid.AddColumn(E_CTIME,t_("Create Time"));
-	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees2);
+	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees1);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Event.Grid.WhenInsertRow = THISBACK(InsertEvent);
 	Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
@@ -163,6 +163,28 @@ void PikaCRM::SetupUI()
 		Event.Grid.FindBar(event_search_bar, 140);
 	Event.btnSearchClear <<= callback2(&(Event.Grid),&GridCtrl::ClearFound,true,true);
 	Event.btnSearchGo <<= callback(&(Event.Grid),&GridCtrl::DoFind);
+	
+	
+	
+	
+	//Merchandise Tab-----------------------------------------------------------------------
+	Merchandise.btnCreate <<= callback(&(Merchandise.Grid),&GridCtrl::DoAppend);
+	Merchandise.btnModify <<= callback(&(Merchandise.Grid),&GridCtrl::DoEdit);
+	Merchandise.btnDelete <<= callback(&(Merchandise.Grid),&GridCtrl::DoRemove);
+	
+	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
+	Merchandise.Grid.AddColumn(M_MODEL,t_("Product Model")).Edit(mes1);
+	Merchandise.Grid.AddColumn(M_NAME,t_("Product Name")).Edit(mesn);
+	Merchandise.Grid.AddColumn(M_PRICE,t_("Price")).Edit(med);
+	Merchandise.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
+	/*Merchandise.Grid.WhenInsertRow = THISBACK(InsertMerchandise);
+	Merchandise.Grid.WhenUpdateRow = THISBACK(UpdateMerchandise);
+	Merchandise.Grid.WhenRemoveRow = THISBACK(RemoveMerchandise);
+	//Merchandise Search------------------------------------------
+	Merchandise.Add(Merchandise_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Merchandise.Grid.FindBar(Merchandise_search_bar, 140);
+	Merchandise.btnSearchClear <<= callback2(&(Merchandise.Grid),&GridCtrl::ClearFound,true,true);
+	Merchandise.btnSearchGo <<= callback(&(Merchandise.Grid),&GridCtrl::DoFind);*/
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()

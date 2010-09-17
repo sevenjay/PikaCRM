@@ -12,7 +12,7 @@ CREATE TABLE "Field" ("f_table" CHAR NOT NULL , "f_idname" CHAR NOT NULL , "f_na
 
 CREATE TABLE "LinkContact" ("o_id" INTEGER NOT NULL , "co_id" INTEGER NOT NULL , PRIMARY KEY ("o_id", "co_id"));
 
-CREATE TABLE "Merchandise" ("m_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "m_name" CHAR NOT NULL , "m_price" INTEGER, "m_1" BLOB, "m_2" BLOB, "m_3" BLOB);
+CREATE TABLE "Merchandise" ("m_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL ,"m_model" CHAR , "m_name" CHAR NOT NULL , "m_price" DOUBLE, "m_1" BLOB, "m_2" BLOB, "m_3" BLOB);
 
 CREATE TABLE "Orders" ("o_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER NOT NULL , "o_ship_add" CHAR, "o_bill_add" CHAR, "o_date" DATETIME, "o_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "o_mtime" DATETIME, "o_note" TEXT);
 
