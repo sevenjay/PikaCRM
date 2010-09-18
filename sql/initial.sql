@@ -1,6 +1,6 @@
 /*PikaCRM database version 1*/
 
-CREATE TABLE "BuyItem" ("o_id" INTEGER NOT NULL , "b_id" INTEGER NOT NULL , "m_id" INTEGER NOT NULL , "b_price" FLOAT NOT NULL , "b_number" INTEGER NOT NULL , PRIMARY KEY ("o_id", "b_id"));
+CREATE TABLE "BuyItem" ("o_id" INTEGER NOT NULL , "b_id" INTEGER NOT NULL , "m_id" INTEGER NOT NULL, "m_model" CHAR, "m_name" CHAR, "m_price" DOUBLE, "b_price" FLOAT NOT NULL , "b_number" INTEGER NOT NULL , PRIMARY KEY ("o_id", "b_id"));
 
 CREATE TABLE "Contact" ("co_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER, "co_name" CHAR NOT NULL , "co_phone" CHAR, "co_address" CHAR, "co_email" CHAR, "co_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "co_profile" BLOB, "co_card" BLOB, "co_1" BLOB, "co_2" BLOB, "co_3" BLOB);
 
@@ -14,7 +14,7 @@ CREATE TABLE "LinkContact" ("o_id" INTEGER NOT NULL , "co_id" INTEGER NOT NULL ,
 
 CREATE TABLE "Merchandise" ("m_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL ,"m_model" CHAR , "m_name" CHAR NOT NULL , "m_price" DOUBLE, "m_1" BLOB, "m_2" BLOB, "m_3" BLOB);
 
-CREATE TABLE "Orders" ("o_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER NOT NULL , "o_ship_add" CHAR, "o_bill_add" CHAR, "o_date" DATETIME, "o_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "o_mtime" DATETIME, "o_note" TEXT);
+CREATE TABLE "Orders" ("o_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER NOT NULL , "o_ship_add" CHAR, "o_bill_add" CHAR, "o_order_date" DATETIME, "o_ship_date" DATETIME, "o_status" CHAR, "o_ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "o_mtime" DATETIME, "o_note" TEXT);
 
 CREATE TABLE "System" ("user" CHAR NOT NULL , "ctime" DATETIME NOT NULL  DEFAULT CURRENT_TIMESTAMP, "ap_ver" CHAR NOT NULL , "sqlite_ver" CHAR NOT NULL , "db_ver" CHAR NOT NULL );
 
