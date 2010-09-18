@@ -151,7 +151,7 @@ void PikaCRM::SetupUI()
 	//content
 	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(mEventDropStatus);
 		mEventDropStatus.AddPlus(THISBACK(EventNewStatusClick));
-	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edd);
+	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edt);
 	Event.Grid.AddColumn(E_CTIME,t_("Create Time"));
 	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees1);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
@@ -191,15 +191,17 @@ void PikaCRM::SetupUI()
 	Order.Grid.AddIndex(O_ID).Default(-1);//for when create row before insert row;
 	Order.Grid.AddIndex(C_ID);
 	Order.Grid.AddColumn(C_TITLE,t_("Customer"));
-	Order.Grid.AddColumn(O_SHIP_ADD,t_("Ship Add.")).Edit(oesn);
-	Order.Grid.AddColumn(O_BILL_ADD,t_("Bill Add.")).Edit(oes1);
-	Order.Grid.AddColumn(O_DATE,t_("Order Date")).Edit(oed);
+	Order.Grid.AddColumn(O_SHIP_ADD,t_("Ship Add.")).Edit(oes1);
+	Order.Grid.AddColumn(O_BILL_ADD,t_("Bill Add.")).Edit(oes2);
+	Order.Grid.AddColumn(O_ORDER_DATE,t_("Order Date")).Edit(oed1);
+	Order.Grid.AddColumn(O_SHIP_DATE,t_("Ship Date")).Edit(oed2);
+	Order.Grid.AddColumn(O_STATUS,t_("Status")).Edit(oes3);
 	Order.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
-	/*Order.Grid.WhenInsertRow = THISBACK(InsertOrder);
+	Order.Grid.WhenInsertRow = THISBACK(InsertOrder);
 	Order.Grid.WhenUpdateRow = THISBACK(UpdateOrder);
 	Order.Grid.WhenRemoveRow = THISBACK(RemoveOrder);
 	//Order Search------------------------------------------
-	Order.Add(Order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+	/*Order.Add(Order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
 		Order.Grid.FindBar(Order_search_bar, 140);
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
 	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);*/
@@ -596,6 +598,71 @@ void PikaCRM::RemoveMerchandise()
 	}
 }
 
+void PikaCRM::LoadOrder()
+{
+	Order.Grid.Clear();
+	bool is_sql_ok=SQL.Execute("select o_id, Orders.c_id, c_title, o_ship_add, o_bill_add, o_order_date, o_ship_date, o_status from Orders left outer join Customer on Orders.c_id = Customer.c_id;");
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			Order.Grid.Add(SQL[O_ID],SQL[C_ID],SQL[C_TITLE],SQL[O_SHIP_ADD],SQL[O_BILL_ADD],SQL[O_ORDER_DATE],SQL[O_SHIP_DATE],SQL[O_STATUS]);
+		}
+	}
+	else
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+	}
+}
+void PikaCRM::InsertOrder()
+{	
+	try
+	{
+		SQL & Insert(ORDERS)
+			(C_ID,	Order.Grid(C_ID))
+			(O_SHIP_ADD,	Order.Grid(O_SHIP_ADD))
+			(O_BILL_ADD,	Order.Grid(O_BILL_ADD))
+			(O_ORDER_DATE,	Order.Grid(O_ORDER_DATE))
+			(O_SHIP_DATE,	Order.Grid(O_SHIP_DATE))
+			(O_STATUS,		Order.Grid(O_STATUS));
+
+		Order.Grid(O_ID) = SQL.GetInsertedId();//it will return only one int primary key
+	}
+	catch(SqlExc &e)
+	{
+		Order.Grid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::UpdateOrder()
+{
+	/*try
+	{
+		SQL & ::Update(Order)
+			(M_NAME,	Order.Grid(M_NAME))
+			(M_MODEL,	Order.Grid(M_MODEL))
+			(M_PRICE,	Order.Grid(M_PRICE))
+			.Where(M_ID == Order.Grid(M_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Order.Grid.CancelUpdate();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}*/
+}
+void PikaCRM::RemoveOrder()
+{
+	/*try
+	{
+		SQL & Delete(Order).Where(M_ID == Order.Grid(M_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Order.Grid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}*/
+}
+
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -693,8 +760,8 @@ void PikaCRM::OpenMainFrom()
 	LoadCustomer();
 	LoadContact();
 	LoadEvent();
-	
 	LoadMerchandise();
+	LoadOrder();
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {

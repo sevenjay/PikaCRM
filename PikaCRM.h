@@ -132,7 +132,7 @@ private :
 	EditString ees1,ees2,ees3,ees4;
 	MultiButtonNotNULL mEventGridCustomerBtn;
 	ToolBar event_search_bar;
-	DropTime edd;
+	DropTime edt;
 	DropGrid mEventDropStatus;
 	
 	//Merchandise.Grid
@@ -142,9 +142,8 @@ private :
 	ToolBar merchandise_search_bar;
 	
 	//Order.Grid
-	EditStringNotNull oesn;
 	EditString oes1,oes2,oes3,oes4;
-	EditDouble oed;
+	EditDate oed1,oed2;
 	ToolBar order_search_bar;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
@@ -188,6 +187,11 @@ private :
 	void InsertMerchandise();
 	void UpdateMerchandise();
 	void RemoveMerchandise();
+			
+	void LoadOrder();
+	void InsertOrder();
+	void UpdateOrder();
+	void RemoveOrder();
 	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
