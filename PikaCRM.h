@@ -144,6 +144,7 @@ private :
 	//Order.Grid
 	EditString oes1,oes2,oes3,oes4;
 	EditDate oed1,oed2;
+	MultiButtonNotNULL mOrderGridCustomerBtn;
 	ToolBar order_search_bar;
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
@@ -232,6 +233,8 @@ public:
 			
 	void	EventGridCustomerBtnClick();
 	void	EventNewStatusClick();
+		
+	void	OrderGridCustomerBtnClick();
 };
 
 #endif
