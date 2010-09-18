@@ -164,9 +164,6 @@ void PikaCRM::SetupUI()
 	Event.btnSearchClear <<= callback2(&(Event.Grid),&GridCtrl::ClearFound,true,true);
 	Event.btnSearchGo <<= callback(&(Event.Grid),&GridCtrl::DoFind);
 	
-	
-	
-	
 	//Merchandise Tab-----------------------------------------------------------------------
 	Merchandise.btnCreate <<= callback(&(Merchandise.Grid),&GridCtrl::DoAppend);
 	Merchandise.btnModify <<= callback(&(Merchandise.Grid),&GridCtrl::DoEdit);
@@ -185,6 +182,28 @@ void PikaCRM::SetupUI()
 		Merchandise.Grid.FindBar(merchandise_search_bar, 140);
 	Merchandise.btnSearchClear <<= callback2(&(Merchandise.Grid),&GridCtrl::ClearFound,true,true);
 	Merchandise.btnSearchGo <<= callback(&(Merchandise.Grid),&GridCtrl::DoFind);
+	
+	//Order Tab-----------------------------------------------------------------------
+	Order.btnCreate <<= callback(&(Order.Grid),&GridCtrl::DoAppend);
+	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
+	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
+	
+	Order.Grid.AddIndex(O_ID).Default(-1);//for when create row before insert row;
+	Order.Grid.AddIndex(C_ID);
+	Order.Grid.AddColumn(C_TITLE,t_("Customer"));
+	Order.Grid.AddColumn(O_SHIP_ADD,t_("Ship Add.")).Edit(oesn);
+	Order.Grid.AddColumn(O_BILL_ADD,t_("Bill Add.")).Edit(oes1);
+	Order.Grid.AddColumn(O_DATE,t_("Order Date")).Edit(oed);
+	Order.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
+	/*Order.Grid.WhenInsertRow = THISBACK(InsertOrder);
+	Order.Grid.WhenUpdateRow = THISBACK(UpdateOrder);
+	Order.Grid.WhenRemoveRow = THISBACK(RemoveOrder);
+	//Order Search------------------------------------------
+	Order.Add(Order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Order.Grid.FindBar(Order_search_bar, 140);
+	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
+	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);*/
+	
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()

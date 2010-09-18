@@ -141,6 +141,12 @@ private :
 	EditDouble med;
 	ToolBar merchandise_search_bar;
 	
+	//Order.Grid
+	EditStringNotNull oesn;
+	EditString oes1,oes2,oes3,oes4;
+	EditDouble oed;
+	ToolBar order_search_bar;
+	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 
