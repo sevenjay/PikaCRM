@@ -143,7 +143,7 @@ private :
 	
 	//Order.Grid
 	EditString oes1,oes2,oes3,oes4;
-	EditDate oed1,oed2;
+	DropDate odd1,odd2;
 	MultiButtonNotNULL mOrderGridCustomerBtn;
 	ToolBar order_search_bar;
 	

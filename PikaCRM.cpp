@@ -195,9 +195,10 @@ void PikaCRM::SetupUI()
 		mOrderGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(OrderGridCustomerBtnClick);
 	Order.Grid.AddColumn(O_SHIP_ADD,t_("Ship Add.")).Edit(oes1);
 	Order.Grid.AddColumn(O_BILL_ADD,t_("Bill Add.")).Edit(oes2);
-	Order.Grid.AddColumn(O_ORDER_DATE,t_("Order Date")).Edit(oed1);
-	Order.Grid.AddColumn(O_SHIP_DATE,t_("Ship Date")).Edit(oed2);
+	Order.Grid.AddColumn(O_ORDER_DATE,t_("Order Date")).Edit(odd1);
+	Order.Grid.AddColumn(O_SHIP_DATE,t_("Ship Date")).Edit(odd2);
 	Order.Grid.AddColumn(O_STATUS,t_("Status")).Edit(oes3);
+	Order.Grid.AddColumn(O_NOTE,t_("Note")).Edit(oes4);
 	Order.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Order.Grid.WhenInsertRow = THISBACK(InsertOrder);
 	Order.Grid.WhenUpdateRow = THISBACK(UpdateOrder);
@@ -603,12 +604,16 @@ void PikaCRM::RemoveMerchandise()
 void PikaCRM::LoadOrder()
 {
 	Order.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select o_id, Orders.c_id, c_title, o_ship_add, o_bill_add, o_order_date, o_ship_date, o_status from Orders left outer join Customer on Orders.c_id = Customer.c_id;");
+	String sql ="select o_id, Orders.c_id, c_title, o_ship_add, o_bill_add, "
+				"strftime('%m/%d/%Y',o_order_date) as o_order_date, "
+				"strftime('%m/%d/%Y',o_ship_date) as o_ship_date, "
+				"o_status, o_note from Orders left outer join Customer on Orders.c_id = Customer.c_id;";
+	bool is_sql_ok=SQL.Execute(sql);
 	if(is_sql_ok)
 	{
 		while(SQL.Fetch())
 		{
-			Order.Grid.Add(SQL[O_ID],SQL[C_ID],SQL[C_TITLE],SQL[O_SHIP_ADD],SQL[O_BILL_ADD],SQL[O_ORDER_DATE],SQL[O_SHIP_DATE],SQL[O_STATUS]);
+			Order.Grid.Add(SQL[O_ID],SQL[C_ID],SQL[C_TITLE],SQL[O_SHIP_ADD],SQL[O_BILL_ADD],SQL[O_ORDER_DATE],SQL[O_SHIP_DATE],SQL[O_STATUS],SQL[O_NOTE]);
 		}
 	}
 	else
@@ -626,7 +631,8 @@ void PikaCRM::InsertOrder()
 			(O_BILL_ADD,	Order.Grid(O_BILL_ADD))
 			(O_ORDER_DATE,	Order.Grid(O_ORDER_DATE))
 			(O_SHIP_DATE,	Order.Grid(O_SHIP_DATE))
-			(O_STATUS,		Order.Grid(O_STATUS));
+			(O_STATUS,		Order.Grid(O_STATUS))
+			(O_NOTE,		Order.Grid(O_NOTE));
 
 		Order.Grid(O_ID) = SQL.GetInsertedId();//it will return only one int primary key
 	}
@@ -638,19 +644,25 @@ void PikaCRM::InsertOrder()
 }
 void PikaCRM::UpdateOrder()
 {
-	/*try
+	String now_time="CURRENT_TIMESTAMP";
+	try
 	{
-		SQL & ::Update(Order)
-			(M_NAME,	Order.Grid(M_NAME))
-			(M_MODEL,	Order.Grid(M_MODEL))
-			(M_PRICE,	Order.Grid(M_PRICE))
-			.Where(M_ID == Order.Grid(M_ID));
+		SQL & ::Update(ORDERS)
+			(C_ID,	Order.Grid(C_ID))
+			(O_SHIP_ADD,	Order.Grid(O_SHIP_ADD))
+			(O_BILL_ADD,	Order.Grid(O_BILL_ADD))
+			(O_ORDER_DATE,	Order.Grid(O_ORDER_DATE))
+			(O_SHIP_DATE,	Order.Grid(O_SHIP_DATE))
+			(O_STATUS,		Order.Grid(O_STATUS))
+			(O_MTIME,		GetSysTime())
+			(O_NOTE,		Order.Grid(O_NOTE))
+			.Where(O_ID == Order.Grid(O_ID));
 	}
 	catch(SqlExc &e)
 	{
 		Order.Grid.CancelUpdate();
 		Exclamation("[* " + DeQtfLf(e) + "]");
-	}*/
+	}
 }
 void PikaCRM::RemoveOrder()
 {
