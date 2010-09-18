@@ -666,15 +666,15 @@ void PikaCRM::UpdateOrder()
 }
 void PikaCRM::RemoveOrder()
 {
-	/*try
+	try
 	{
-		SQL & Delete(Order).Where(M_ID == Order.Grid(M_ID));
+		SQL & Delete(ORDERS).Where(O_ID == Order.Grid(O_ID));
 	}
 	catch(SqlExc &e)
 	{
 		Order.Grid.CancelRemove();
 		Exclamation("[* " + DeQtfLf(e) + "]");
-	}*/
+	}
 }
 
 //application control-----------------------------------------------------------
