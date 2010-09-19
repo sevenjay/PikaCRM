@@ -203,12 +203,31 @@ void PikaCRM::SetupUI()
 	Order.Grid.WhenInsertRow = THISBACK(InsertOrder);
 	Order.Grid.WhenUpdateRow = THISBACK(UpdateOrder);
 	Order.Grid.WhenRemoveRow = THISBACK(RemoveOrder);
+	Order.Grid.WhenChangeRow = THISBACK(ChangeOrder);
 	//Order Search------------------------------------------
 	/*Order.Add(Order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
 		Order.Grid.FindBar(Order_search_bar, 140);
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
 	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);*/
+	//Order.BuyItemGrid-------------------------------------
+	Order.BuyItemGrid.AddIndex(O_ID);
+	Order.BuyItemGrid.AddIndex(B_ID).Default(-1);//for when create row before insert row;
+	Order.BuyItemGrid.AddIndex(M_ID);
+	Order.BuyItemGrid.AddColumn(M_NAME,t_("Product Name - Model")).Edit(mBuyItemGridMerchBtn);
+		mBuyItemGridMerchBtn.SetDisplay(Single<ColorNotNull>());
+		mBuyItemGridMerchBtn.AddButton().SetLabel("...").WhenPush=THISBACK(BuyItemGridMerchBtnClick);
+	//Order.BuyItemGrid.AddColumn(M_MODEL,t_("Product Model"));
+	Order.BuyItemGrid.AddColumn(M_PRICE,t_("Price"));
 	
+	Order.BuyItemGrid.AddColumn(B_PRICE,t_("Order Price")).Edit(bed);
+	Order.BuyItemGrid.AddColumn(B_NUMBER,t_("Quantity")).Edit(beis).Default(0);
+		beis.NotNull();
+	Order.BuyItemGrid.Removing().AskRemove().Editing().Canceling().ColorRows();
+	Order.BuyItemGrid.SetToolBar();
+	Order.BuyItemGrid.WhenNewRow = THISBACK(NewBuyItem);
+	Order.BuyItemGrid.WhenInsertRow = THISBACK(InsertBuyItem);
+	Order.BuyItemGrid.WhenUpdateRow = THISBACK(UpdateBuyItem);
+	Order.BuyItemGrid.WhenRemoveRow = THISBACK(RemoveBuyItem);
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
@@ -676,7 +695,87 @@ void PikaCRM::RemoveOrder()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
+void PikaCRM::ChangeOrder()
+{
+	Order.BuyItemGrid.Appending(true);
+	LoadBuyItem(Order.Grid(O_ID));
+}
 
+void PikaCRM::LoadBuyItem(int o_id)
+{
+	Order.BuyItemGrid.Clear();
+	bool is_sql_ok=SQL.Execute("select * from BuyItem where o_id = ?;",o_id);
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			Order.BuyItemGrid.Add(SQL[O_ID],SQL[B_ID],SQL[M_ID],SQL[M_NAME]/*,SQL[M_MODEL]*/,SQL[M_PRICE],SQL[B_PRICE],SQL[B_NUMBER]);
+		}
+	}
+	else
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+	}
+}
+void PikaCRM::NewBuyItem()
+{	
+	Order.BuyItemGrid(O_ID)=Order.Grid(O_ID);
+}
+void PikaCRM::InsertBuyItem()
+{
+	try
+	{
+		SQL & Insert(BUYITEM)
+			(O_ID,		Order.BuyItemGrid(O_ID))
+			(M_ID,		Order.BuyItemGrid(M_ID))
+			(M_NAME,	Order.BuyItemGrid(M_NAME))
+			//(M_MODEL,	Order.BuyItemGrid(M_MODEL))
+			(M_PRICE,	Order.BuyItemGrid(M_PRICE))
+			(B_PRICE,	Order.BuyItemGrid(B_PRICE))
+			(B_NUMBER,	Order.BuyItemGrid(B_NUMBER));
+			
+		Order.BuyItemGrid(B_ID) = SQL.GetInsertedId();//it will return only one int primary key
+	}
+	catch(SqlExc &e)
+	{
+		Order.BuyItemGrid.CancelInsert();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::UpdateBuyItem()
+{
+	/*String now_time="CURRENT_TIMESTAMP";
+	try
+	{
+		SQL & ::Update(BuyItemS)
+			(C_ID,	BuyItem.Grid(C_ID))
+			(O_SHIP_ADD,	BuyItem.Grid(O_SHIP_ADD))
+			(O_BILL_ADD,	BuyItem.Grid(O_BILL_ADD))
+			(O_BuyItem_DATE,	BuyItem.Grid(O_BuyItem_DATE))
+			(O_SHIP_DATE,	BuyItem.Grid(O_SHIP_DATE))
+			(O_STATUS,		BuyItem.Grid(O_STATUS))
+			(O_MTIME,		GetSysTime())
+			(O_NOTE,		BuyItem.Grid(O_NOTE))
+			.Where(O_ID == BuyItem.Grid(O_ID));
+	}
+	catch(SqlExc &e)
+	{
+		BuyItem.Grid.CancelUpdate();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}*/
+}
+void PikaCRM::RemoveBuyItem()
+{
+	/*try
+	{
+		SQL & Delete(BuyItemS).Where(O_ID == BuyItem.Grid(O_ID));
+	}
+	catch(SqlExc &e)
+	{
+		BuyItem.Grid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}*/
+}
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
 {
@@ -1275,6 +1374,75 @@ void PikaCRM::OrderGridCustomerBtnClick()
 		}
 		Order.Grid.Set(C_ID,costomer_id);		
 		Order.Grid.Set(C_TITLE,title);
+    }
+}
+
+void PikaCRM::BuyItemGridMerchBtnClick()
+{
+	//UI--------------------------------------------
+	TopWindow d;
+	Button ok, cancel;
+
+    d.SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+	ok.Ok() <<= d.Acceptor(IDOK);
+	cancel.Cancel() <<= d.Rejector(IDCANCEL);
+	
+	ColumnList list;
+	d.Add(list);
+	list.SetRect(0, 0, 400, 325);
+	list.Columns(3);
+	//end UI--------------------------------------------
+	//add costomer to select
+	SQL & Select(M_ID, M_NAME, M_MODEL, M_PRICE).From(MERCHANDISE);
+	while(SQL.Fetch())
+	{
+		String item_value=SQL[M_NAME].ToString();
+		if(!SQL[M_MODEL].IsNull()) item_value+=" - "+SQL[M_MODEL].ToString();
+		list.Add(SQL[M_ID], item_value, true);
+	}
+	
+	if(list.GetCount()<=0)	return;//there is no any customer
+	if(Order.BuyItemGrid(M_ID).IsNull())
+	{
+		
+	}
+	else
+	{
+		int list_index=list.Find(Order.BuyItemGrid(M_ID));
+		list.SetCursor(list_index);
+	}
+	
+	int merch_id;
+	String title;
+	if(d.Run()==IDOK) {
+		for(int i = 0; i < list.GetCount(); i++)
+		{
+			if(list.IsSel(i))
+			{
+				merch_id=list.Get(i);
+								
+				//show on the grid
+				title=String(list.GetValue(i));
+				
+				//update in the database
+				try
+				{
+					if(-1 != Order.BuyItemGrid(B_ID))
+					{
+						SQL & ::Update(BUYITEM) (M_ID,  merch_id).Where(B_ID == Order.BuyItemGrid(B_ID));
+					}
+				}
+				catch(SqlExc &e)
+				{
+					continue;
+					Exclamation("[* " + DeQtfLf(e) + "]");
+				}
+			}
+		}
+		Order.BuyItemGrid.Set(M_ID,merch_id);		
+		Order.BuyItemGrid.Set(M_NAME,title);
     }
 }
 //end interactive with GUI==========================================================

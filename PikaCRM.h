@@ -147,6 +147,12 @@ private :
 	MultiButtonNotNULL mOrderGridCustomerBtn;
 	ToolBar order_search_bar;
 	
+	//Order.BuyItemGrid
+	EditDoubleNotNull	bed;
+	EditIntSpin beis;
+	MultiButtonNotNULL mBuyItemGridMerchBtn;
+	
+	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
 	int	mLanguage;
 
@@ -193,6 +199,13 @@ private :
 	void InsertOrder();
 	void UpdateOrder();
 	void RemoveOrder();
+	void ChangeOrder();
+				
+	void LoadBuyItem(int o_id);
+	void NewBuyItem();
+	void InsertBuyItem();
+	void UpdateBuyItem();
+	void RemoveBuyItem();
 	
 	//application control--------------------------------------------------------------
 	void CloseMainFrom();
@@ -235,6 +248,8 @@ public:
 	void	EventNewStatusClick();
 		
 	void	OrderGridCustomerBtnClick();
+	
+	void	BuyItemGridMerchBtnClick();
 };
 
 #endif

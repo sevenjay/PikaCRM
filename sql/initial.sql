@@ -1,6 +1,6 @@
 /*PikaCRM database version 1*/
 
-CREATE TABLE "BuyItem" ("o_id" INTEGER NOT NULL , "b_id" INTEGER NOT NULL , "m_id" INTEGER NOT NULL, "m_model" CHAR, "m_name" CHAR, "m_price" DOUBLE, "b_price" FLOAT NOT NULL , "b_number" INTEGER NOT NULL , PRIMARY KEY ("o_id", "b_id"));
+CREATE TABLE "BuyItem" ("o_id" INTEGER NOT NULL , "b_id" INTEGER PRIMARY KEY NOT NULL , "m_id" INTEGER NOT NULL, "m_model" CHAR, "m_name" CHAR, "m_price" DOUBLE, "b_price" FLOAT NOT NULL , "b_number" INTEGER NOT NULL);
 
 CREATE TABLE "Contact" ("co_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER, "co_name" CHAR NOT NULL , "co_phone" CHAR, "co_address" CHAR, "co_email" CHAR, "co_ctime" DATETIME NOT NULL  DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')), "co_profile" BLOB, "co_card" BLOB, "co_1" BLOB, "co_2" BLOB, "co_3" BLOB);
 
