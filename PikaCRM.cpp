@@ -1395,12 +1395,14 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 	list.Columns(3);
 	//end UI--------------------------------------------
 	//add costomer to select
+	Vector<double> price_list;
 	SQL & Select(M_ID, M_NAME, M_MODEL, M_PRICE).From(MERCHANDISE);
 	while(SQL.Fetch())
 	{
 		String item_value=SQL[M_NAME].ToString();
 		if(!SQL[M_MODEL].IsNull()) item_value+=" - "+SQL[M_MODEL].ToString();
 		list.Add(SQL[M_ID], item_value, true);
+		price_list.Add(SQL[M_PRICE]);
 	}
 	
 	if(list.GetCount()<=0)	return;//there is no any customer
@@ -1414,6 +1416,7 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 		list.SetCursor(list_index);
 	}
 	
+	double price;
 	int merch_id;
 	String title;
 	if(d.Run()==IDOK) {
@@ -1421,17 +1424,21 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 		{
 			if(list.IsSel(i))
 			{
-				merch_id=list.Get(i);
-								
-				//show on the grid
-				title=String(list.GetValue(i));
+				merch_id	= list.Get(i);
+				title		= list.GetValue(i).ToString();
+				price	= price_list[i];
 				
 				//update in the database
 				try
 				{
 					if(-1 != Order.BuyItemGrid(B_ID))
 					{
-						SQL & ::Update(BUYITEM) (M_ID,  merch_id).Where(B_ID == Order.BuyItemGrid(B_ID));
+						SQL & ::Update(BUYITEM) 
+							(M_ID,		merch_id)
+							(M_NAME,	title)
+							//(M_MODEL,	Order.BuyItemGrid(M_MODEL))
+							(M_PRICE,	price)
+							.Where(B_ID == Order.BuyItemGrid(B_ID));
 					}
 				}
 				catch(SqlExc &e)
@@ -1442,7 +1449,8 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 			}
 		}
 		Order.BuyItemGrid.Set(M_ID,merch_id);		
-		Order.BuyItemGrid.Set(M_NAME,title);
+		Order.BuyItemGrid.Set(M_NAME,title);	
+		Order.BuyItemGrid.Set(M_PRICE,price);	
     }
 }
 //end interactive with GUI==========================================================
