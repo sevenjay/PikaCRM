@@ -209,6 +209,14 @@ void PikaCRM::SetupUI()
 		Order.Grid.FindBar(Order_search_bar, 140);
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
 	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);*/
+	//Order.ContactDrop-------------------------------------
+	Order.ContactDrop.AddColumn(t_("Name"));
+	Order.ContactDrop.AddColumn(t_("Phone"));
+	Order.ContactDrop.AddColumn(t_("Email"));
+	Order.ContactDrop.Width(200);
+	//Order.ContactDrop.SetValueColumn(0);
+	Order.ContactDrop.AddValueColumn(0).AddValueColumn(1);
+	Order.ContactDrop.Tip(t_("Contact"));
 	//Order.BuyItemGrid-------------------------------------
 	Order.BuyItemGrid.AddIndex(O_ID);
 	Order.BuyItemGrid.AddIndex(B_ID).Default(-1);//for when create row before insert row;
@@ -642,6 +650,7 @@ void PikaCRM::LoadOrder()
 }
 void PikaCRM::LoadOrderCustomer()
 {
+	Order.ContactDrop.Clear();
 	bool is_sql_ok=SQL.Execute("select * from Customer where c_id = ?;", Order.Grid(C_ID));
 	if(is_sql_ok)
 	{
@@ -652,19 +661,13 @@ void PikaCRM::LoadOrderCustomer()
 			Order.CustomerADD	=SQL[C_ADDRESS].ToString();
 			Order.CustomerEmail	=SQL[C_EMAIL].ToString();
 			Order.CustomerWeb	=SQL[C_WEBSITE].ToString();
-			/*VectorMap<int, String> temp_contact_map;
 			Sql sql2;
-			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
+			sql2 & Select(CO_ID, CO_NAME, CO_PHONE, CO_EMAIL).From(CONTACT).Where(C_ID == SQL[C_ID]);
 			while(sql2.Fetch())
 			{
-				temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
+				Order.ContactDrop.Add(sql2[CO_NAME], sql2[CO_PHONE], sql2[CO_EMAIL]);
 			}
-			//const Value & raw_map = RawToValue(temp_contact_map);
-			
-			//Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);//,all_name);
-			//Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
-			//Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
-			*/
+			if(!Order.ContactDrop.IsEmpty()) Order.ContactDrop.SetIndex(0);
 		}
 	}
 	else
