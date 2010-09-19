@@ -230,7 +230,7 @@ void PikaCRM::SetupUI()
 	Order.BuyItemGrid.AddColumn(B_PRICE,t_("Order Price")).Edit(bed);
 	Order.BuyItemGrid.AddColumn(B_NUMBER,t_("Quantity")).Edit(beis).Default(0);
 		beis.NotNull();
-	Order.BuyItemGrid.Removing().AskRemove().Editing().Canceling().ColorRows();
+	Order.BuyItemGrid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Order.BuyItemGrid.SetToolBar();
 	Order.BuyItemGrid.WhenNewRow = THISBACK(NewBuyItem);
 	Order.BuyItemGrid.WhenInsertRow = THISBACK(InsertBuyItem);
@@ -733,7 +733,6 @@ void PikaCRM::RemoveOrder()
 }
 void PikaCRM::ChangeOrder()
 {
-	Order.BuyItemGrid.Appending(true);
 	LoadOrderCustomer();
 	LoadBuyItem(Order.Grid(O_ID));
 }
@@ -755,7 +754,21 @@ void PikaCRM::LoadBuyItem(int o_id)
 	}
 }
 void PikaCRM::NewBuyItem()
-{	
+{
+	if(Order.Grid.IsEmpty())
+	{
+		Exclamation(t_("Please create an order first."));
+		Order.BuyItemGrid.DoCancelEdit();
+		return;
+	}
+	
+	if(!Order.Grid.IsSelected())
+	{
+		Exclamation(t_("Please select an order first."));
+		Order.BuyItemGrid.DoCancelEdit();
+		return;
+	}
+	
 	Order.BuyItemGrid(O_ID)=Order.Grid(O_ID);
 }
 void PikaCRM::InsertBuyItem()
@@ -781,37 +794,35 @@ void PikaCRM::InsertBuyItem()
 }
 void PikaCRM::UpdateBuyItem()
 {
-	/*String now_time="CURRENT_TIMESTAMP";
 	try
 	{
-		SQL & ::Update(BuyItemS)
-			(C_ID,	BuyItem.Grid(C_ID))
-			(O_SHIP_ADD,	BuyItem.Grid(O_SHIP_ADD))
-			(O_BILL_ADD,	BuyItem.Grid(O_BILL_ADD))
-			(O_BuyItem_DATE,	BuyItem.Grid(O_BuyItem_DATE))
-			(O_SHIP_DATE,	BuyItem.Grid(O_SHIP_DATE))
-			(O_STATUS,		BuyItem.Grid(O_STATUS))
-			(O_MTIME,		GetSysTime())
-			(O_NOTE,		BuyItem.Grid(O_NOTE))
-			.Where(O_ID == BuyItem.Grid(O_ID));
+		SQL & ::Update(BUYITEM)
+			(O_ID,		Order.BuyItemGrid(O_ID))
+			(M_ID,		Order.BuyItemGrid(M_ID))
+			(M_NAME,	Order.BuyItemGrid(M_NAME))
+			//(M_MODEL,	Order.BuyItemGrid(M_MODEL))
+			(M_PRICE,	Order.BuyItemGrid(M_PRICE))
+			(B_PRICE,	Order.BuyItemGrid(B_PRICE))
+			(B_NUMBER,	Order.BuyItemGrid(B_NUMBER))
+			.Where(B_ID == Order.BuyItemGrid(B_ID));
 	}
 	catch(SqlExc &e)
 	{
-		BuyItem.Grid.CancelUpdate();
+		Order.BuyItemGrid.CancelUpdate();
 		Exclamation("[* " + DeQtfLf(e) + "]");
-	}*/
+	}
 }
 void PikaCRM::RemoveBuyItem()
 {
-	/*try
+	try
 	{
-		SQL & Delete(BuyItemS).Where(O_ID == BuyItem.Grid(O_ID));
+		SQL & Delete(BUYITEM).Where(B_ID == Order.BuyItemGrid(B_ID));
 	}
 	catch(SqlExc &e)
 	{
-		BuyItem.Grid.CancelRemove();
+		Order.BuyItemGrid.CancelRemove();
 		Exclamation("[* " + DeQtfLf(e) + "]");
-	}*/
+	}
 }
 //application control-----------------------------------------------------------
 String PikaCRM::GetLogPath()
