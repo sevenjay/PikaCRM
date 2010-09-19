@@ -650,7 +650,7 @@ void PikaCRM::LoadOrder()
 }
 void PikaCRM::LoadOrderCustomer()
 {
-	Order.ContactDrop.Clear();
+	Order.ContactDrop.GetList().Clear();//DropGrid.Clear() will set focus, use DropGrid.list.Clear()
 	bool is_sql_ok=SQL.Execute("select * from Customer where c_id = ?;", Order.Grid(C_ID));
 	if(is_sql_ok)
 	{
@@ -1422,6 +1422,7 @@ void PikaCRM::OrderGridCustomerBtnClick()
 		}
 		Order.Grid.Set(C_ID,costomer_id);		
 		Order.Grid.Set(C_TITLE,title);
+		LoadOrderCustomer();
     }
 }
 
