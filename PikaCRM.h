@@ -196,6 +196,7 @@ private :
 	void RemoveMerchandise();
 			
 	void LoadOrder();
+	void LoadOrderCustomer();
 	void InsertOrder();
 	void UpdateOrder();
 	void RemoveOrder();

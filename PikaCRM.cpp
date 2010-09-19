@@ -640,6 +640,39 @@ void PikaCRM::LoadOrder()
 		SysLog.Error(SQL.GetLastError()+"\n");
 	}
 }
+void PikaCRM::LoadOrderCustomer()
+{
+	bool is_sql_ok=SQL.Execute("select * from Customer where c_id = ?;", Order.Grid(C_ID));
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())
+		{
+			Order.CustomerTitle	=SQL[C_TITLE].ToString();
+			Order.CustomerPhone	=SQL[C_PHONE].ToString();
+			Order.CustomerADD	=SQL[C_ADDRESS].ToString();
+			Order.CustomerEmail	=SQL[C_EMAIL].ToString();
+			Order.CustomerWeb	=SQL[C_WEBSITE].ToString();
+			/*VectorMap<int, String> temp_contact_map;
+			Sql sql2;
+			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
+			while(sql2.Fetch())
+			{
+				temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
+			}
+			//const Value & raw_map = RawToValue(temp_contact_map);
+			
+			//Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);//,all_name);
+			//Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+			//Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
+			*/
+		}
+	}
+	else
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
 void PikaCRM::InsertOrder()
 {	
 	try
@@ -698,6 +731,7 @@ void PikaCRM::RemoveOrder()
 void PikaCRM::ChangeOrder()
 {
 	Order.BuyItemGrid.Appending(true);
+	LoadOrderCustomer();
 	LoadBuyItem(Order.Grid(O_ID));
 }
 
