@@ -80,8 +80,8 @@ void PikaCRM::SetupUI()
 	MainFrom.tabMain.Add(Order.SizePos(), t_("Orders"));
 	CtrlLayout(Merchandise);
 	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
-	CtrlLayout(Setup);
-	MainFrom.tabMain.Add(Setup.SizePos(), t_("Setup"));
+	CtrlLayout(Preference);
+	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));
 	//end TabCtrl------------------------------------------------------------------------
 	//Customer Tab-----------------------------------------------------------------------
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
@@ -236,6 +236,9 @@ void PikaCRM::SetupUI()
 	Order.BuyItemGrid.WhenInsertRow = THISBACK(InsertBuyItem);
 	Order.BuyItemGrid.WhenUpdateRow = THISBACK(UpdateBuyItem);
 	Order.BuyItemGrid.WhenRemoveRow = THISBACK(RemoveBuyItem);
+	
+	//Preference Tab-----------------------------------------------------------------------
+	Preference.btnDatabase <<= THISBACK(ConfigDB);
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()

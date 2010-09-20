@@ -113,7 +113,7 @@ private :
 	WithEventLayout<ParentCtrl> Event;
 	WithOrderLayout<ParentCtrl> Order;
 	WithMerchandiseLayout<ParentCtrl> Merchandise;
-	WithSetupLayout<ParentCtrl> Setup;
+	WithPreferenceLayout<ParentCtrl> Preference;
 
 	//Customer.Grid
 	EditStringNotNull cesn;
@@ -252,6 +252,13 @@ public:
 	void	OrderGridCustomerBtnClick();
 	
 	void	BuyItemGridMerchBtnClick();
+	
+	//Preference Tab------------------------------------------------------
+	void	ConfigDB(){
+				String database_file_path = getConfigDirPath()+FILE_DATABASE;
+				SetupDB(database_file_path); 
+				CreateOrOpenDB(database_file_path);
+			};
 };
 
 #endif

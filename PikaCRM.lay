@@ -150,6 +150,7 @@ LAYOUT(MerchandiseLayout, 596, 400)
 	ITEM(GridCtrl, Grid, HSizePosZ(0, 2).VSizePosZ(60, 2))
 END_LAYOUT
 
-LAYOUT(SetupLayout, 596, 400)
+LAYOUT(PreferenceLayout, 596, 400)
+	ITEM(Button, btnDatabase, SetLabel(t_("Database")).LeftPosZ(44, 56).TopPosZ(44, 15))
 END_LAYOUT
 
