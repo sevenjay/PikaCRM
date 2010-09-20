@@ -205,10 +205,10 @@ void PikaCRM::SetupUI()
 	Order.Grid.WhenRemoveRow = THISBACK(RemoveOrder);
 	Order.Grid.WhenChangeRow = THISBACK(ChangeOrder);
 	//Order Search------------------------------------------
-	/*Order.Add(Order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
-		Order.Grid.FindBar(Order_search_bar, 140);
+	Order.Add(order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+		Order.Grid.FindBar(order_search_bar, 140);
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
-	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);*/
+	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);
 	//Order.ContactDrop-------------------------------------
 	Order.ContactDrop.AddColumn(t_("Name"));
 	Order.ContactDrop.AddColumn(t_("Phone"));
@@ -724,6 +724,8 @@ void PikaCRM::RemoveOrder()
 	try
 	{
 		SQL & Delete(ORDERS).Where(O_ID == Order.Grid(O_ID));
+		RemoveOrderBuyItem();
+		Order.BuyItemGrid.Clear();
 	}
 	catch(SqlExc &e)
 	{
@@ -817,6 +819,18 @@ void PikaCRM::RemoveBuyItem()
 	try
 	{
 		SQL & Delete(BUYITEM).Where(B_ID == Order.BuyItemGrid(B_ID));
+	}
+	catch(SqlExc &e)
+	{
+		Order.BuyItemGrid.CancelRemove();
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::RemoveOrderBuyItem()
+{
+	try
+	{
+		SQL & Delete(BUYITEM).Where(O_ID == Order.Grid(O_ID));
 	}
 	catch(SqlExc &e)
 	{

@@ -201,6 +201,7 @@ private :
 	void UpdateOrder();
 	void RemoveOrder();
 	void ChangeOrder();
+	void RemoveOrderBuyItem();
 				
 	void LoadBuyItem(int o_id);
 	void NewBuyItem();
