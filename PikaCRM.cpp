@@ -864,17 +864,15 @@ void PikaCRM::OpenMainFrom()
 			SysLog.Info("Remeber the PW\n");
 			String key=CombineKey(GetSystemKey(), mConfig.Password);
 			SysLog.Debug("key:"+key+"\n");
-			//PromptOK(key);
 			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
-				IsInputPWCheck();//false 		///@todo exit all
-			/*	else
+				if(!IsInputPWCheck()) return;//false
+			else
 				;//just using mConfig.Password;
-			*/
 		}
 		else//not Remember PW 
 		{
 			SysLog.Info("Not Remeber the PW\n");
-			IsInputPWCheck();
+			if(!IsInputPWCheck()) return;
 		}
 		mSplash.ShowSplash();
 	}
@@ -1119,6 +1117,7 @@ bool PikaCRM::IsInputPWCheck()
 	}
 	else
 	{
+		SysLog.Info("Cancel input the password\n");
 		return false;
 	}
 }
