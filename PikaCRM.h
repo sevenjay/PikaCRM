@@ -222,7 +222,7 @@ private :
 		void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
 	bool IsDBWork();
 	
-	void InputPWCheck();
+	bool IsInputPWCheck();
 		void CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw);
 	String GetSystemKey();
 	String CombineKey(const String & key1, const String & key2);
@@ -254,11 +254,7 @@ public:
 	void	BuyItemGridMerchBtnClick();
 	
 	//Preference Tab------------------------------------------------------
-	void	ConfigDB(){
-				String database_file_path = getConfigDirPath()+FILE_DATABASE;
-				SetupDB(database_file_path); 
-				CreateOrOpenDB(database_file_path);
-			};
+	void	ConfigDB();
 };
 
 #endif

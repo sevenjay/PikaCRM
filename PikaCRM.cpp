@@ -861,19 +861,20 @@ void PikaCRM::OpenMainFrom()
 		mSplash.HideSplash();
 		if(mConfig.IsRememberPW)
 		{
-			SysLog.Debug("Remeber the PW\n");
+			SysLog.Info("Remeber the PW\n");
 			String key=CombineKey(GetSystemKey(), mConfig.Password);
 			SysLog.Debug("key:"+key+"\n");
 			//PromptOK(key);
 			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
-				InputPWCheck();
+				IsInputPWCheck();//false 		///@todo exit all
 			/*	else
 				;//just using mConfig.Password;
 			*/
 		}
 		else//not Remember PW 
 		{
-			InputPWCheck();
+			SysLog.Info("Not Remeber the PW\n");
+			IsInputPWCheck();
 		}
 		mSplash.ShowSplash();
 	}
@@ -954,6 +955,7 @@ bool PikaCRM::IsHaveDBFile(const String & database_file_path)
 
 void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 {
+	mSqlite3Session.Close();
 	if(!mSqlite3Session.Open(database_file_path))
 	{
 		SysLog.Error("can't create or open database file: "+database_file_path+"\n");
@@ -1102,21 +1104,22 @@ void PikaCRM::SaveConfig(const String & config_file_path)
 }
 
 
-void PikaCRM::InputPWCheck()
+bool PikaCRM::IsInputPWCheck()
 {
 	String config_file_path=getConfigDirPath()+FILE_CONFIG;
 	WithInputPWLayout<TopWindow> d;
-	CtrlLayoutOK(d,t_("Pika Customer Relationship Management"));
+	CtrlLayoutOKCancel(d,t_("Pika Customer Relationship Management"));
 	d.ok.WhenPush = THISBACK2(CheckPWRight, &d, mConfig.Password);
 	d.optRememberPW = mConfig.IsRememberPW;
 	if(d.Run() == IDOK) {
 		mConfig.IsRememberPW=(bool)d.optRememberPW;
 		if(d.optRememberPW) mConfig.SystemPWKey=CombineKey(GetSystemKey(), mConfig.Password);
 		SaveConfig(config_file_path);
+		return true;
 	}
 	else
 	{
-		///@todo exit all
+		return false;
 	}
 }
 
@@ -1519,6 +1522,14 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 		Order.BuyItemGrid.Set(M_PRICE,price);	
     }
 }
+
+void PikaCRM::ConfigDB()
+{
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	SetupDB(database_file_path); 
+	//must resetkey?
+	CreateOrOpenDB(database_file_path);
+};
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------
 String PikaCRM::getConfigDirPath()
