@@ -854,7 +854,7 @@ void PikaCRM::OpenMainFrom()
 	
 	mSplash.ShowSplashStatus(t_("Loading Settings..."));
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
-	LoadConfig(config_file_path);///@todo see if encrypt?
+	LoadConfig(config_file_path);
 
 	if(mConfig.IsDBEncrypt)
 	{
@@ -896,7 +896,7 @@ void PikaCRM::OpenMainFrom()
 	{
 		mSplash.HideSplash();
 		///@todo first welcome
-		SetupDB(config_file_path);
+		if(!IsSetupDB(config_file_path)) return;
 		mSplash.ShowSplash();
 		CreateOrOpenDB(database_file_path);//CreateDB
 		InitialDB();
@@ -999,22 +999,30 @@ void PikaCRM::InitialDB()
 
 #endif
 }
-void PikaCRM::SetupDB(const String config_file_path)
+bool PikaCRM::IsSetupDB(const String config_file_path)
 {
 	WithInitialDBLayout<TopWindow> d;
-	CtrlLayoutOK(d, t_("Setup your database"));
+	CtrlLayoutOKCancel(d, t_("Setup your database"));
 	d.esPassword.Password();
 	d.esCheckPassword.Password();
 	d.optRequire.SetEditable(false);
 	d.optPW.WhenAction=THISBACK1(OnOptPWAction, &d);
+	d.optRevealPW.WhenAction=THISBACK1(OnOptRevealPWAction, &d);
 	d.ok.WhenPush = THISBACK1(CheckPWSame, &d);
 	
-
 	String note,note2;
 	note<<"[1 "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
 	d.rtNoteEncrypted.SetQTF(note);
 	note2<<"[1 "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";
 	d.rtNoteEncrypted2.SetQTF(note2);
+	
+	//Load from Config
+	d.optPW=mConfig.IsDBEncrypt;
+	OnOptPWAction(&d);
+	d.optRequire=!mConfig.IsRememberPW;
+	//Get from IsInputPWCheck
+	d.esPassword=mRevealedPW;
+	d.esCheckPassword=mRevealedPW;
 	if(d.Run() == IDOK) {
 		if(d.optPW)
 		{
@@ -1024,11 +1032,23 @@ void PikaCRM::SetupDB(const String config_file_path)
 			mConfig.IsRememberPW=!(bool)d.optRequire;	
 			mConfig.SystemPWKey=CombineKey(GetSystemKey(), mConfig.Password);	
 		}
+		else
+		{
+			//String tempPW=d.esPassword.GetData();
+			mConfig.IsDBEncrypt=false;
+			mConfig.Password="";
+			mConfig.IsRememberPW=false;	
+			mConfig.SystemPWKey="";			
+		}
 
 		SaveConfig(config_file_path);
+		return true;
 	}
-	
-	
+	else
+	{
+		SysLog.Info("Cancel setup the database\n");
+		return false;
+	}
 }
 void PikaCRM::OnOptPWAction(WithInitialDBLayout<TopWindow> * d)
 {
@@ -1053,6 +1073,19 @@ void PikaCRM::OnOptPWAction(WithInitialDBLayout<TopWindow> * d)
 		d->optRequire.SetEditable(false);
 	}
 }
+void PikaCRM::OnOptRevealPWAction(WithInitialDBLayout<TopWindow> * d)
+{
+	if(d->optRevealPW)
+	{
+		d->esPassword.Password(false);
+		d->esCheckPassword.Password(false);
+	}
+	else 
+	{
+		d->esPassword.Password();
+		d->esCheckPassword.Password();
+	}
+}
 void PikaCRM::CheckPWSame(WithInitialDBLayout<TopWindow> * d)
 {
 	String p1=d->esPassword;
@@ -1067,7 +1100,7 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 	{
 		if(mConfig.Load(config_file_path))
 		{
-			SysLog.Debug("loaded the config file\n");
+			SysLog.Info("loaded the config file\n");
 		}
 		else
 		{
@@ -1126,9 +1159,10 @@ void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw)
 {
 	String p1=d->esPassword;
 	String pwMD5=getMD5(p1<<PW_MAGIC_WORD);
-	if(!pw.IsEqual(pwMD5))
+	if(pw.IsEqual(pwMD5))
+		mRevealedPW=d->esPassword;
+	else
 		Exclamation(t_("The Password is incorrect!"));
-		//PromptOK(t_("The Password is incorrect!"));
 }
 
 String PikaCRM::GetSystemKey()
@@ -1524,10 +1558,21 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 
 void PikaCRM::ConfigDB()
 {
+	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
-	SetupDB(database_file_path); 
-	//must resetkey?
-	CreateOrOpenDB(database_file_path);
+	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db
+	if(IsInputPWCheck())
+	{
+		if(IsSetupDB(config_file_path))
+		{
+			SysLog.Info("Reset database encrypted key.\n");
+			if(!mSqlite3Session.ResetKey(getSwap1st2ndChar(mConfig.Password)))
+			{
+				SysLog.Error("sqlite3 reset key error\n");
+				///@note we dont know how to deal this error, undefine		
+			}
+		}
+	}
 };
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------

@@ -11,7 +11,9 @@ LAYOUT(InitialDBLayout, 412, 204)
 	ITEM(Option, optRequire, SetLabel(t_("Require the user to enter this password when start.")).LeftPosZ(36, 292).TopPosZ(136, 16))
 	ITEM(Label, dv___6, SetLabel(t_("Re-Enter Password:")).LeftPosZ(36, 104).TopPosZ(108, 20))
 	ITEM(Label, dv___7, SetLabel(t_("Enter new Password:")).LeftPosZ(36, 100).TopPosZ(80, 20))
-	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(288, 24).TopPosZ(172, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(288, 24).TopPosZ(172, 20))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(164, 148).TopPosZ(172, 20))
+	ITEM(Option, optRevealPW, SetLabel(t_("Reveal Passwords")).LeftPosZ(280, 108).TopPosZ(80, 20))
 END_LAYOUT
 
 LAYOUT(InputPWLayout, 300, 120)

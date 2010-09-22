@@ -161,6 +161,9 @@ private :
 	Config mConfig;
 	
 	Sqlite3Session mSqlite3Session;
+	
+	//private data-------------------------------------------------------------------
+	String mRevealedPW;
 
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
@@ -217,8 +220,9 @@ private :
 	bool IsHaveDBFile(const String & database_file_path);
 	void CreateOrOpenDB(const String & database_file_path);
 	void InitialDB();
-	void SetupDB(const String config_file_path);
+	bool IsSetupDB(const String config_file_path);
 		void OnOptPWAction(WithInitialDBLayout<TopWindow> * d);
+		void OnOptRevealPWAction(WithInitialDBLayout<TopWindow> * d);
 		void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
 	bool IsDBWork();
 	
