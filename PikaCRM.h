@@ -40,6 +40,7 @@ using namespace Upp;
 #define BUILD_DATE						Date(2010, 9, 1)
 
 #define PW_MAGIC_WORD					"sevenjay777"
+#define PW_EMPTY						getMD5(PW_MAGIC_WORD) //avoid clear config file pw hack
 //we let PW SETKEY ROLL by getSwap1st2ndChar
 
 //define file path and name------------------------------------------------------

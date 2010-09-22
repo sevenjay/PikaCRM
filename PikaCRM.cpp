@@ -967,7 +967,7 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 	
 	SQL = mSqlite3Session;//this is Upp default globe 
 	
-	if(!mConfig.Password.IsEmpty())
+	if(!mConfig.Password.IsEqual(PW_EMPTY))
 	{
 		SysLog.Info("setting database encrypted key.\n");
 		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
@@ -1036,7 +1036,7 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 		{
 			//String tempPW=d.esPassword.GetData();
 			mConfig.IsDBEncrypt=false;
-			mConfig.Password="";
+			mConfig.Password=PW_EMPTY;
 			mConfig.IsRememberPW=false;	
 			mConfig.SystemPWKey="";			
 		}
@@ -1112,7 +1112,7 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 	{
 		SysLog.Info("make a new config file\n");
 		mConfig.IsDBEncrypt=false;
-		mConfig.Password="";
+		mConfig.Password=PW_EMPTY;
 		mConfig.IsRememberPW=false;
 		mConfig.SystemPWKey="";
 		SaveConfig(config_file_path);
@@ -1560,13 +1560,19 @@ void PikaCRM::ConfigDB()
 {
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
-	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db
-	if(IsInputPWCheck())
+	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db, so we re-open
+	if(IsInputPWCheck())//if no pw not need? how do you know
 	{
 		if(IsSetupDB(config_file_path))
 		{
 			SysLog.Info("Reset database encrypted key.\n");
-			if(!mSqlite3Session.ResetKey(getSwap1st2ndChar(mConfig.Password)))
+			String pwkey;
+			if(mConfig.Password.IsEqual(PW_EMPTY))
+				pwkey="";
+			else
+				pwkey=mConfig.Password;
+				
+			if(!mSqlite3Session.ResetKey(getSwap1st2ndChar(pwkey)))
 			{
 				SysLog.Error("sqlite3 reset key error\n");
 				///@note we dont know how to deal this error, undefine		
@@ -1637,6 +1643,8 @@ String PikaCRM::getMD5(const String & text)
 }
 String PikaCRM::getSwap1st2ndChar(const String & text)
 {
+	if(text.IsEmpty()) return "";
+	
 	String r(text);
 	//String r2=text;
 	r.Remove(0);
