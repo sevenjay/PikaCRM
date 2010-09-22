@@ -243,7 +243,7 @@ void PikaCRM::SetupUI()
 //database control------------------------------------------------------------
 void PikaCRM::LoadCustomer()
 {
-	
+	SysLog.Info("Load Customers\n");
 	Customer.Grid.Clear();
 	bool is_sql_ok=SQL.Execute("select * from Customer;");
 	if(is_sql_ok)
@@ -385,7 +385,8 @@ void PikaCRM::RemoveCustomer()
 }
 
 void PikaCRM::LoadContact()
-{	
+{
+	SysLog.Info("Load Contacts\n");
 	Contact.Grid.Clear();
 	bool is_sql_ok=SQL.Execute("select co_id, Contact.c_id, c_title, co_name, co_phone, co_address, co_email from Contact left outer join Customer on Contact.c_id = Customer.c_id;");
 	if(is_sql_ok)
@@ -490,7 +491,8 @@ void PikaCRM::Update_dg_contact()
 }
 
 void PikaCRM::LoadEvent()
-{	
+{
+	SysLog.Info("Load Events\n");
 	Event.Grid.Clear();
 	String sql ="select e_id, Event.c_id, c_title, e_ask, e_status, "
 				"strftime('%m/%d/%Y %H:%M',e_rtime) as e_rtime, "
@@ -571,6 +573,7 @@ void PikaCRM::UpdateEventDropStatus()
 
 void PikaCRM::LoadMerchandise()
 {
+	SysLog.Info("Load Merchandises\n");
 	Merchandise.Grid.Clear();
 	bool is_sql_ok=SQL.Execute("select * from Merchandise;");
 	if(is_sql_ok)
@@ -633,6 +636,7 @@ void PikaCRM::RemoveMerchandise()
 
 void PikaCRM::LoadOrder()
 {
+	SysLog.Info("Load Orders\n");
 	Order.Grid.Clear();
 	String sql ="select o_id, Orders.c_id, c_title, o_ship_add, o_bill_add, "
 				"strftime('%m/%d/%Y',o_order_date) as o_order_date, "
@@ -653,6 +657,7 @@ void PikaCRM::LoadOrder()
 }
 void PikaCRM::LoadOrderCustomer()
 {
+	SysLog.Info("Load the Customer of the Order\n");
 	Order.ContactDrop.GetList().Clear();//DropGrid.Clear() will set focus, use DropGrid.list.Clear()
 	bool is_sql_ok=SQL.Execute("select * from Customer where c_id = ?;", Order.Grid(C_ID));
 	if(is_sql_ok)
@@ -744,6 +749,7 @@ void PikaCRM::ChangeOrder()
 
 void PikaCRM::LoadBuyItem(int o_id)
 {
+	SysLog.Info("Load Buy Items\n");
 	Order.BuyItemGrid.Clear();
 	bool is_sql_ok=SQL.Execute("select * from BuyItem where o_id = ?;",o_id);
 	if(is_sql_ok)
@@ -861,17 +867,20 @@ void PikaCRM::OpenMainFrom()
 		mSplash.HideSplash();
 		if(mConfig.IsRememberPW)
 		{
-			SysLog.Info("Remeber the PW\n");
+			SysLog.Info("config: Remeber the PW\n");
 			String key=CombineKey(GetSystemKey(), mConfig.Password);
-			SysLog.Debug("key:"+key+"\n");
+			SysLog.Debug("systemPWKey:"+key+"\n");
 			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
+			{
+				SysLog.Info("config: application is running on different PC\n");
 				if(!IsInputPWCheck()) return;//false
-			else
-				;//just using mConfig.Password;
+			}
+			//else
+			//	;//just using mConfig.Password;
 		}
 		else//not Remember PW 
 		{
-			SysLog.Info("Not Remeber the PW\n");
+			SysLog.Info("config: Not Remeber the PW\n");
 			if(!IsInputPWCheck()) return;
 		}
 		mSplash.ShowSplash();
@@ -882,6 +891,7 @@ void PikaCRM::OpenMainFrom()
 	SysLog.Info(t_("Loading Database..."))<<"\n";
 	if(IsHaveDBFile(database_file_path))
 	{
+		SysLog.Info("open the database file\n");
 		CreateOrOpenDB(database_file_path);//OpenDB
 		/*if(GetDBVersion()<DATABASE_VERSION)
 			UpdateDB();
@@ -894,6 +904,7 @@ void PikaCRM::OpenMainFrom()
 	}
 	else
 	{
+		SysLog.Info("create the database file\n");
 		mSplash.HideSplash();
 		///@todo first welcome
 		if(!IsSetupDB(config_file_path)) return;
@@ -959,7 +970,7 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 		SysLog.Error("can't create or open database file: "+database_file_path+"\n");
 		///@todo thow 
 	}
-	SysLog.Debug("create or open database file: "+database_file_path+"\n");
+	SysLog.Debug("created or opened database file: "+database_file_path+"\n");
 	
 #ifdef _DEBUG
 	mSqlite3Session.SetTrace();
@@ -969,7 +980,7 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 	
 	if(!mConfig.Password.IsEqual(PW_EMPTY))
 	{
-		SysLog.Info("setting database encrypted key.\n");
+		SysLog.Info("set database encrypted key.\n");
 		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
 		{
 			SysLog.Error("sqlite3 set key error\n");
@@ -979,6 +990,7 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 }
 void PikaCRM::InitialDB()
 {
+	SysLog.Info("initial the database file\n");
 	FileIn initial("initial.sql");
 	if(!initial)
 	{
@@ -1001,6 +1013,7 @@ void PikaCRM::InitialDB()
 }
 bool PikaCRM::IsSetupDB(const String config_file_path)
 {
+	SysLog.Info("setup the database\n");
 	WithInitialDBLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d, t_("Setup your database"));
 	d.esPassword.Password();
@@ -1558,6 +1571,7 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 
 void PikaCRM::ConfigDB()
 {
+	SysLog.Info("configure the database\n");
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
 	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db, so we re-open
@@ -1572,7 +1586,7 @@ void PikaCRM::ConfigDB()
 	
 	if(IsSetupDB(config_file_path))
 	{
-			SysLog.Info("Reset database encrypted key.\n");
+			SysLog.Info("reset database encrypted key.\n");
 			String pwkey;
 			if(mConfig.Password.IsEqual(PW_EMPTY))
 				pwkey="";
