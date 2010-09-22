@@ -1561,10 +1561,17 @@ void PikaCRM::ConfigDB()
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
 	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db, so we re-open
-	if(IsInputPWCheck())//if no pw not need? how do you know
+	if(mConfig.Password.IsEqual(PW_EMPTY))
 	{
-		if(IsSetupDB(config_file_path))
-		{
+		;
+	}
+	else //if no pw (PW_EMPTY) not need
+	{
+		if(!IsInputPWCheck()) return;
+	}
+	
+	if(IsSetupDB(config_file_path))
+	{
 			SysLog.Info("Reset database encrypted key.\n");
 			String pwkey;
 			if(mConfig.Password.IsEqual(PW_EMPTY))
@@ -1577,8 +1584,8 @@ void PikaCRM::ConfigDB()
 				SysLog.Error("sqlite3 reset key error\n");
 				///@note we dont know how to deal this error, undefine		
 			}
-		}
 	}
+	
 };
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------
