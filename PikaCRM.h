@@ -178,6 +178,10 @@ private :
 	
 	//database control------------------------------------------------------------
 	void LoadSetAllField();
+	void CreateField();
+	void ModifyField();
+	void RemoveField();
+	
 	void LoadCustomer();
 	void NewCustomer();
 	void InsertCustomer();

@@ -88,6 +88,9 @@ void PikaCRM::SetupUI()
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
+	Customer.btnCreateF <<= THISBACK(CreateField);
+	//Customer.btnModifyF <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
+	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 
 	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
 	Customer.Grid.AddColumn(C_TITLE,t_("Title")).Edit(cesn);
@@ -282,6 +285,33 @@ void PikaCRM::LoadSetAllField()
 	}
 	//int zz=mFieldEditList.Top().use_count();
 }
+void PikaCRM::CreateField()
+{
+	//UI--------------------------------------------
+	TopWindow d;
+	Button ok, cancel;
+
+	d.Title(t_("Create a customer field")).SetRect(0, 0, 300, 150);
+	d.Add(ok.SetLabel("OK").LeftPosZ(20, 45).TopPosZ(50, 16));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(100, 45).TopPosZ(50, 16));
+	ok.Ok() <<= d.Acceptor(IDOK);
+	cancel.Cancel() <<= d.Rejector(IDCANCEL);
+	
+	EditString edit;
+	Label title;
+	title.SetLabel(t_("Field title: "));
+	d.Add(title.LeftPosZ(15, 75).TopPosZ(20, 16));
+	d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
+	//end UI--------------------------------------------
+	if(d.Run()==IDOK) {
+		if(!IsNull(edit.GetData()))
+		{
+			//mEventDropStatus.Add(edit.GetData());
+			//mEventDropStatus.SetData(edit.GetData());
+		}
+	}
+}
+
 void PikaCRM::LoadCustomer()
 {
 	SysLog.Info("Load Customers\n");
@@ -1489,14 +1519,17 @@ void PikaCRM::EventNewStatusClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.SetRect(0, 0, 200, 200);
-	d.Add(ok.SetLabel("OK").LeftPosZ(8, 45).TopPosZ(50, 16));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(60, 45).TopPosZ(50, 16));
+	d.Title(t_("New status")).SetRect(0, 0, 300, 150);
+	d.Add(ok.SetLabel("OK").LeftPosZ(20, 45).TopPosZ(50, 16));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(100, 45).TopPosZ(50, 16));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
 	EditString edit;
-	d.Add(edit.LeftPosZ(15, 75).TopPosZ(20, 16));
+	Label title;
+	title.SetLabel(t_("Status: "));
+	d.Add(title.LeftPosZ(18, 75).TopPosZ(20, 16));
+	d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
 	//end UI--------------------------------------------
 	if(d.Run()==IDOK) {
 		if(!IsNull(edit.GetData()))
