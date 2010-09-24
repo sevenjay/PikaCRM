@@ -99,8 +99,10 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(Single<ConvContactNames>());
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
 	Customer.Grid.AddIndex(CONTACTS_MAP);
-	Customer.Grid.AddColumn(C_0);
-	Customer.Grid.AddColumn(C_1);
+	Customer.Grid.AddColumn(C_0).Hidden();
+	Customer.Grid.AddColumn(C_1).Hidden();
+	Customer.Grid.AddColumn(C_2).Hidden();
+	Customer.Grid.AddColumn(C_3).Hidden();
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();//.Searching();
 	//Customer.Grid.RejectNullRow();.Duplicating().Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
@@ -257,15 +259,13 @@ void PikaCRM::LoadSetAllField()
 
 	while(SQL.Fetch())
 	{
-		//boost::shared_ptr<EditString> pEStemp(new EditString());
-		//mFieldEditList.Add(pEStemp);
 		mFieldEditList.Add(new EditString());
 		if(SQL[F_TABLE]=="c")
 		{
 			SqlId sqlid=mFieldMap.Get("c")[SQL[F_ROWID]];
 			int c_index=Customer.Grid.FindCol(sqlid);
 			if(-1!=c_index)
-				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString());
+				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false);
 			//Customer.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);//.Width(200);
 			//Contact.Grid.AddColumn(C_0, "Conutry").Edit(es);		
 		}	
@@ -300,7 +300,17 @@ void PikaCRM::LoadCustomer()
 			}
 			const Value & raw_map = RawToValue(temp_contact_map);
 			
-			Customer.Grid.Add(SQL[C_ID],SQL[C_TITLE],SQL[C_PHONE],SQL[C_ADDRESS],SQL[C_EMAIL],SQL[C_WEBSITE]);//,all_name);
+			Customer.Grid.Add();
+			Customer.Grid(C_ID) = SQL[C_ID];
+			Customer.Grid(C_TITLE) = SQL[C_TITLE];
+			Customer.Grid(C_PHONE) = SQL[C_PHONE];
+			Customer.Grid(C_ADDRESS) = SQL[C_ADDRESS];
+			Customer.Grid(C_EMAIL) = SQL[C_EMAIL];
+			Customer.Grid(C_WEBSITE) = SQL[C_WEBSITE];
+			Customer.Grid(C_0) = SQL[C_0];
+			Customer.Grid(C_1) = SQL[C_1];
+			Customer.Grid(C_2) = SQL[C_2];
+			Customer.Grid(C_3) = SQL[C_3];
 			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
 			Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
 		}
@@ -331,7 +341,11 @@ void PikaCRM::InsertCustomer()
 			(C_PHONE,  Customer.Grid(C_PHONE))
 			(C_ADDRESS,Customer.Grid(C_ADDRESS))
 			(C_EMAIL,  Customer.Grid(C_EMAIL))
-			(C_WEBSITE,Customer.Grid(C_WEBSITE));
+			(C_WEBSITE,Customer.Grid(C_WEBSITE))
+			(C_0,  Customer.Grid(C_0))
+			(C_1,  Customer.Grid(C_1))
+			(C_2,  Customer.Grid(C_2))
+			(C_3,  Customer.Grid(C_3));
 
 		Customer.Grid(C_ID) = SQL.GetInsertedId();//it will return only one int primary key
 		
@@ -376,6 +390,10 @@ void PikaCRM::UpdateCustomer()
 			(C_ADDRESS,Customer.Grid(C_ADDRESS))
 			(C_EMAIL,  Customer.Grid(C_EMAIL))
 			(C_WEBSITE,Customer.Grid(C_WEBSITE))
+			(C_0,  Customer.Grid(C_0))
+			(C_1,  Customer.Grid(C_1))
+			(C_2,  Customer.Grid(C_2))
+			(C_3,  Customer.Grid(C_3))
 			.Where(C_ID == Customer.Grid(C_ID));
 		//update Contact.Grid(C_TITLE)	
 		const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
