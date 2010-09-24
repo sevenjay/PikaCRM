@@ -57,6 +57,7 @@ PikaCRM::PikaCRM()
 	
 	SetupUI();
 
+	SetAllFieldMap();
 
 	MainFrom.WhenClose=THISBACK(CloseMainFrom);
 	MainFrom.Sizeable().Zoomable();
@@ -241,6 +242,40 @@ void PikaCRM::SetupUI()
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
 }
 //database control------------------------------------------------------------
+void PikaCRM::LoadSetAllField()
+{
+	SysLog.Info("Load and Set All Fields\n");
+	bool is_sql_ok=SQL.Execute("select * from Field;");
+	if(!is_sql_ok)
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+		return;
+		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+
+	while(SQL.Fetch())
+	{
+		boost::shared_ptr<EditString> pEStemp(new EditString());
+		mFieldEditList.Add(pEStemp);
+		if(SQL[F_TABLE]=="c")
+		{
+			SqlId sqlid=mFieldMap.Get("c")[SQL[F_ROWID]];
+			Customer.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);//.Width(200);
+			//Contact.Grid.AddColumn(C_0, "Conutry").Edit(es);		
+		}	
+		else if(SQL[F_TABLE]=="co")
+		{
+			SqlId sqlid=mFieldMap.Get("co")[SQL[F_ROWID]];
+			Contact.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);
+		}	
+		else if(SQL[F_TABLE]=="m")
+		{
+			SqlId sqlid=mFieldMap.Get("m")[SQL[F_ROWID]];
+			Merchandise.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);
+		}
+	}
+	//int zz=mFieldEditList.Top().use_count();
+}
 void PikaCRM::LoadCustomer()
 {
 	SysLog.Info("Load Customers\n");
@@ -923,15 +958,7 @@ void PikaCRM::OpenMainFrom()
 	}
 	
 	
-	*/
-	
-	MainFrom.OpenMain();
-	
-	mSplash.ShowSplashStatus(t_("Normal Running..."));
-	SysLog.Info(t_("Normal Running..."))<<"\n";
-	
-	mSplash.SetSplashTimer(500);
-	
+	*/	
 	//test if database OK
 	bool is_sql_ok=SQL.Execute("select * from System;");
 	if(is_sql_ok)
@@ -943,13 +970,22 @@ void PikaCRM::OpenMainFrom()
 		SysLog.Error(SQL.GetLastError()+"\n");
 	}
 
-
-	
+	//Load and set customer field(UI+data)
+	LoadSetAllField();
+	//Load all tab data
 	LoadCustomer();
 	LoadContact();
 	LoadEvent();
 	LoadMerchandise();
-	LoadOrder();
+	LoadOrder();	
+	
+	
+	MainFrom.OpenMain();
+	
+	mSplash.ShowSplashStatus(t_("Normal Running..."));
+	SysLog.Info(t_("Normal Running..."))<<"\n";
+	
+	mSplash.SetSplashTimer(500);
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
@@ -1226,6 +1262,30 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 		ckey=getMD5(temp);
 	}
 	return ckey;
+}
+
+void PikaCRM::SetAllFieldMap()
+{
+	Vector<SqlId> c;
+	c.Add(C_0);
+	c.Add(C_1);
+	c.Add(C_2);
+	c.Add(C_3);
+	mFieldMap.Add("c",c);
+	
+	Vector<SqlId> co;
+	co.Add(CO_0);
+	co.Add(CO_1);
+	co.Add(CO_2);
+	co.Add(CO_3);
+	mFieldMap.Add("co",co);
+		
+	Vector<SqlId> m;
+	m.Add(M_0);
+	m.Add(M_1);
+	m.Add(M_2);
+	m.Add(M_3);
+	mFieldMap.Add("m",m);
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================

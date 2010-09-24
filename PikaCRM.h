@@ -9,7 +9,7 @@ using namespace Upp;
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
 #include <plugin/sqlite3/Sqlite3.h>
-//#include "boost/smart_ptr.hpp"
+#include "boost/smart_ptr.hpp"
 #include <DropGrid/DropGrid.h>
 #include <GridCtrl/GridCtrl.h> //must include before *.lay
 //end useful library---------------------------------------------------
@@ -164,6 +164,8 @@ private :
 	Sqlite3Session mSqlite3Session;
 	
 	//private data-------------------------------------------------------------------
+	VectorMap< String, Vector<SqlId> > mFieldMap;
+	Array< boost::shared_ptr<EditString> > mFieldEditList;
 	String mRevealedPW;
 
 	//private utility-------------------------------------------------------------------
@@ -175,6 +177,7 @@ private :
 	void	test(){PromptOK("test");};
 	
 	//database control------------------------------------------------------------
+	void LoadSetAllField();
 	void LoadCustomer();
 	void NewCustomer();
 	void InsertCustomer();
@@ -235,6 +238,8 @@ private :
 	void LoadConfig(const String & config_file_path);
 	void SetConfig();
 	void SaveConfig(const String & config_file_path);
+	
+	void SetAllFieldMap();
 	//end used in initial================================================
 	
 public:
