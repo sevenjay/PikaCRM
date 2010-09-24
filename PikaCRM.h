@@ -165,7 +165,8 @@ private :
 	
 	//private data-------------------------------------------------------------------
 	VectorMap< String, Vector<SqlId> > mFieldMap;
-	Array< boost::shared_ptr<EditString> > mFieldEditList;
+	//Array< boost::shared_ptr<EditString> > mFieldEditList;
+	Array<EditString> mFieldEditList;
 	String mRevealedPW;
 
 	//private utility-------------------------------------------------------------------

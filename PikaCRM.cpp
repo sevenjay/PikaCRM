@@ -99,6 +99,8 @@ void PikaCRM::SetupUI()
 	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(Single<ConvContactNames>());
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
 	Customer.Grid.AddIndex(CONTACTS_MAP);
+	Customer.Grid.AddColumn(C_0);
+	Customer.Grid.AddColumn(C_1);
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();//.Searching();
 	//Customer.Grid.RejectNullRow();.Duplicating().Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
@@ -255,23 +257,27 @@ void PikaCRM::LoadSetAllField()
 
 	while(SQL.Fetch())
 	{
-		boost::shared_ptr<EditString> pEStemp(new EditString());
-		mFieldEditList.Add(pEStemp);
+		//boost::shared_ptr<EditString> pEStemp(new EditString());
+		//mFieldEditList.Add(pEStemp);
+		mFieldEditList.Add(new EditString());
 		if(SQL[F_TABLE]=="c")
 		{
 			SqlId sqlid=mFieldMap.Get("c")[SQL[F_ROWID]];
-			Customer.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);//.Width(200);
+			int c_index=Customer.Grid.FindCol(sqlid);
+			if(-1!=c_index)
+				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString());
+			//Customer.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);//.Width(200);
 			//Contact.Grid.AddColumn(C_0, "Conutry").Edit(es);		
 		}	
 		else if(SQL[F_TABLE]=="co")
 		{
 			SqlId sqlid=mFieldMap.Get("co")[SQL[F_ROWID]];
-			Contact.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);
+			Contact.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
 		}	
 		else if(SQL[F_TABLE]=="m")
 		{
 			SqlId sqlid=mFieldMap.Get("m")[SQL[F_ROWID]];
-			Merchandise.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);
+			Merchandise.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
 		}
 	}
 	//int zz=mFieldEditList.Top().use_count();
