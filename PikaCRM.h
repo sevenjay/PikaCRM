@@ -96,10 +96,19 @@ public:
 class MultiButtonNotNULL : public MultiButton {
 	virtual Value GetData() const{
 		if(IsNull(Get()))
-			return ErrorValue(t_("Please select one customer."));
+			return ErrorValue(t_("Please select one customer."));///@todo pass msg for buyitem
 		else
 			return MultiButton::GetData();
 	};
+};
+
+class FieldId : Moveable<FieldId> {
+public:
+	SqlId Id;	
+	bool IsUsed;
+	
+	FieldId() : IsUsed(false)	{};
+	void SetId(SqlId id){ Id=id;}
 };
 
 class PikaCRM
@@ -164,7 +173,7 @@ private :
 	Sqlite3Session mSqlite3Session;
 	
 	//private data-------------------------------------------------------------------
-	VectorMap< String, Vector<SqlId> > mFieldMap;
+	VectorMap< String, Vector<FieldId> > mFieldMap;
 	Array<EditString> mFieldEditList;
 	String mRevealedPW;
 

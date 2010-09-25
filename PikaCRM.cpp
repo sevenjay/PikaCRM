@@ -265,22 +265,23 @@ void PikaCRM::LoadSetAllField()
 		mFieldEditList.Add(new EditString());
 		if(SQL[F_TABLE]=="c")
 		{
-			SqlId sqlid=mFieldMap.Get("c")[SQL[F_ROWID]];
-			int c_index=Customer.Grid.FindCol(sqlid);
+			FieldId & field=mFieldMap.Get("c")[SQL[F_ROWID]];//c [0] is FieldId with C_0
+			int c_index=Customer.Grid.FindCol(field.Id);
 			if(-1!=c_index)
+			{
 				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false);
-			//Customer.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(*pEStemp);//.Width(200);
-			//Contact.Grid.AddColumn(C_0, "Conutry").Edit(es);		
+				field.IsUsed=true;
+			}
 		}	
 		else if(SQL[F_TABLE]=="co")
 		{
-			SqlId sqlid=mFieldMap.Get("co")[SQL[F_ROWID]];
-			Contact.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
+			//SqlId sqlid=mFieldMap.Get("co")[SQL[F_ROWID]];
+			//Contact.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
 		}	
 		else if(SQL[F_TABLE]=="m")
 		{
-			SqlId sqlid=mFieldMap.Get("m")[SQL[F_ROWID]];
-			Merchandise.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
+			//SqlId sqlid=mFieldMap.Get("m")[SQL[F_ROWID]];
+			//Merchandise.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
 		}
 	}
 	//int zz=mFieldEditList.Top().use_count();
@@ -1320,25 +1321,25 @@ String PikaCRM::CombineKey(const String & key1, const String & key2) //avoid hac
 
 void PikaCRM::SetAllFieldMap()
 {
-	Vector<SqlId> c;
-	c.Add(C_0);
-	c.Add(C_1);
-	c.Add(C_2);
-	c.Add(C_3);
+	Vector<FieldId> c;
+	c.Add().SetId(C_0);
+	c.Add().SetId(C_1);
+	c.Add().SetId(C_2);
+	c.Add().SetId(C_3);
 	mFieldMap.Add("c",c);
 	
-	Vector<SqlId> co;
-	co.Add(CO_0);
-	co.Add(CO_1);
-	co.Add(CO_2);
-	co.Add(CO_3);
+	Vector<FieldId> co;
+	co.Add().SetId(CO_0);
+	co.Add().SetId(CO_1);
+	co.Add().SetId(CO_2);
+	co.Add().SetId(CO_3);
 	mFieldMap.Add("co",co);
 		
-	Vector<SqlId> m;
-	m.Add(M_0);
-	m.Add(M_1);
-	m.Add(M_2);
-	m.Add(M_3);
+	Vector<FieldId> m;
+	m.Add().SetId(M_0);
+	m.Add().SetId(M_1);
+	m.Add().SetId(M_2);
+	m.Add().SetId(M_3);
 	mFieldMap.Add("m",m);
 }
 //end application control-----------------------------------------------------------
