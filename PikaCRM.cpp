@@ -91,7 +91,8 @@ void PikaCRM::SetupUI()
 	Customer.btnCreateF <<= THISBACK(CreateField);
 	//Customer.btnModifyF <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
-
+	
+	//Customer.Grid.Absolute();
 	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
 	Customer.Grid.AddColumn(C_TITLE,t_("Title")).Edit(cesn);
 	Customer.Grid.AddColumn(C_PHONE,t_("Phone")).Edit(ces1);
@@ -265,7 +266,7 @@ void PikaCRM::LoadSetAllField()
 		mFieldEditList.Add(new EditString());
 		if(SQL[F_TABLE]=="c")
 		{
-			FieldId & field=mFieldMap.Get("c")[SQL[F_ROWID]];//c [0] is FieldId with C_0
+			FieldId & field=mFieldMap.Get("c")[SQL[F_ROWID]];//"c" [0] is FieldId with C_0
 			int c_index=Customer.Grid.FindCol(field.Id);
 			if(-1!=c_index)
 			{
@@ -288,6 +289,7 @@ void PikaCRM::LoadSetAllField()
 }
 void PikaCRM::CreateField()
 {
+					Customer.Grid.Ready(false);
 	//UI--------------------------------------------
 	TopWindow d;
 	Button ok, cancel;
@@ -298,19 +300,38 @@ void PikaCRM::CreateField()
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
-	EditString edit;
+	EditStringNotNull edit;
 	Label title;
 	title.SetLabel(t_("Field title: "));
 	d.Add(title.LeftPosZ(15, 75).TopPosZ(20, 16));
 	d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
 	//end UI--------------------------------------------
 	if(d.Run()==IDOK) {
-		if(!IsNull(edit.GetData()))
-		{
-			//mEventDropStatus.Add(edit.GetData());
-			//mEventDropStatus.SetData(edit.GetData());
-		}
+
+		for(int i=0; i<=3; ++i){
+			FieldId & field=mFieldMap.Get("c")[i];//"c" [0] is FieldId with C_0
+			if(false==field.IsUsed){
+				mFieldEditList.Add(new EditString());
+				int c_index=Customer.Grid.FindCol(field.Id);
+				if(-1!=c_index)
+				{
+					Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(edit.GetData().ToString()).Hidden(false);
+					field.IsUsed=true;
+				
+				//INSERT INTO "main"."Field" ("f_table","f_rowid","f_name") VALUES ('c','3','asdf')
+				///@todo try catch
+				SQL & Insert(FIELD)
+					(F_TABLE,  "c")
+					(F_ROWID,  i)
+					(F_NAME,   edit.GetData().ToString());
+				
+					break;
+				}
+			}
+		}	
+			
 	}
+					Customer.Grid.Ready(true);
 }
 
 void PikaCRM::LoadCustomer()
@@ -1526,18 +1547,15 @@ void PikaCRM::EventNewStatusClick()
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
-	EditString edit;
+	EditStringNotNull edit;
 	Label title;
 	title.SetLabel(t_("Status: "));
 	d.Add(title.LeftPosZ(18, 75).TopPosZ(20, 16));
 	d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
 	//end UI--------------------------------------------
 	if(d.Run()==IDOK) {
-		if(!IsNull(edit.GetData()))
-		{
-			mEventDropStatus.Add(edit.GetData());
-			mEventDropStatus.SetData(edit.GetData());
-		}
+		mEventDropStatus.Add(edit.GetData());
+		mEventDropStatus.SetData(edit.GetData());
 	}
 }
 
