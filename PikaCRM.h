@@ -56,6 +56,7 @@ struct Config {
 	String	Password;
 	bool	IsRememberPW;
 	String	SystemPWKey;
+	VectorMap<String, int> CWidth;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
@@ -63,6 +64,7 @@ struct Config {
 			("Password", Password)
 			("RememberPW", IsRememberPW)
 			("SystemPWKey", SystemPWKey)
+			("CustomerWidth", CWidth)
 		;
 	}
 	

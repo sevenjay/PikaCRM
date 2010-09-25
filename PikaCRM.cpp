@@ -54,8 +54,6 @@ PikaCRM::PikaCRM()
 	
 	int QtfHigh=20;
 	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(),SrcImages::Logo(),mLanguage);
-	
-	SetupUI();
 
 	SetAllFieldMap();
 
@@ -89,24 +87,24 @@ void PikaCRM::SetupUI()
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	Customer.btnCreateF <<= THISBACK(CreateField);
-	//Customer.btnModifyF <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
+	Customer.btnModifyF <<= THISBACK(ModifyField);
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	
-	//Customer.Grid.Absolute();
+	Customer.Grid.Absolute();
 	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
-	Customer.Grid.AddColumn(C_TITLE,t_("Title")).Edit(cesn);
-	Customer.Grid.AddColumn(C_PHONE,t_("Phone")).Edit(ces1);
-	Customer.Grid.AddColumn(C_ADDRESS,t_("Address")).Edit(ces2);
-	Customer.Grid.AddColumn(C_EMAIL,t_("Email")).Edit(ces3);
-	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4);
+	Customer.Grid.AddColumn(C_TITLE,t_("Title")).Edit(cesn).Width(mConfig.CWidth.Get(~C_TITLE));
+	Customer.Grid.AddColumn(C_PHONE,t_("Phone")).Edit(ces1).Width(mConfig.CWidth.Get(~C_PHONE));
+	Customer.Grid.AddColumn(C_ADDRESS,t_("Address")).Edit(ces2).Width(mConfig.CWidth.Get(~C_ADDRESS));
+	Customer.Grid.AddColumn(C_EMAIL,t_("Email")).Edit(ces3).Width(mConfig.CWidth.Get(~C_EMAIL));
+	Customer.Grid.AddColumn(C_WEBSITE,t_("Web site")).Edit(ces4).Width(mConfig.CWidth.Get(~C_WEBSITE));
 	///@important when SetConvert(), it will Convert when you add, so must add the type like RawToValue(temp) in LoadCustomer()
-	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn);//.SetConvert(Single<ConvContactNames>());
+	Customer.Grid.AddColumn(CO_NAME,t_("Contact")).Edit(mCustomerGridContactBtn).Width(mConfig.CWidth.Get(~CO_NAME));//.SetConvert(Single<ConvContactNames>());
 		mCustomerGridContactBtn.AddButton().SetLabel("...").WhenPush=THISBACK(CustomerGridContactBtnClick);
 	Customer.Grid.AddIndex(CONTACTS_MAP);
-	Customer.Grid.AddColumn(C_0).Hidden();
-	Customer.Grid.AddColumn(C_1).Hidden();
-	Customer.Grid.AddColumn(C_2).Hidden();
-	Customer.Grid.AddColumn(C_3).Hidden();
+	Customer.Grid.AddColumn(C_0).Hidden().Width(mConfig.CWidth.Get(~C_0));
+	Customer.Grid.AddColumn(C_1).Hidden().Width(mConfig.CWidth.Get(~C_1));
+	Customer.Grid.AddColumn(C_2).Hidden().Width(mConfig.CWidth.Get(~C_2));
+	Customer.Grid.AddColumn(C_3).Hidden().Width(mConfig.CWidth.Get(~C_3));
 	Customer.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();//.Searching();
 	//Customer.Grid.RejectNullRow();.Duplicating().Accepting().Clipboard()//.Absolute() for horizontal scroll
 	//Customer.Grid.GetDisplay().SetTheme(2);
@@ -270,7 +268,7 @@ void PikaCRM::LoadSetAllField()
 			int c_index=Customer.Grid.FindCol(field.Id);
 			if(-1!=c_index)
 			{
-				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false);
+				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false).Width(50);
 				field.IsUsed=true;
 			}
 		}	
@@ -315,7 +313,7 @@ void PikaCRM::CreateField()
 				int c_index=Customer.Grid.FindCol(field.Id);
 				if(-1!=c_index)
 				{
-					Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(edit.GetData().ToString()).Hidden(false);
+					Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(edit.GetData().ToString()).Hidden(false).Width(50);
 					field.IsUsed=true;
 				
 				//INSERT INTO "main"."Field" ("f_table","f_rowid","f_name") VALUES ('c','3','asdf')
@@ -332,6 +330,11 @@ void PikaCRM::CreateField()
 			
 	}
 					Customer.Grid.Ready(true);
+}
+void PikaCRM::ModifyField()
+{
+	int x=Customer.Grid.GetWidth(8);
+	int xx=Customer.Grid.GetWidth(8);
 }
 
 void PikaCRM::LoadCustomer()
@@ -359,12 +362,12 @@ void PikaCRM::LoadCustomer()
 			Customer.Grid(C_ADDRESS) = SQL[C_ADDRESS];
 			Customer.Grid(C_EMAIL) = SQL[C_EMAIL];
 			Customer.Grid(C_WEBSITE) = SQL[C_WEBSITE];
+			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+			Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
 			Customer.Grid(C_0) = SQL[C_0];
 			Customer.Grid(C_1) = SQL[C_1];
 			Customer.Grid(C_2) = SQL[C_2];
 			Customer.Grid(C_3) = SQL[C_3];
-			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
-			Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
 		}
 	}
 	else
@@ -972,6 +975,8 @@ void PikaCRM::OpenMainFrom()
 	mSplash.ShowSplashStatus(t_("Loading Settings..."));
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
 	LoadConfig(config_file_path);
+	
+	SetupUI();
 
 	if(mConfig.IsDBEncrypt)
 	{
@@ -1240,6 +1245,18 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 		mConfig.Password=PW_EMPTY;
 		mConfig.IsRememberPW=false;
 		mConfig.SystemPWKey="";
+	
+		mConfig.CWidth.Add(~C_TITLE, 100);
+		mConfig.CWidth.Add(~C_PHONE, 100);
+		mConfig.CWidth.Add(~C_ADDRESS, 100);
+		mConfig.CWidth.Add(~C_EMAIL, 100);
+		mConfig.CWidth.Add(~C_WEBSITE, 100);
+		mConfig.CWidth.Add(~CO_NAME, 100);
+		mConfig.CWidth.Add(~C_0, 0);
+		mConfig.CWidth.Add(~C_1, 0);
+		mConfig.CWidth.Add(~C_2, 0);
+		mConfig.CWidth.Add(~C_3, 0);
+		
 		SaveConfig(config_file_path);
 	}
 }
