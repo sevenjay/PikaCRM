@@ -268,7 +268,7 @@ void PikaCRM::LoadSetAllField()
 			int c_index=Customer.Grid.FindCol(field.Id);
 			if(-1!=c_index)
 			{
-				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false).Width(50);
+				Customer.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false);
 				field.IsUsed=true;
 			}
 		}	
@@ -1070,6 +1070,24 @@ void PikaCRM::OpenMainFrom()
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
+	String config_file_path = getConfigDirPath()+FILE_CONFIG;
+	double fac=1000;
+	double base=Ctrl::VertLayoutZoom(1000);
+		mConfig.CWidth.Get(~C_TITLE)=round(Customer.Grid.FindColWidth(C_TITLE)*fac/base);
+		mConfig.CWidth.Get(~C_PHONE)=round(Customer.Grid.FindColWidth(C_PHONE)*fac/base);
+		/*mConfig.CWidth.Get(~C_ADDRESS);
+		mConfig.CWidth.Get(~C_EMAIL);
+		mConfig.CWidth.Get(~C_WEBSITE);
+		mConfig.CWidth.Get(~CO_NAME);
+		mConfig.CWidth.Get(~C_0);
+		mConfig.CWidth.Get(~C_1);
+		mConfig.CWidth.Get(~C_2);
+		mConfig.CWidth.Get(~C_3);*/
+	
+	
+	
+	SaveConfig(config_file_path);
+	
 	mSplash.~SplashSV();
 	MainFrom.Close();
 }
