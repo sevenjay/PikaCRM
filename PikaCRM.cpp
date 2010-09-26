@@ -390,9 +390,14 @@ void PikaCRM::ModifyField()
 			{
 				Exclamation("[* " + DeQtfLf(e) + "]");
 			}
-	
-	
-	
+			
+			//update grid
+			FieldId & field=mFieldMap.Get("c")[esList.GetKey(i)];//"c" [0] is FieldId with C_0
+			int c_index=Customer.Grid.FindCol(field.Id);
+			if(-1!=c_index)
+			{
+				Customer.Grid.GetColumn(c_index).Name(esList[i].GetData().ToString());
+			}
 		}
 	}
 }
