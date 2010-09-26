@@ -57,6 +57,7 @@ struct Config {
 	bool	IsRememberPW;
 	String	SystemPWKey;
 	VectorMap<String, int> CWidth;
+	VectorMap<String, int> COWidth;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
@@ -65,6 +66,7 @@ struct Config {
 			("RememberPW", IsRememberPW)
 			("SystemPWKey", SystemPWKey)
 			("CustomerWidth", CWidth)
+			("ContactWidth", COWidth)
 		;
 	}
 	
@@ -189,7 +191,7 @@ private :
 	
 	//database control------------------------------------------------------------
 	void LoadSetAllField();
-	void CreateField();
+	void CreateField(GridCtrl * grid, String f_table);
 	void ModifyField();
 	void RemoveField();
 	
