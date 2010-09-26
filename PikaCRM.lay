@@ -157,3 +157,12 @@ LAYOUT(PreferenceLayout, 596, 400)
 	ITEM(Button, btnDatabase, SetLabel(t_("Database")).LeftPosZ(44, 56).TopPosZ(44, 15))
 END_LAYOUT
 
+LAYOUT(ModifyFieldsLayout, 196, 252)
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(116, 8).TopPosZ(224, 20))
+	ITEM(Label, dv___1, SetLabel(t_("Modified")).LeftPosZ(104, 60).TopPosZ(4, 16))
+	ITEM(LabelBox, dv___2, LeftPosZ(8, 180).TopPosZ(20, 196))
+	ITEM(Label, dv___3, SetLabel(t_("Original")).LeftPosZ(16, 60).TopPosZ(4, 16))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(8, 112).TopPosZ(224, 20))
+	ITEM(EditString, dv___5, LeftPosZ(104, 72).TopPosZ(32, 16))
+END_LAYOUT
+

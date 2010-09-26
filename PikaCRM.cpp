@@ -287,7 +287,7 @@ void PikaCRM::LoadSetAllField()
 }
 void PikaCRM::CreateField()
 {
-					Customer.Grid.Ready(false);
+	SysLog.Info("Create a customer field\n");	
 	//UI--------------------------------------------
 	TopWindow d;
 	Button ok, cancel;
@@ -304,11 +304,15 @@ void PikaCRM::CreateField()
 	d.Add(title.LeftPosZ(15, 75).TopPosZ(20, 16));
 	d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
 	//end UI--------------------------------------------
+	bool is_no_field;
 	if(d.Run()==IDOK) {
-
+		Customer.Grid.Ready(false);
+		
+		is_no_field=true;
 		for(int i=0; i<=3; ++i){
 			FieldId & field=mFieldMap.Get("c")[i];//"c" [0] is FieldId with C_0
 			if(false==field.IsUsed){
+				is_no_field=false;
 				mFieldEditList.Add(new EditString());
 				int c_index=Customer.Grid.FindCol(field.Id);
 				if(-1!=c_index)
@@ -318,23 +322,79 @@ void PikaCRM::CreateField()
 				
 				//INSERT INTO "main"."Field" ("f_table","f_rowid","f_name") VALUES ('c','3','asdf')
 				///@todo try catch
-				SQL & Insert(FIELD)
-					(F_TABLE,  "c")
-					(F_ROWID,  i)
-					(F_NAME,   edit.GetData().ToString());
+					SQL & Insert(FIELD)
+						(F_TABLE,  "c")
+						(F_ROWID,  i)
+						(F_NAME,   edit.GetData().ToString());
 				
 					break;
 				}
-			}
+			}			
 		}	
 			
+		Customer.Grid.Ready(true);
+		
+		if(is_no_field) Exclamation("There is no more customer field!");
 	}
-					Customer.Grid.Ready(true);
 }
 void PikaCRM::ModifyField()
 {
-	int x=Customer.Grid.GetWidth(8);
-	int xx=Customer.Grid.GetWidth(8);
+	SysLog.Info("Modify Fields\n");
+	//UI--------------------------------------------
+	WithModifyFieldsLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d,t_("Modify Fields"));
+
+	
+	EditString edit;
+	Label title;
+	title.SetLabel(t_("Field title: "));
+	//d.Add(title.LeftPosZ(15, 75).TopPosZ(20, 16));
+	//d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
+	ArrayMap<int,StaticText> stList;
+	ArrayMap<int,EditString> esList;
+	int y_level=24;
+	int y_start=32;
+	//end UI--------------------------------------------
+	bool is_sql_ok=SQL.Execute("select * from Field where f_table==?;","c");
+	if(!is_sql_ok)
+	{
+		SysLog.Error(SQL.GetLastError()+"\n");
+		return;
+		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+
+	while(SQL.Fetch())
+	{
+		stList.Add(SQL[F_ROWID],new StaticText());
+		esList.Add(SQL[F_ROWID],new EditString());
+		d.Add(stList.Top());
+		d.Add(esList.Top());
+		
+		stList.Top().SetText(SQL[F_NAME].ToString()).LeftPosZ(16, 60).TopPosZ(y_start, 16);
+		esList.Top().LeftPosZ(104, 72).TopPosZ(y_start, 16);
+
+		y_start+=y_level;
+	}
+	
+	
+	if(d.Run()==IDOK) {
+		for(int i=0;i<esList.GetCount();++i)
+		{
+			if(""==(esList[i].GetData().ToString())) continue;
+			
+			try
+			{
+				SQL & ::Update(FIELD) (F_NAME,  ~(esList[i])).Where(F_TABLE == "c" && F_ROWID==esList.GetKey(i));
+			}
+			catch(SqlExc &e)
+			{
+				Exclamation("[* " + DeQtfLf(e) + "]");
+			}
+	
+	
+	
+		}
+	}
 }
 
 void PikaCRM::LoadCustomer()
