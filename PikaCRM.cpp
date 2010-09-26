@@ -87,7 +87,7 @@ void PikaCRM::SetupUI()
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	Customer.btnCreateF <<= THISBACK2(CreateField, &(Customer.Grid), "c");
-	Customer.btnModifyF <<= THISBACK(ModifyField);
+	Customer.btnModifyF <<= THISBACK2(ModifyField, &(Customer.Grid), "c");
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	
 	Customer.Grid.Absolute();
@@ -126,6 +126,7 @@ void PikaCRM::SetupUI()
 	Contact.btnModify <<= callback(&(Contact.Grid),&GridCtrl::DoEdit);
 	Contact.btnDelete <<= callback(&(Contact.Grid),&GridCtrl::DoRemove);
 	Contact.btnCreateF <<= THISBACK2(CreateField, &(Contact.Grid), "co");
+	Contact.btnModifyF <<= THISBACK2(ModifyField, &(Contact.Grid), "co");
 	
 	Contact.Grid.Absolute();
 	Contact.Grid.AddIndex(CO_ID);
@@ -182,6 +183,7 @@ void PikaCRM::SetupUI()
 	Merchandise.btnModify <<= callback(&(Merchandise.Grid),&GridCtrl::DoEdit);
 	Merchandise.btnDelete <<= callback(&(Merchandise.Grid),&GridCtrl::DoRemove);
 	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
+	Merchandise.btnModifyF <<= THISBACK2(ModifyField, &(Merchandise.Grid), "m");
 	
 	Merchandise.Grid.Absolute();
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
@@ -359,7 +361,7 @@ void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 		if(is_no_field) Exclamation("There is no more customer field!");
 	}
 }
-void PikaCRM::ModifyField()
+void PikaCRM::ModifyField(GridCtrl * grid, String f_table)
 {
 	SysLog.Info("Modify Fields\n");
 	//UI--------------------------------------------
@@ -370,14 +372,12 @@ void PikaCRM::ModifyField()
 	EditString edit;
 	Label title;
 	title.SetLabel(t_("Field title: "));
-	//d.Add(title.LeftPosZ(15, 75).TopPosZ(20, 16));
-	//d.Add(edit.LeftPosZ(70, 75).TopPosZ(20, 16));
 	ArrayMap<int,StaticText> stList;
 	ArrayMap<int,EditString> esList;
 	int y_level=24;
 	int y_start=32;
 	//end UI--------------------------------------------
-	bool is_sql_ok=SQL.Execute("select * from Field where f_table==?;","c");
+	bool is_sql_ok=SQL.Execute("select * from Field where f_table==?;",f_table);
 	if(!is_sql_ok)
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
@@ -406,7 +406,7 @@ void PikaCRM::ModifyField()
 			
 			try
 			{
-				SQL & ::Update(FIELD) (F_NAME,  ~(esList[i])).Where(F_TABLE == "c" && F_ROWID==esList.GetKey(i));
+				SQL & ::Update(FIELD) (F_NAME,  ~(esList[i])).Where(F_TABLE == f_table && F_ROWID==esList.GetKey(i));
 			}
 			catch(SqlExc &e)
 			{
@@ -414,11 +414,11 @@ void PikaCRM::ModifyField()
 			}
 			
 			//update grid
-			FieldId & field=mFieldMap.Get("c")[esList.GetKey(i)];//"c" [0] is FieldId with C_0
-			int c_index=Customer.Grid.FindCol(field.Id);
+			FieldId & field=mFieldMap.Get(f_table)[esList.GetKey(i)];//"c" [0] is FieldId with C_0
+			int c_index=grid->FindCol(field.Id);
 			if(-1!=c_index)
 			{
-				Customer.Grid.GetColumn(c_index).Name(esList[i].GetData().ToString());
+				grid->GetColumn(c_index).Name(esList[i].GetData().ToString());
 			}
 		}
 	}

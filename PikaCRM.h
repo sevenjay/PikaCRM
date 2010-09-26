@@ -194,7 +194,7 @@ private :
 	//database control------------------------------------------------------------
 	void LoadSetAllField();
 	void CreateField(GridCtrl * grid, String f_table);
-	void ModifyField();
+	void ModifyField(GridCtrl * grid, String f_table);
 	void RemoveField();
 	
 	void LoadCustomer();
