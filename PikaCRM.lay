@@ -163,6 +163,5 @@ LAYOUT(ModifyFieldsLayout, 196, 252)
 	ITEM(LabelBox, dv___2, LeftPosZ(8, 180).TopPosZ(20, 196))
 	ITEM(Label, dv___3, SetLabel(t_("Original")).LeftPosZ(16, 60).TopPosZ(4, 16))
 	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(8, 112).TopPosZ(224, 20))
-	ITEM(EditString, dv___5, LeftPosZ(104, 72).TopPosZ(32, 16))
 END_LAYOUT
 

@@ -181,11 +181,17 @@ void PikaCRM::SetupUI()
 	Merchandise.btnCreate <<= callback(&(Merchandise.Grid),&GridCtrl::DoAppend);
 	Merchandise.btnModify <<= callback(&(Merchandise.Grid),&GridCtrl::DoEdit);
 	Merchandise.btnDelete <<= callback(&(Merchandise.Grid),&GridCtrl::DoRemove);
+	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
 	
+	Merchandise.Grid.Absolute();
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
-	Merchandise.Grid.AddColumn(M_NAME,t_("Product Name")).Edit(mesn);
-	Merchandise.Grid.AddColumn(M_MODEL,t_("Product Model")).Edit(mes1);
-	Merchandise.Grid.AddColumn(M_PRICE,t_("Price")).Edit(med);
+	Merchandise.Grid.AddColumn(M_NAME,t_("Product Name")).Edit(mesn).Width(mConfig.MWidth.Get(~M_NAME));
+	Merchandise.Grid.AddColumn(M_MODEL,t_("Product Model")).Edit(mes1).Width(mConfig.MWidth.Get(~M_MODEL));
+	Merchandise.Grid.AddColumn(M_PRICE,t_("Price")).Edit(med).Width(mConfig.MWidth.Get(~M_PRICE));
+	Merchandise.Grid.AddColumn(M_0).Hidden().Width(mConfig.MWidth.Get(~M_0));
+	Merchandise.Grid.AddColumn(M_1).Hidden().Width(mConfig.MWidth.Get(~M_1));
+	Merchandise.Grid.AddColumn(M_2).Hidden().Width(mConfig.MWidth.Get(~M_2));
+	Merchandise.Grid.AddColumn(M_3).Hidden().Width(mConfig.MWidth.Get(~M_3));
 	Merchandise.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Merchandise.Grid.WhenInsertRow = THISBACK(InsertMerchandise);
 	Merchandise.Grid.WhenUpdateRow = THISBACK(UpdateMerchandise);
@@ -280,7 +286,7 @@ void PikaCRM::LoadSetAllField()
 		}	
 		else if(SQL[F_TABLE]=="co")
 		{
-			FieldId & field=mFieldMap.Get("co")[SQL[F_ROWID]];//"c" [0] is FieldId with C_0
+			FieldId & field=mFieldMap.Get("co")[SQL[F_ROWID]];
 			int c_index=Contact.Grid.FindCol(field.Id);
 			if(-1!=c_index)
 			{
@@ -290,8 +296,13 @@ void PikaCRM::LoadSetAllField()
 		}	
 		else if(SQL[F_TABLE]=="m")
 		{
-			//SqlId sqlid=mFieldMap.Get("m")[SQL[F_ROWID]];
-			//Merchandise.Grid.AddColumn(sqlid, SQL[F_NAME].ToString()).Edit(mFieldEditList.Top());
+			FieldId & field=mFieldMap.Get("m")[SQL[F_ROWID]];
+			int c_index=Merchandise.Grid.FindCol(field.Id);
+			if(-1!=c_index)
+			{
+				Merchandise.Grid.GetColumn(c_index).Edit(mFieldEditList.Top()).Name(SQL[F_NAME].ToString()).Hidden(false);
+				field.IsUsed=true;
+			}
 		}
 	}
 	//int zz=mFieldEditList.Top().use_count();
@@ -778,7 +789,7 @@ void PikaCRM::LoadMerchandise()
 	{
 		while(SQL.Fetch())
 		{
-			Merchandise.Grid.Add(SQL[M_ID],SQL[M_NAME],SQL[M_MODEL],SQL[M_PRICE]);
+			Merchandise.Grid.Add(SQL[M_ID],SQL[M_NAME],SQL[M_MODEL],SQL[M_PRICE],SQL[M_0],SQL[M_1],SQL[M_2],SQL[M_3]);
 		}
 	}
 	else
@@ -793,7 +804,11 @@ void PikaCRM::InsertMerchandise()
 		SQL & Insert(MERCHANDISE)
 			(M_NAME,	Merchandise.Grid(M_NAME))
 			(M_MODEL,	Merchandise.Grid(M_MODEL))
-			(M_PRICE,	Merchandise.Grid(M_PRICE));
+			(M_PRICE,	Merchandise.Grid(M_PRICE))
+			(M_0,	Merchandise.Grid(M_0))
+			(M_1,	Merchandise.Grid(M_1))
+			(M_2,	Merchandise.Grid(M_2))
+			(M_3,	Merchandise.Grid(M_3));
 
 		Merchandise.Grid(M_ID) = SQL.GetInsertedId();//it will return only one int primary key
 	}
@@ -811,6 +826,10 @@ void PikaCRM::UpdateMerchandise()
 			(M_NAME,	Merchandise.Grid(M_NAME))
 			(M_MODEL,	Merchandise.Grid(M_MODEL))
 			(M_PRICE,	Merchandise.Grid(M_PRICE))
+			(M_0,	Merchandise.Grid(M_0))
+			(M_1,	Merchandise.Grid(M_1))
+			(M_2,	Merchandise.Grid(M_2))
+			(M_3,	Merchandise.Grid(M_3))
 			.Where(M_ID == Merchandise.Grid(M_ID));
 	}
 	catch(SqlExc &e)
@@ -1177,6 +1196,15 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 		mConfig.COWidth.Get(~CO_1)=round(Contact.Grid.FindColWidth(CO_1)*fac);
 		mConfig.COWidth.Get(~CO_2)=round(Contact.Grid.FindColWidth(CO_2)*fac);
 		mConfig.COWidth.Get(~CO_3)=round(Contact.Grid.FindColWidth(CO_3)*fac);	
+		
+				
+		mConfig.MWidth.Get(~M_NAME)=round(Merchandise.Grid.FindColWidth(M_NAME)*fac);
+		mConfig.MWidth.Get(~M_MODEL)=round(Merchandise.Grid.FindColWidth(M_MODEL)*fac);
+		mConfig.MWidth.Get(~M_PRICE)=round(Merchandise.Grid.FindColWidth(M_PRICE)*fac);
+		mConfig.MWidth.Get(~M_0)=round(Merchandise.Grid.FindColWidth(M_0)*fac);
+		mConfig.MWidth.Get(~M_1)=round(Merchandise.Grid.FindColWidth(M_1)*fac);
+		mConfig.MWidth.Get(~M_2)=round(Merchandise.Grid.FindColWidth(M_2)*fac);
+		mConfig.MWidth.Get(~M_3)=round(Merchandise.Grid.FindColWidth(M_3)*fac);
 	
 	SaveConfig(config_file_path);
 	
@@ -1376,6 +1404,14 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 		mConfig.COWidth.Add(~CO_1, 0);
 		mConfig.COWidth.Add(~CO_2, 0);
 		mConfig.COWidth.Add(~CO_3, 0);
+		
+		mConfig.MWidth.Add(~M_NAME, 100);
+		mConfig.MWidth.Add(~M_MODEL, 100);
+		mConfig.MWidth.Add(~M_PRICE, 100);
+		mConfig.MWidth.Add(~M_0, 0);
+		mConfig.MWidth.Add(~M_1, 0);
+		mConfig.MWidth.Add(~M_2, 0);
+		mConfig.MWidth.Add(~M_3, 0);
 		
 		SaveConfig(config_file_path);
 	}

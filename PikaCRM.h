@@ -58,6 +58,7 @@ struct Config {
 	String	SystemPWKey;
 	VectorMap<String, int> CWidth;
 	VectorMap<String, int> COWidth;
+	VectorMap<String, int> MWidth;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
@@ -67,6 +68,7 @@ struct Config {
 			("SystemPWKey", SystemPWKey)
 			("CustomerWidth", CWidth)
 			("ContactWidth", COWidth)
+			("MerchandiseWidth", MWidth)
 		;
 	}
 	
