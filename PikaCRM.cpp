@@ -1071,18 +1071,18 @@ void PikaCRM::OpenMainFrom()
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
-	double fac=1000;
 	double base=Ctrl::VertLayoutZoom(1000);
-		mConfig.CWidth.Get(~C_TITLE)=round(Customer.Grid.FindColWidth(C_TITLE)*fac/base);
-		mConfig.CWidth.Get(~C_PHONE)=round(Customer.Grid.FindColWidth(C_PHONE)*fac/base);
-		/*mConfig.CWidth.Get(~C_ADDRESS);
-		mConfig.CWidth.Get(~C_EMAIL);
-		mConfig.CWidth.Get(~C_WEBSITE);
-		mConfig.CWidth.Get(~CO_NAME);
-		mConfig.CWidth.Get(~C_0);
-		mConfig.CWidth.Get(~C_1);
-		mConfig.CWidth.Get(~C_2);
-		mConfig.CWidth.Get(~C_3);*/
+	double fac=1000/base;
+		mConfig.CWidth.Get(~C_TITLE)=round(Customer.Grid.FindColWidth(C_TITLE)*fac);
+		mConfig.CWidth.Get(~C_PHONE)=round(Customer.Grid.FindColWidth(C_PHONE)*fac);
+		mConfig.CWidth.Get(~C_ADDRESS)=round(Customer.Grid.FindColWidth(C_ADDRESS)*fac);
+		mConfig.CWidth.Get(~C_EMAIL)=round(Customer.Grid.FindColWidth(C_EMAIL)*fac);
+		mConfig.CWidth.Get(~C_WEBSITE)=round(Customer.Grid.FindColWidth(C_WEBSITE)*fac);
+		mConfig.CWidth.Get(~CO_NAME)=round(Customer.Grid.FindColWidth(CO_NAME)*fac);
+		mConfig.CWidth.Get(~C_0)=round(Customer.Grid.FindColWidth(C_0)*fac);
+		mConfig.CWidth.Get(~C_1)=round(Customer.Grid.FindColWidth(C_1)*fac);
+		mConfig.CWidth.Get(~C_2)=round(Customer.Grid.FindColWidth(C_2)*fac);
+		mConfig.CWidth.Get(~C_3)=round(Customer.Grid.FindColWidth(C_3)*fac);
 	
 	
 	
