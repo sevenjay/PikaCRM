@@ -91,6 +91,7 @@ void PikaCRM::SetupUI()
 	Customer.btnModifyF <<= THISBACK2(ModifyField, &(Customer.Grid), "c");
 	Customer.btnDeleteF.Disable();
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
+	Customer.btnExport <<= THISBACK(ExportFile);
 	
 	Customer.Grid.Absolute();
 	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
@@ -235,6 +236,8 @@ void PikaCRM::SetupUI()
 	Order.dlFilter.Add(t_("Past half year"));//1
 	Order.dlFilter.Add(t_("Past 2 month"));//2
 	Order.dlFilter.Add(t_("Past month"));//3
+	Order.dlFilter.SetIndex(0);
+	Order.btnFilterSet.Tip("Not yet").Disable();
 	//Order Search------------------------------------------
 	Order.Add(order_search_bar.LeftPosZ(239, 82).TopPosZ(4, 19));
 		Order.Grid.FindBar(order_search_bar, 140);
@@ -1902,6 +1905,29 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 		Order.BuyItemGrid.Set(M_NAME,title);	
 		Order.BuyItemGrid.Set(M_PRICE,price);	
     }
+}
+
+
+void PikaCRM::ExportFile()
+{
+	SysLog.Info("Export File\n");	
+	//UI--------------------------------------------
+	WithExportLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d,t_("Export File"));
+	d.swFormat <<= 0;
+
+	d.swFormat.DisableCase(1);
+	d.swFormat.DisableCase(2);
+	d.swFormat.DisableCase(3);
+	
+	d.opUTF8BOM.Disable();
+	//end UI--------------------------------------------
+	
+		
+	if(d.Run()==IDOK) {
+		test();
+		
+	}
 }
 
 void PikaCRM::ConfigDB()

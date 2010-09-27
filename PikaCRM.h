@@ -188,6 +188,8 @@ private :
 	VectorMap< String, Vector<FieldId> > mFieldMap;
 	Array<EditString> mFieldEditList;
 	String mRevealedPW;
+	
+	FileSel mFileSel;
 
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
@@ -287,6 +289,8 @@ public:
 	void	OrderGridCustomerBtnClick();
 	
 	void	BuyItemGridMerchBtnClick();
+	
+	void	ExportFile();
 	
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();
