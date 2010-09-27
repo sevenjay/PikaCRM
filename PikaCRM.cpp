@@ -89,6 +89,7 @@ void PikaCRM::SetupUI()
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	Customer.btnCreateF <<= THISBACK2(CreateField, &(Customer.Grid), "c");
 	Customer.btnModifyF <<= THISBACK2(ModifyField, &(Customer.Grid), "c");
+	Customer.btnDeleteF.Disable();
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	
 	Customer.Grid.Absolute();
@@ -128,6 +129,7 @@ void PikaCRM::SetupUI()
 	Contact.btnDelete <<= callback(&(Contact.Grid),&GridCtrl::DoRemove);
 	Contact.btnCreateF <<= THISBACK2(CreateField, &(Contact.Grid), "co");
 	Contact.btnModifyF <<= THISBACK2(ModifyField, &(Contact.Grid), "co");
+	Contact.btnDeleteF.Disable();
 	
 	Contact.Grid.Absolute();
 	Contact.Grid.AddIndex(CO_ID);
@@ -174,7 +176,7 @@ void PikaCRM::SetupUI()
 	Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
 	Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
 	//Event Search------------------------------------------
-	Event.Add(event_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+	Event.Add(event_search_bar.LeftPosZ(147, 82).TopPosZ(4, 19));
 		Event.Grid.FindBar(event_search_bar, 140);
 	Event.btnSearchClear <<= callback2(&(Event.Grid),&GridCtrl::ClearFound,true,true);
 	Event.btnSearchGo <<= callback(&(Event.Grid),&GridCtrl::DoFind);
@@ -185,6 +187,7 @@ void PikaCRM::SetupUI()
 	Merchandise.btnDelete <<= callback(&(Merchandise.Grid),&GridCtrl::DoRemove);
 	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
 	Merchandise.btnModifyF <<= THISBACK2(ModifyField, &(Merchandise.Grid), "m");
+	Merchandise.btnDeleteF.Disable();
 	
 	Merchandise.Grid.Absolute();
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
@@ -226,8 +229,14 @@ void PikaCRM::SetupUI()
 	Order.Grid.WhenUpdateRow = THISBACK(UpdateOrder);
 	Order.Grid.WhenRemoveRow = THISBACK(RemoveOrder);
 	Order.Grid.WhenChangeRow = THISBACK(ChangeOrder);
+	//Order Filter------------------------------------------
+	Order.dlFilter.Add(t_("All"));//0
+	Order.dlFilter.Add(t_("Past year"));//1
+	Order.dlFilter.Add(t_("Past half year"));//1
+	Order.dlFilter.Add(t_("Past 2 month"));//2
+	Order.dlFilter.Add(t_("Past month"));//3
 	//Order Search------------------------------------------
-	Order.Add(order_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+	Order.Add(order_search_bar.LeftPosZ(239, 82).TopPosZ(4, 19));
 		Order.Grid.FindBar(order_search_bar, 140);
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
 	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);
@@ -243,14 +252,14 @@ void PikaCRM::SetupUI()
 	Order.BuyItemGrid.AddIndex(O_ID);
 	Order.BuyItemGrid.AddIndex(B_ID).Default(-1);//for when create row before insert row;
 	Order.BuyItemGrid.AddIndex(M_ID);
-	Order.BuyItemGrid.AddColumn(M_NAME,t_("Product Name - Model")).Edit(mBuyItemGridMerchBtn);
+	Order.BuyItemGrid.AddColumn(M_NAME,t_("Product Name / Model")).Edit(mBuyItemGridMerchBtn);
 		mBuyItemGridMerchBtn.SetDisplay(Single<ColorNotNull>());
 		mBuyItemGridMerchBtn.AddButton().SetLabel("...").WhenPush=THISBACK(BuyItemGridMerchBtnClick);
 	//Order.BuyItemGrid.AddColumn(M_MODEL,t_("Product Model"));
 	Order.BuyItemGrid.AddColumn(M_PRICE,t_("Price"));
 	
-	Order.BuyItemGrid.AddColumn(B_PRICE,t_("Order Price")).Edit(bed);
-	Order.BuyItemGrid.AddColumn(B_NUMBER,t_("Quantity")).Edit(beis).Default(0);
+	Order.BuyItemGrid.AddColumn(B_PRICE,t_("Purchase price")).Edit(bed);
+	Order.BuyItemGrid.AddColumn(B_NUMBER,t_("Quantity_")).Edit(beis).Default(0);
 		beis.NotNull();
 	Order.BuyItemGrid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
 	Order.BuyItemGrid.SetToolBar();
@@ -1427,6 +1436,8 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 		mConfig.MWidth.Add(~M_1, 0);
 		mConfig.MWidth.Add(~M_2, 0);
 		mConfig.MWidth.Add(~M_3, 0);
+		
+		mConfig.IsMaximized=false;
 		
 		SaveConfig(config_file_path);
 	}
