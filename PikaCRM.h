@@ -56,9 +56,12 @@ struct Config {
 	String	Password;
 	bool	IsRememberPW;
 	String	SystemPWKey;
+	
 	VectorMap<String, int> CWidth;
 	VectorMap<String, int> COWidth;
 	VectorMap<String, int> MWidth;
+	
+	bool	IsMaximized;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
@@ -69,6 +72,7 @@ struct Config {
 			("CustomerWidth", CWidth)
 			("ContactWidth", COWidth)
 			("MerchandiseWidth", MWidth)
+			("IsMaximized", IsMaximized)
 		;
 	}
 	

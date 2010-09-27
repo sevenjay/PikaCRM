@@ -1163,7 +1163,7 @@ void PikaCRM::OpenMainFrom()
 	LoadMerchandise();
 	LoadOrder();	
 	
-	
+	if(mConfig.IsMaximized) MainFrom.Maximize();
 	MainFrom.OpenMain();
 	
 	mSplash.ShowSplashStatus(t_("Normal Running..."));
@@ -1205,6 +1205,8 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 		mConfig.MWidth.Get(~M_1)=round(Merchandise.Grid.FindColWidth(M_1)*fac);
 		mConfig.MWidth.Get(~M_2)=round(Merchandise.Grid.FindColWidth(M_2)*fac);
 		mConfig.MWidth.Get(~M_3)=round(Merchandise.Grid.FindColWidth(M_3)*fac);
+	
+	mConfig.IsMaximized=MainFrom.IsMaximized();
 	
 	SaveConfig(config_file_path);
 	
