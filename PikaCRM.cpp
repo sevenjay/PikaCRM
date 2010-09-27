@@ -50,7 +50,7 @@ PikaCRM::PikaCRM()
 	//mLanguage=LNG_('E','N','U','S');
 	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
 
-	Upp::CtrlLayout(MainFrom, t_("Pika Customer Relationship Management"));
+	Upp::CtrlLayout(MainFrom);
 	
 	int QtfHigh=20;
 	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(),SrcImages::Logo(),mLanguage);
@@ -67,6 +67,7 @@ PikaCRM::~PikaCRM()
 
 void PikaCRM::SetupUI()
 {
+	MainFrom.Title(t_("Pika Customer Relationship Management"));
 	//TabCtrl----------------------------------------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
@@ -261,8 +262,12 @@ void PikaCRM::SetupUI()
 	//Preference Tab-----------------------------------------------------------------------
 	Preference.dlLang.Add( SetLNGCharset(LNG_('E','N','U','S'),CHARSET_UTF8) , "English" );
 	Preference.dlLang.Add( SetLNGCharset(LNG_('Z','H','T','W'),CHARSET_UTF8) , "繁體中文" );
+	//Preference.dlLang.Add( SetLNGCharset(LNG_('J','A','J','P'),CHARSET_UTF8) , "日本語" );
+	
 	int index=Preference.dlLang.FindKey(mConfig.Language);
-	Preference.dlLang.SetIndex(index);
+	if(-1==index) Preference.dlLang.SetIndex(0);
+	else Preference.dlLang.SetIndex(index);
+	
 	Preference.btnSave <<= THISBACK(SavePreference);
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
 }
@@ -1928,8 +1933,9 @@ void PikaCRM::SavePreference()
 	int tt0=LNG_('Z','H','T','W');//860823
 	int tt1=Preference.dlLang.GetKey(index);//860823
 	
-	int tt2=GetSystemLNG()& 0xfffff;//268247703
+	int tt2=GetSystemLNG();//268247703
 	int tt3=SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 );//268247703
+	int tt4=GetSystemLNG()& 0xfffff;//860823
 	String langStr1 = LNGAsText(tt1);//ZH-TW
 	String langStr2 = LNGAsText(tt2);//ZH-TW UTF-8 //these two are the same in linux
 	String langStr3 = LNGAsText(tt3);//ZH-TW UTF-8 //but different in Windows
@@ -1938,11 +1944,11 @@ void PikaCRM::SavePreference()
 	if(-1!=index)
 	{
 		mConfig.Language=Preference.dlLang.GetKey(index);
-		SetLanguage( SetLNGCharset( Preference.dlLang.GetKey(index), CHARSET_UTF8 ) );
-		//Upp::SetLanguage(Preference.dlLang.GetKey(index));
 	}
 
-	MainFrom.Refresh();
+	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
+	SaveConfig(config_file_path);
+	PromptOK(t_("The setting has been saved and will take effect the next time you start this application."));
 }
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------
