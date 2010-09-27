@@ -46,9 +46,9 @@ public:
 
 PikaCRM::PikaCRM()
 {
-	mLanguage=LNG_('Z','H','T','W');
+	//mLanguage=LNG_('Z','H','T','W');
 	//mLanguage=LNG_('E','N','U','S');
-	Upp::SetLanguage(mLanguage);
+	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
 
 	Upp::CtrlLayout(MainFrom, t_("Pika Customer Relationship Management"));
 	
@@ -259,6 +259,11 @@ void PikaCRM::SetupUI()
 	Order.BuyItemGrid.WhenRemoveRow = THISBACK(RemoveBuyItem);
 	
 	//Preference Tab-----------------------------------------------------------------------
+	Preference.dlLang.Add( SetLNGCharset(LNG_('E','N','U','S'),CHARSET_UTF8) , "English" );
+	Preference.dlLang.Add( SetLNGCharset(LNG_('Z','H','T','W'),CHARSET_UTF8) , "繁體中文" );
+	int index=Preference.dlLang.FindKey(mConfig.Language);
+	Preference.dlLang.SetIndex(index);
+	Preference.btnSave <<= THISBACK(SavePreference);
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
 }
 //database control------------------------------------------------------------
@@ -1079,6 +1084,8 @@ void PikaCRM::OpenMainFrom()
 	SysLog.Info(t_("Loading Settings..."))<<"\n";
 	LoadConfig(config_file_path);
 	
+	SetLanguage( SetLNGCharset( mConfig.Language, CHARSET_UTF8 ) );
+	
 	SetupUI();
 
 	if(mConfig.IsDBEncrypt)
@@ -1381,6 +1388,7 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 	else
 	{
 		SysLog.Info("make a new config file\n");
+		mConfig.Language = SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 );
 		mConfig.IsDBEncrypt=false;
 		mConfig.Password=PW_EMPTY;
 		mConfig.IsRememberPW=false;
@@ -1911,7 +1919,31 @@ void PikaCRM::ConfigDB()
 			}
 	}
 	
-};
+}
+
+void PikaCRM::SavePreference()
+{
+	int index=Preference.dlLang.GetIndex();
+	//test-------------------------------------------------------
+	int tt0=LNG_('Z','H','T','W');//860823
+	int tt1=Preference.dlLang.GetKey(index);//860823
+	
+	int tt2=GetSystemLNG()& 0xfffff;//268247703
+	int tt3=SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 );//268247703
+	String langStr1 = LNGAsText(tt1);//ZH-TW
+	String langStr2 = LNGAsText(tt2);//ZH-TW UTF-8 //these two are the same in linux
+	String langStr3 = LNGAsText(tt3);//ZH-TW UTF-8 //but different in Windows
+	//end test---------------------------------------------------
+
+	if(-1!=index)
+	{
+		mConfig.Language=Preference.dlLang.GetKey(index);
+		SetLanguage( SetLNGCharset( Preference.dlLang.GetKey(index), CHARSET_UTF8 ) );
+		//Upp::SetLanguage(Preference.dlLang.GetKey(index));
+	}
+
+	MainFrom.Refresh();
+}
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------
 String PikaCRM::getConfigDirPath()

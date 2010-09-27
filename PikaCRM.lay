@@ -154,7 +154,11 @@ LAYOUT(MerchandiseLayout, 596, 400)
 END_LAYOUT
 
 LAYOUT(PreferenceLayout, 596, 400)
-	ITEM(Button, btnDatabase, SetLabel(t_("Database")).LeftPosZ(44, 56).TopPosZ(44, 15))
+	ITEM(Button, btnDatabase, SetLabel(t_("Setup Encryption")).LeftPosZ(484, 92).TopPosZ(20, 20))
+	ITEM(LabelBox, dv___1, LeftPosZ(4, 468).TopPosZ(4, 372))
+	ITEM(Label, dv___2, SetLabel(t_("Language:")).LeftPosZ(8, 56).TopPosZ(20, 20))
+	ITEM(DropList, dlLang, LeftPosZ(72, 64).TopPosZ(20, 19))
+	ITEM(Button, btnSave, SetLabel(t_("Save")).LeftPosZ(412, 56).TopPosZ(352, 19))
 END_LAYOUT
 
 LAYOUT(ModifyFieldsLayout, 196, 252)

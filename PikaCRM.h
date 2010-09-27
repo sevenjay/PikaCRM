@@ -52,6 +52,7 @@ using namespace Upp;
 //end define file path and name--------------------------------------------------
 
 struct Config {
+	int		Language;
 	bool	IsDBEncrypt;
 	String	Password;
 	bool	IsRememberPW;
@@ -65,6 +66,7 @@ struct Config {
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
+			("Language", Language)
 			("Encrypted", IsDBEncrypt)
 			("Password", Password)
 			("RememberPW", IsRememberPW)
@@ -288,6 +290,7 @@ public:
 	
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();
+	void	SavePreference();
 };
 
 #endif
