@@ -91,6 +91,8 @@ void PikaCRM::SetupUI()
 	Customer.btnModifyF <<= THISBACK2(ModifyField, &(Customer.Grid), "c");
 	Customer.btnDeleteF.Disable();
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
+	Customer.btnImport.Disable();
+	Customer.btnPrint.Disable();
 	Customer.btnExport <<= THISBACK2(ExportFile, &(Customer.Grid), "Customers");
 	
 	Customer.Grid.Absolute();
@@ -131,6 +133,8 @@ void PikaCRM::SetupUI()
 	Contact.btnCreateF <<= THISBACK2(CreateField, &(Contact.Grid), "co");
 	Contact.btnModifyF <<= THISBACK2(ModifyField, &(Contact.Grid), "co");
 	Contact.btnDeleteF.Disable();
+	Contact.btnImport.Disable();
+	Contact.btnPrint.Disable();
 	Contact.btnExport <<= THISBACK2(ExportFile, &(Contact.Grid), "Contacts");
 	
 	Contact.Grid.Absolute();
@@ -160,6 +164,8 @@ void PikaCRM::SetupUI()
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
 	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
 	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
+	Event.btnImport.Disable();
+	Event.btnPrint.Disable();
 	Event.btnExport <<= THISBACK2(ExportFile, &(Event.Grid), "Events");
 	
 	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
@@ -191,6 +197,8 @@ void PikaCRM::SetupUI()
 	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
 	Merchandise.btnModifyF <<= THISBACK2(ModifyField, &(Merchandise.Grid), "m");
 	Merchandise.btnDeleteF.Disable();
+	Merchandise.btnImport.Disable();
+	Merchandise.btnPrint.Disable();
 	Merchandise.btnExport <<= THISBACK2(ExportFile, &(Merchandise.Grid), "Merchandises");
 	
 	Merchandise.Grid.Absolute();
@@ -216,6 +224,8 @@ void PikaCRM::SetupUI()
 	Order.btnCreate <<= callback(&(Order.Grid),&GridCtrl::DoAppend);
 	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
 	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
+	Order.btnImport.Disable();
+	Order.btnPrint.Disable();
 	Order.btnExport <<= THISBACK2(ExportFile, &(Order.Grid), "Orders");
 	
 	Order.Grid.AddColumn(O_ID,t_("Order ID")).Default(-1);//for when create row before insert row;
