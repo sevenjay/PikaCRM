@@ -214,7 +214,7 @@ void PikaCRM::SetupUI()
 	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
 	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
 	
-	Order.Grid.AddIndex(O_ID).Default(-1);//for when create row before insert row;
+	Order.Grid.AddColumn(O_ID,t_("Order ID")).Default(-1);//for when create row before insert row;
 	Order.Grid.AddIndex(C_ID);
 	Order.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mOrderGridCustomerBtn);
 		mOrderGridCustomerBtn.SetDisplay(Single<ColorNotNull>());
