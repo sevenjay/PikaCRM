@@ -131,6 +131,7 @@ void PikaCRM::SetupUI()
 	Contact.btnCreateF <<= THISBACK2(CreateField, &(Contact.Grid), "co");
 	Contact.btnModifyF <<= THISBACK2(ModifyField, &(Contact.Grid), "co");
 	Contact.btnDeleteF.Disable();
+	Contact.btnExport <<= THISBACK2(ExportFile, &(Contact.Grid), "Contacts");
 	
 	Contact.Grid.Absolute();
 	Contact.Grid.AddIndex(CO_ID);
@@ -159,6 +160,7 @@ void PikaCRM::SetupUI()
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
 	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
 	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
+	Event.btnExport <<= THISBACK2(ExportFile, &(Event.Grid), "Events");
 	
 	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
 	Event.Grid.AddIndex(C_ID);
@@ -189,6 +191,7 @@ void PikaCRM::SetupUI()
 	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
 	Merchandise.btnModifyF <<= THISBACK2(ModifyField, &(Merchandise.Grid), "m");
 	Merchandise.btnDeleteF.Disable();
+	Merchandise.btnExport <<= THISBACK2(ExportFile, &(Merchandise.Grid), "Merchandises");
 	
 	Merchandise.Grid.Absolute();
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
@@ -213,6 +216,7 @@ void PikaCRM::SetupUI()
 	Order.btnCreate <<= callback(&(Order.Grid),&GridCtrl::DoAppend);
 	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
 	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
+	Order.btnExport <<= THISBACK2(ExportFile, &(Order.Grid), "Orders");
 	
 	Order.Grid.AddColumn(O_ID,t_("Order ID")).Default(-1);//for when create row before insert row;
 	Order.Grid.AddIndex(C_ID);
@@ -1927,7 +1931,6 @@ void PikaCRM::ExportFile(GridCtrl * grid, String name)
 
 		
 	if(d.Run()==IDOK) {
-		//test();
 		ExportCSV(grid, ~(d.esFilePath), name);
 	}
 }
@@ -1939,6 +1942,56 @@ void PikaCRM::SelectExportDir(EditString * path, String & name)
 	fileSel.Set(name+".csv");
 	if(fileSel.ExecuteSaveAs()){
 		*path=~fileSel;
+	}
+}
+
+void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & name)
+{
+	SysLog.Info("Export CSV File\n");	
+	FileOut out(path);//clear file
+	FileAppend outAppend(path);
+	
+	int cols=grid->GetColumnCount();
+	int rows=grid->GetCount();//not include fix row title
+	//outAppend.Put(name+",rows,"+AsString(rows)+",cols,"+AsString(cols)+"\r\n");	
+	SysLog.Info(name+",rows,"+AsString(rows)+",cols,"+AsString(cols)+"\n");
+	
+	//test---------------------------------------------
+	///String s="____";
+	//String test="\""+s+"\","+"\""+s+"\","+"\""+s+"\","+"\""+s+"\","+"\""+s+"\","+"\""+s+"\"";
+	//outAppend.Put(test+"\r\n");
+	//outAppend.Put(test+"\r\n");
+	//end test------------------------------------------
+	
+	//row title
+	String 	line;
+	bool 	isFirstOne=true;
+	for(int i=0;i<cols;++i)
+	{
+		if(!grid->GetColumn(i).IsHidden())
+		{
+			if(isFirstOne==false) line<<",";
+			line<<"\""<<grid->GetColumn(i).GetName()<<"\"";
+			isFirstOne=false;
+		}		
+	}
+	outAppend.Put(line+"\r\n");
+	line.Clear();
+	
+	//data start from row=0
+	for(int i=0;i<rows;++i){
+		isFirstOne=true;
+		for(int j=0;j<cols;++j)
+		{
+			if(!grid->GetColumn(j).IsHidden())
+			{
+				if(isFirstOne==false) line<<",";
+				line<<"\""<<grid->Get(i,j)<<"\"";
+				isFirstOne=false;
+			}		
+		}
+		outAppend.Put(line+"\r\n");
+		line.Clear();
 	}
 }
 
@@ -1998,54 +2051,6 @@ void PikaCRM::SavePreference()
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	SaveConfig(config_file_path);
 	PromptOK(t_("The setting has been saved and will take effect the next time you start this application."));
-}
-
-void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & name)
-{
-	FileOut out(path);//clear file
-	FileAppend outAppend(path);
-	
-	int cols=grid->GetColumnCount();
-	int rows=grid->GetCount();//not include fix row title
-	outAppend.Put(name+",rows,"+AsString(rows)+",cols,"+AsString(cols)+"\r\n");
-	
-	//test---------------------------------------------
-	String s="____";
-	String test="\""+s+"\","+"\""+s+"\","+"\""+s+"\","+"\""+s+"\","+"\""+s+"\","+"\""+s+"\"";
-	outAppend.Put(test+"\r\n");
-	outAppend.Put(test+"\r\n");
-	//end test------------------------------------------
-	
-	//row title
-	String 	line;
-	bool 	isFirstOne=true;
-	for(int i=0;i<cols;++i)
-	{
-		if(!grid->GetColumn(i).IsHidden())
-		{
-			if(isFirstOne==false) line<<",";
-			line<<"\""<<grid->GetColumn(i).GetName()<<"\"";
-			isFirstOne=false;
-		}		
-	}
-	outAppend.Put(line+"\r\n");
-	line.Clear();
-	
-	//data start from row=0
-	for(int i=0;i<rows;++i){
-		isFirstOne=true;
-		for(int j=0;j<cols;++j)
-		{
-			if(!grid->GetColumn(j).IsHidden())
-			{
-				if(isFirstOne==false) line<<",";
-				line<<"\""<<grid->Get(i,j)<<"\"";
-				isFirstOne=false;
-			}		
-		}
-		outAppend.Put(line+"\r\n");
-		line.Clear();
-	}
 }
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------

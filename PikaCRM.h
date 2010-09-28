@@ -291,12 +291,12 @@ public:
 	void	ExportFile(GridCtrl * grid, String name);
 			void	SelectExportDir(EditString * path, String & name);
 	
+	//File Operation------------------------------------------------------
+	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
+	
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();
 	void	SavePreference();
-	
-	//File Operation------------------------------------------------------
-	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
 };
 
 #endif
