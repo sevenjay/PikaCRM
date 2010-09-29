@@ -50,6 +50,37 @@ using namespace Upp;
 #define FILE_LOG						"PikaCRM.log"//in PATH_USER_HOME
 #define FILE_DATABASE					"PikaCRM.sqlite"//in PATH_USER_HOME
 //end define file path and name--------------------------------------------------
+class ApExc : public String {
+	byte mHandle;
+	
+public:
+	enum Handle
+	{
+		NONE	= 0x00,
+		RELEASE	= 0x01, //release some resource
+		NOTICE	= 0x02, //notice user
+		RECOVER	= 0x04, //recover from error
+		REPORT	= 0x08, //need user to report
+		EXIT	= 0x10, //exit ap
+		//LNOTICE	= 0x20,
+		//LINFO		= 0x40,
+		//LDEBUG	= 0x80,
+		//------------------
+		SYS_FAIL= 0x12, //NOTICE, EXIT		
+		AP_FAIL	= 0x0a, //NOTICE, REPORT
+		FATAL	= 0x1a  //NOTICE, REPORT, EXIT
+	};
+	
+	//Exc(); // throw exception according to GetLastError()
+	ApExc() : String(GetLastErrorMessage()), mHandle(ApExc::NOTICE) {}
+	ApExc(const String& desc) : String(desc), mHandle(ApExc::NOTICE) {}
+	ApExc(const char * desc) : String(desc), mHandle(ApExc::NOTICE) {}
+	
+	ApExc & SetHandle(Handle h) {mHandle=h; return *this;}
+	ApExc & AddHandle(Handle h) {mHandle&=h; return *this;}
+	ApExc & RemoveHandle(Handle h) {mHandle&=~h; return *this;}
+	byte GetHandle() {return mHandle;}
+};
 
 struct Config {
 	int		Language;

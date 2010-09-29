@@ -347,12 +347,12 @@ void PikaCRM::LoadSetAllField()
 }
 void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 {
-	SysLog.Info("Create a customer field\n");	
+	SysLog.Info("Create a custom field\n");	
 	//UI--------------------------------------------
 	TopWindow d;
 	Button ok, cancel;
 
-	d.Title(t_("Create a customer field")).SetRect(0, 0, 300, 150);
+	d.Title(t_("Create a custom field")).SetRect(0, 0, 300, 150);
 	d.Add(ok.SetLabel("OK").LeftPosZ(20, 45).TopPosZ(50, 16));
 	d.Add(cancel.SetLabel("Cancel").LeftPosZ(100, 45).TopPosZ(50, 16));
 	ok.Ok() <<= d.Acceptor(IDOK);
@@ -1414,6 +1414,7 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 		{
 			SysLog.Error("load the config file fail\n");
 			///@todo thow and renew outside
+			throw ApExc("load the config file fail\n");
 		}
 	}
 	else
@@ -2084,8 +2085,12 @@ String PikaCRM::getConfigDirPath()
 			;//do nothing
 		else
 		{
-			RLOG("can't create the application config directory!");
-			//throw this error///@todo throw "Can't create config directory!"
+			//RLOG("can't create the application config directory!");//in ~/.upp/PikaCRM/PikaCRM.log
+			String msg;
+			msg =	"Can't create the application config directory!\n"
+					"Please check you have the privilege to create:\n"
+					+ full_directory_path;
+			throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
 		}
 	}
 

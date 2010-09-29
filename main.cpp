@@ -6,8 +6,11 @@
 
 GUI_APP_MAIN
 {	
-	RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log
-//try ///@todo
+	//RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log
+try
+{
+	SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
+	
 	PikaCRM pikaCRM;
 	SysLog.Open(GetExeTitle());
 	SetVppLogName(pikaCRM.GetLogPath());	
@@ -49,6 +52,21 @@ GUI_APP_MAIN
 	Ctrl::EventLoop();
 	SysLog(SystemLog::LDEBUG) << "End Application Main\n";
 	
-//catch ///@todo
+}
+catch(ApExc & e)
+{
+	if(e.GetHandle()&ApExc::REPORT) e+="\nAnd please report this issue to xxxweb.";
+	
+	if(e.GetHandle()&ApExc::NOTICE) Exclamation("[* " + DeQtfLf(e) + "]");
+	
+	if(e.GetHandle()&ApExc::EXIT) exit;//not necessary, it is exiting
+}
+catch(...)
+{	//can not do anything
+	String what= t_("Sorry, there is an unknown error.\n"
+					"If it always happens, you can report to xxxweb with the log and last error:\n")
+				+GetLastErrorMessage();
+	Exclamation("[* " + DeQtfLf(what) + "]");
+}
 }
 
