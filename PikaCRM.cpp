@@ -374,12 +374,19 @@ void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 					field.IsUsed=true;
 				
 				//INSERT INTO "main"."Field" ("f_table","f_rowid","f_name") VALUES ('c','3','asdf')
-				///@todo try catch
-					SQL & Insert(FIELD)
-						(F_TABLE,  f_table)
-						(F_ROWID,  i)
-						(F_NAME,   edit.GetData().ToString());
-				
+					try
+					{
+						SQL & Insert(FIELD)
+							(F_TABLE,  f_table)
+							(F_ROWID,  i)
+							(F_NAME,   edit.GetData().ToString());
+					}
+					catch(SqlExc &e)
+					{
+						SysLog.Error(e+"\n");
+						Exclamation("[* " + DeQtfLf(e) + "]");
+					}
+					
 					break;
 				}
 			}			
@@ -406,13 +413,10 @@ void PikaCRM::ModifyField(GridCtrl * grid, String f_table)
 	int y_level=24;
 	int y_start=32;
 	//end UI--------------------------------------------
-	bool is_sql_ok=SQL.Execute("select * from Field where f_table==?;",f_table);
-	if(!is_sql_ok)
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
-		return;
-		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
-	}
+try
+{
+		
+	SQL.ExecuteX("select * from Field where f_table==?;",f_table);
 
 	while(SQL.Fetch())
 	{
@@ -433,15 +437,9 @@ void PikaCRM::ModifyField(GridCtrl * grid, String f_table)
 		{
 			if(""==(esList[i].GetData().ToString())) continue;
 			
-			try
-			{
-				SQL & ::Update(FIELD) (F_NAME,  ~(esList[i])).Where(F_TABLE == f_table && F_ROWID==esList.GetKey(i));
-			}
-			catch(SqlExc &e)
-			{
-				Exclamation("[* " + DeQtfLf(e) + "]");
-			}
-			
+			SQL & ::Update(FIELD) (F_NAME,  ~(esList[i]))
+					.Where(F_TABLE == f_table && F_ROWID==esList.GetKey(i));
+
 			//update grid
 			FieldId & field=mFieldMap.Get(f_table)[esList.GetKey(i)];//"c" [0] is FieldId with C_0
 			int c_index=grid->FindCol(field.Id);
@@ -451,6 +449,14 @@ void PikaCRM::ModifyField(GridCtrl * grid, String f_table)
 			}
 		}
 	}
+	
+}
+catch(SqlExc &e)
+{
+	SysLog.Error(e+"\n");
+	Exclamation("[* " + DeQtfLf(e) + "]");
+}
+
 }
 
 void PikaCRM::LoadCustomer()
@@ -517,24 +523,18 @@ void PikaCRM::InsertCustomer()
 		for(int i = 0; i < contact_map.GetCount(); i++)//add already select contact to customer
 		{
 			int contact_id=contact_map.GetKey(i);
-			try
-			{
-				SQL & ::Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);				
-				//update Contact.Grid(C_TITLE);
-				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
-				Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
-				Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
-			}
-			catch(SqlExc &e)
-			{
-				Exclamation("[* " + DeQtfLf(e) + "]");
-				continue;
-			}
+
+			SQL & Update(CONTACT) (C_ID, Customer.Grid(C_ID)).Where(CO_ID == contact_id);				
+			//update Contact.Grid(C_TITLE);
+			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+			Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
+			Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
 		}			
 	}
 	catch(SqlExc &e)
 	{
 		Customer.Grid.CancelInsert();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -570,6 +570,7 @@ void PikaCRM::UpdateCustomer()
 	catch(SqlExc &e)
 	{
 		Customer.Grid.CancelUpdate();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -584,24 +585,17 @@ void PikaCRM::RemoveCustomer()
 		{
 			int contact_id=contact_map.GetKey(i);
 			
-			try
-			{
-				SQL.ExecuteX("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
-				//clear Contact.Grid(C_TITLE);
-				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
-				Contact.Grid.Set(contact_row,C_TITLE,"");
-				Contact.Grid.Set(contact_row,C_ID,NULL);
-			}
-			catch(SqlExc &e)
-			{
-				Exclamation("[* " + DeQtfLf(e) + "]");
-				continue;
-			}			
+			SQL.ExecuteX("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+			//clear Contact.Grid(C_TITLE);
+			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+			Contact.Grid.Set(contact_row,C_TITLE,"");
+			Contact.Grid.Set(contact_row,C_ID,NULL);		
 		}
 	}
 	catch(SqlExc &e)
 	{
 		Customer.Grid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -635,6 +629,7 @@ void PikaCRM::InsertContact()
 	catch(SqlExc &e)
 	{
 		Contact.Grid.CancelInsert();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -671,6 +666,7 @@ void PikaCRM::UpdateContact()
 	catch(SqlExc &e)
 	{
 		Contact.Grid.CancelUpdate();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -697,6 +693,7 @@ void PikaCRM::RemoveContact()
 	catch(SqlExc &e)
 	{
 		Contact.Grid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -745,6 +742,7 @@ void PikaCRM::InsertEvent()
 	catch(SqlExc &e)
 	{
 		Event.Grid.CancelInsert();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -763,6 +761,7 @@ void PikaCRM::UpdateEvent()
 	catch(SqlExc &e)
 	{
 		Event.Grid.CancelUpdate();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -775,16 +774,25 @@ void PikaCRM::RemoveEvent()
 	catch(SqlExc &e)
 	{
 		Event.Grid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
 void PikaCRM::UpdateEventDropStatus()
 {
-	mEventDropStatus.Clear();
-	SQL & Select(E_STATUS).From(EVENT).GroupBy(E_STATUS);
-
-	while(SQL.Fetch())
-		mEventDropStatus.Add(SQL[0]);
+	try
+	{
+		mEventDropStatus.Clear();
+		SQL & Select(E_STATUS).From(EVENT).GroupBy(E_STATUS);
+	
+		while(SQL.Fetch())
+			mEventDropStatus.Add(SQL[0]);
+	}
+	catch(SqlExc &e)
+	{
+		SysLog.Error(e+"\n");
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
 }
 
 void PikaCRM::LoadMerchandise()
@@ -815,6 +823,7 @@ void PikaCRM::InsertMerchandise()
 	catch(SqlExc &e)
 	{
 		Merchandise.Grid.CancelInsert();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -835,6 +844,7 @@ void PikaCRM::UpdateMerchandise()
 	catch(SqlExc &e)
 	{
 		Merchandise.Grid.CancelUpdate();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -847,6 +857,7 @@ void PikaCRM::RemoveMerchandise()
 	catch(SqlExc &e)
 	{
 		Merchandise.Grid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -891,7 +902,7 @@ void PikaCRM::LoadOrderCustomer()
 	else
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
-		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
+		Exclamation(SQL.GetLastError());///@lazy to use try catch
 	}
 }
 void PikaCRM::InsertOrder()
@@ -912,6 +923,7 @@ void PikaCRM::InsertOrder()
 	catch(SqlExc &e)
 	{
 		Order.Grid.CancelInsert();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -934,6 +946,7 @@ void PikaCRM::UpdateOrder()
 	catch(SqlExc &e)
 	{
 		Order.Grid.CancelUpdate();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -948,6 +961,7 @@ void PikaCRM::RemoveOrder()
 	catch(SqlExc &e)
 	{
 		Order.Grid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -972,6 +986,7 @@ void PikaCRM::LoadBuyItem(int o_id)
 	else
 	{
 		SysLog.Error(SQL.GetLastError()+"\n");
+		Exclamation(SQL.GetLastError());///@lazy to use try catch
 	}
 }
 void PikaCRM::NewBuyItem()
@@ -1010,6 +1025,7 @@ void PikaCRM::InsertBuyItem()
 	catch(SqlExc &e)
 	{
 		Order.BuyItemGrid.CancelInsert();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -1030,6 +1046,7 @@ void PikaCRM::UpdateBuyItem()
 	catch(SqlExc &e)
 	{
 		Order.BuyItemGrid.CancelUpdate();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -1042,6 +1059,7 @@ void PikaCRM::RemoveBuyItem()
 	catch(SqlExc &e)
 	{
 		Order.BuyItemGrid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -1054,6 +1072,7 @@ void PikaCRM::RemoveOrderBuyItem()
 	catch(SqlExc &e)
 	{
 		Order.BuyItemGrid.CancelRemove();
+		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
@@ -1627,7 +1646,8 @@ void PikaCRM::CustomerGridContactBtnClick()
 		if(0==i) list.SetCursor(list_index);///@important must set cursor once and first, or it will clear all selected
 		list.SelectOne(list_index,true);
 	}
-	
+try
+{
 	//add no costomer contact to select
 	SQL & Select(CO_ID, CO_NAME).From(CONTACT).Where(IsNull(C_ID));
 	while(SQL.Fetch())
@@ -1640,22 +1660,14 @@ void PikaCRM::CustomerGridContactBtnClick()
 		for(int i = 0; i < contact_map.GetCount(); i++)
 		{
 			int contact_id=contact_map.GetKey(i);
-			
-			try
-			{
-				//SQL & ::Update(CONTACT) (C_ID, NULL).Where(CO_ID == contact_id);//fail, NULL will be 0
-				SQL.Execute("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+
+			//SQL & ::Update(CONTACT) (C_ID, NULL).Where(CO_ID == contact_id);//fail, NULL will be 0
+			SQL.ExecuteX("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
 				
-				//clear Contact.Grid(C_TITLE);
-				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
-				Contact.Grid.Set(contact_row,C_TITLE,"");
-				Contact.Grid.Set(contact_row,C_ID,NULL);
-			}
-			catch(SqlExc &e)
-			{
-				continue;
-				Exclamation("[* " + DeQtfLf(e) + "]");
-			}			
+			//clear Contact.Grid(C_TITLE);
+			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+			Contact.Grid.Set(contact_row,C_TITLE,"");
+			Contact.Grid.Set(contact_row,C_ID,NULL);		
 		}
 		
 		VectorMap<int, String> new_contact_map;
@@ -1665,23 +1677,16 @@ void PikaCRM::CustomerGridContactBtnClick()
 			{
 				int contact_id=list.Get(i);
 				//update in the database. if costomer_id ==-1, no need to do, it will do in InsertCustomer()
-				try
+
+				if(-1 != costomer_id)
 				{
-					if(-1 != costomer_id)
-					{
-						SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == contact_id);
-						//update Contact.Grid(C_TITLE);
-						int contact_row=Contact.Grid.Find(contact_id,CO_ID);
-						Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
-						Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
-					}
+					SQL & ::Update(CONTACT) (C_ID,  costomer_id).Where(CO_ID == contact_id);
+					//update Contact.Grid(C_TITLE);
+					int contact_row=Contact.Grid.Find(contact_id,CO_ID);
+					Contact.Grid.Set(contact_row,C_TITLE,Customer.Grid(C_TITLE));
+					Contact.Grid.Set(contact_row,C_ID,Customer.Grid(C_ID));
 				}
-				catch(SqlExc &e)
-				{
-					continue;//Contact.Grid.CancelUpdate();
-					Exclamation("[* " + DeQtfLf(e) + "]");
-				}
-				
+								
 				//record in the map
 				new_contact_map.Add(contact_id,list.GetValue(i));///@note if list i has no key, it will assert fail
 			}
@@ -1691,6 +1696,14 @@ void PikaCRM::CustomerGridContactBtnClick()
 		
 		Customer.Grid.Set(CO_NAME,all_name);//Customer.Grid(CO_NAME)=hh;//must use Set to refresh and show
     }
+    
+}
+catch(SqlExc &e)
+{
+	SysLog.Error(e+"\n");
+	Exclamation("[* " + DeQtfLf(e) + "]");
+}
+
 }
 
 void PikaCRM::EventGridCustomerBtnClick()
@@ -1711,6 +1724,8 @@ void PikaCRM::EventGridCustomerBtnClick()
 	list.Columns(3);
 	//list.MultiSelect();
 	//end UI--------------------------------------------
+try
+{
 	//add costomer to select
 	SQL & Select(C_ID, C_TITLE).From(CUSTOMER);
 	while(SQL.Fetch())
@@ -1743,23 +1758,22 @@ void PikaCRM::EventGridCustomerBtnClick()
 				title=String(list.GetValue(i));
 				
 				//update in the database
-				try
+				if(-1 != Event.Grid(E_ID))
 				{
-					if(-1 != Event.Grid(E_ID))
-					{
-						SQL & ::Update(EVENT) (C_ID,  costomer_id).Where(E_ID == Event.Grid(E_ID));
-					}
-				}
-				catch(SqlExc &e)
-				{
-					continue;//Contact.Grid.CancelUpdate();
-					Exclamation("[* " + DeQtfLf(e) + "]");
+					SQL & ::Update(EVENT) (C_ID,  costomer_id).Where(E_ID == Event.Grid(E_ID));
 				}
 			}
 		}
 		Event.Grid.Set(C_ID,costomer_id);		
 		Event.Grid.Set(C_TITLE,title);
     }
+    
+}
+catch(SqlExc &e)
+{
+	SysLog.Error(e+"\n");
+	Exclamation("[* " + DeQtfLf(e) + "]");
+}
 }
 void PikaCRM::EventNewStatusClick()
 {
