@@ -301,13 +301,7 @@ void PikaCRM::SetupUI()
 void PikaCRM::LoadSetAllField()
 {
 	SysLog.Info("Load and Set All Fields\n");
-	bool is_sql_ok=SQL.Execute("select * from Field;");
-	if(!is_sql_ok)
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
-		return;
-		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
-	}
+	SQL.ExecuteX("select * from Field;");
 
 	while(SQL.Fetch())
 	{
@@ -343,7 +337,6 @@ void PikaCRM::LoadSetAllField()
 			}
 		}
 	}
-	//int zz=mFieldEditList.Top().use_count();
 }
 void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 {
@@ -464,39 +457,31 @@ void PikaCRM::LoadCustomer()
 {
 	SysLog.Info("Load Customers\n");
 	Customer.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select * from Customer;");
-	if(is_sql_ok)
+	SQL.ExecuteX("select * from Customer;");
+	while(SQL.Fetch())
 	{
-		while(SQL.Fetch())
+		VectorMap<int, String> temp_contact_map;
+		Sql sql2;
+		sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
+		while(sql2.Fetch())
 		{
-			VectorMap<int, String> temp_contact_map;
-			Sql sql2;
-			sql2 & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID == SQL[C_ID]);
-			while(sql2.Fetch())
-			{
-				temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
-			}
-			const Value & raw_map = RawToValue(temp_contact_map);
-			
-			Customer.Grid.Add();
-			Customer.Grid(C_ID) = SQL[C_ID];
-			Customer.Grid(C_TITLE) = SQL[C_TITLE];
-			Customer.Grid(C_PHONE) = SQL[C_PHONE];
-			Customer.Grid(C_ADDRESS) = SQL[C_ADDRESS];
-			Customer.Grid(C_EMAIL) = SQL[C_EMAIL];
-			Customer.Grid(C_WEBSITE) = SQL[C_WEBSITE];
-			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
-			Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
-			Customer.Grid(C_0) = SQL[C_0];
-			Customer.Grid(C_1) = SQL[C_1];
-			Customer.Grid(C_2) = SQL[C_2];
-			Customer.Grid(C_3) = SQL[C_3];
+			temp_contact_map.Add(sql2[CO_ID], sql2[CO_NAME]);
 		}
-	}
-	else
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
-		///@todo Exclamation("[* " + DeQtfLf(e) + "]");
+		const Value & raw_map = RawToValue(temp_contact_map);
+			
+		Customer.Grid.Add();
+		Customer.Grid(C_ID) = SQL[C_ID];
+		Customer.Grid(C_TITLE) = SQL[C_TITLE];
+		Customer.Grid(C_PHONE) = SQL[C_PHONE];
+		Customer.Grid(C_ADDRESS) = SQL[C_ADDRESS];
+		Customer.Grid(C_EMAIL) = SQL[C_EMAIL];
+		Customer.Grid(C_WEBSITE) = SQL[C_WEBSITE];
+		Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+		Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
+		Customer.Grid(C_0) = SQL[C_0];
+		Customer.Grid(C_1) = SQL[C_1];
+		Customer.Grid(C_2) = SQL[C_2];
+		Customer.Grid(C_3) = SQL[C_3];
 	}
 }
 void PikaCRM::NewCustomer()
@@ -601,7 +586,7 @@ void PikaCRM::RemoveCustomer()
 			
 			try
 			{
-				SQL.Execute("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+				SQL.ExecuteX("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
 				//clear Contact.Grid(C_TITLE);
 				int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 				Contact.Grid.Set(contact_row,C_TITLE,"");
@@ -609,8 +594,8 @@ void PikaCRM::RemoveCustomer()
 			}
 			catch(SqlExc &e)
 			{
-				continue;
 				Exclamation("[* " + DeQtfLf(e) + "]");
+				continue;
 			}			
 		}
 	}
@@ -625,17 +610,10 @@ void PikaCRM::LoadContact()
 {
 	SysLog.Info("Load Contacts\n");
 	Contact.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select co_id, Contact.c_id, c_title, co_name, co_phone, co_address, co_email from Contact left outer join Customer on Contact.c_id = Customer.c_id;");
-	if(is_sql_ok)
+	SQL.ExecuteX("select co_id, Contact.c_id, c_title, co_name, co_phone, co_address, co_email from Contact left outer join Customer on Contact.c_id = Customer.c_id;");
+	while(SQL.Fetch())
 	{
-		while(SQL.Fetch())
-		{
-			Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[C_ID],SQL[C_TITLE],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL],SQL[CO_0],SQL[CO_1],SQL[CO_2],SQL[CO_3]);
-		}
-	}
-	else
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
+		Contact.Grid.Add(SQL[CO_ID],SQL[CO_NAME],SQL[C_ID],SQL[C_TITLE],SQL[CO_PHONE],SQL[CO_ADDRESS],SQL[CO_EMAIL],SQL[CO_0],SQL[CO_1],SQL[CO_2],SQL[CO_3]);
 	}
 }
 void PikaCRM::InsertContact()
@@ -743,19 +721,12 @@ void PikaCRM::LoadEvent()
 				"strftime('%m/%d/%Y %H:%M',e_rtime) as e_rtime, "
 				"strftime('%m/%d/%Y %H:%M',e_ctime) as e_ctime, "
 				"e_note from Event left outer join Customer on Event.c_id = Customer.c_id;";
-	bool is_sql_ok=SQL.Execute(sql);
-	if(is_sql_ok)
+	SQL.ExecuteX(sql);
+	while(SQL.Fetch())
 	{
-		while(SQL.Fetch())
-		{
-			Event.Grid.Add(SQL[E_ID],SQL[C_ID],SQL[C_TITLE],SQL[E_ASK],SQL[E_STATUS],SQL[E_RTIME],SQL[E_CTIME],SQL[E_NOTE]);
-		}
-		UpdateEventDropStatus();
+		Event.Grid.Add(SQL[E_ID],SQL[C_ID],SQL[C_TITLE],SQL[E_ASK],SQL[E_STATUS],SQL[E_RTIME],SQL[E_CTIME],SQL[E_NOTE]);
 	}
-	else
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
-	}
+	UpdateEventDropStatus();
 }
 void PikaCRM::InsertEvent()
 {	
@@ -820,17 +791,10 @@ void PikaCRM::LoadMerchandise()
 {
 	SysLog.Info("Load Merchandises\n");
 	Merchandise.Grid.Clear();
-	bool is_sql_ok=SQL.Execute("select * from Merchandise;");
-	if(is_sql_ok)
+	SQL.ExecuteX("select * from Merchandise;");
+	while(SQL.Fetch())
 	{
-		while(SQL.Fetch())
-		{
-			Merchandise.Grid.Add(SQL[M_ID],SQL[M_NAME],SQL[M_MODEL],SQL[M_PRICE],SQL[M_0],SQL[M_1],SQL[M_2],SQL[M_3]);
-		}
-	}
-	else
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
+		Merchandise.Grid.Add(SQL[M_ID],SQL[M_NAME],SQL[M_MODEL],SQL[M_PRICE],SQL[M_0],SQL[M_1],SQL[M_2],SQL[M_3]);
 	}
 }
 void PikaCRM::InsertMerchandise()
@@ -895,17 +859,10 @@ void PikaCRM::LoadOrder()
 				"strftime('%m/%d/%Y',o_order_date) as o_order_date, "
 				"strftime('%m/%d/%Y',o_ship_date) as o_ship_date, "
 				"o_status, o_note from Orders left outer join Customer on Orders.c_id = Customer.c_id;";
-	bool is_sql_ok=SQL.Execute(sql);
-	if(is_sql_ok)
+	SQL.ExecuteX(sql);
+	while(SQL.Fetch())
 	{
-		while(SQL.Fetch())
-		{
-			Order.Grid.Add(SQL[O_ID],SQL[C_ID],SQL[C_TITLE],SQL[O_SHIP_ADD],SQL[O_BILL_ADD],SQL[O_ORDER_DATE],SQL[O_SHIP_DATE],SQL[O_STATUS],SQL[O_NOTE]);
-		}
-	}
-	else
-	{
-		SysLog.Error(SQL.GetLastError()+"\n");
+		Order.Grid.Add(SQL[O_ID],SQL[C_ID],SQL[C_TITLE],SQL[O_SHIP_ADD],SQL[O_BILL_ADD],SQL[O_ORDER_DATE],SQL[O_SHIP_DATE],SQL[O_STATUS],SQL[O_NOTE]);
 	}
 }
 void PikaCRM::LoadOrderCustomer()
@@ -1163,7 +1120,6 @@ void PikaCRM::OpenMainFrom()
 		mSplash.ShowSplashStatus(t_("Creating the database..."));
 		SysLog.Info(t_("Creating the database..."))<<"\n";;
 		CreateOrOpenDB(database_file_path);//CreateDB
-		//InitialDB();///@todo this must be after IsDBWork
 	}
 	
 	//test if database OK-----------------------------------------------------
@@ -1197,15 +1153,25 @@ void PikaCRM::OpenMainFrom()
 	}	
 	*/		
 	
-	
-	//Load and set customer field(UI+data)
-	LoadSetAllField();
-	//Load all tab data
-	LoadCustomer();
-	LoadContact();
-	LoadEvent();
-	LoadMerchandise();
-	LoadOrder();	
+	try
+	{
+		//Load and set customer field(UI+data)
+		LoadSetAllField();
+		//Load all tab data
+		LoadCustomer();
+		LoadContact();
+		LoadEvent();
+		LoadMerchandise();
+		LoadOrder();	
+	}
+	catch(SqlExc &e)
+	{
+		mSplash.HideSplash();
+		SysLog.Error(e+"\n");
+		Exclamation( t_("There is a database operation error.\n"
+						"If data is not correct, please report to xxxweb with the log and last error: \n")
+						+ SQL.GetLastError());
+	}
 	
 	if(mConfig.IsMaximized) MainFrom.Maximize();
 	MainFrom.OpenMain();
@@ -1322,10 +1288,11 @@ void PikaCRM::InitialDB()
 		throw ApExc("Perform Script ./initial.sql Fail!").SetHandle(ApExc::SYS_FAIL);
 	}
 	
-	SQL.ExecuteX("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
+	int is_sql_ok=SQL.Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name
-	//@todo handel is_sql_ok						
+							
+	if(!is_sql_ok) throw ApExc("initial the database fail").SetHandle(ApExc::SYS_FAIL);					
 #ifdef _DEBUG
 	//in debug
 	String out=ExportSch(mSqlite3Session, "main");						

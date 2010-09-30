@@ -17,7 +17,7 @@ try
 #ifdef _DEBUG
 	SysLog.SetLevels(SystemLog::LALLDEBUG);// enables all log levels
 #else
-	SysLog.SetLevels(SystemLog::LALLERR);//Used to enable all error-level logs, no LWARNING
+	SysLog.SetLevels(SystemLog::LALLDEBUG);///@todo when 1.0 release change
 #endif
 	/*
 			LEMERGENCY	= 0x01,
@@ -28,7 +28,7 @@ try
 			LNOTICE		= 0x20,
 			LINFO		= 0x40, used for notice user, software information
 			LDEBUG		= 0x80, used for debug only
-			LALLERR		= 0x0f,
+			LALLERR		= 0x0f, //Used to enable all error-level logs, no LWARNING
 			LALL		= 0x7f, //Used to enable all but not debug logs
 			LALLDEBUG	= 0xff
 
