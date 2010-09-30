@@ -1816,6 +1816,7 @@ void PikaCRM::OrderGridCustomerBtnClick()
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);
 	//end UI--------------------------------------------
+try{
 	//add costomer to select
 	SQL & Select(C_ID, C_TITLE).From(CUSTOMER);
 	while(SQL.Fetch())
@@ -1848,17 +1849,9 @@ void PikaCRM::OrderGridCustomerBtnClick()
 				title=String(list.GetValue(i));
 				
 				//update in the database
-				try
+				if(-1 != Order.Grid(O_ID))
 				{
-					if(-1 != Order.Grid(O_ID))
-					{
-						SQL & ::Update(ORDERS) (C_ID,  costomer_id).Where(O_ID == Order.Grid(O_ID));
-					}
-				}
-				catch(SqlExc &e)
-				{
-					continue;//Contact.Grid.CancelUpdate();
-					Exclamation("[* " + DeQtfLf(e) + "]");
+					SQL & ::Update(ORDERS) (C_ID,  costomer_id).Where(O_ID == Order.Grid(O_ID));
 				}
 			}
 		}
@@ -1866,6 +1859,12 @@ void PikaCRM::OrderGridCustomerBtnClick()
 		Order.Grid.Set(C_TITLE,title);
 		LoadOrderCustomer();
     }
+}
+catch(SqlExc &e)
+{
+	SysLog.Error(e+"\n");
+	Exclamation("[* " + DeQtfLf(e) + "]");
+}
 }
 
 void PikaCRM::BuyItemGridMerchBtnClick()
@@ -1885,6 +1884,7 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 	list.SetRect(0, 0, 400, 325);
 	list.Columns(3);
 	//end UI--------------------------------------------
+try{
 	//add costomer to select
 	Vector<double> price_list;
 	SQL & Select(M_ID, M_NAME, M_MODEL, M_PRICE).From(MERCHANDISE);
@@ -1920,22 +1920,14 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 				price	= price_list[i];
 				
 				//update in the database
-				try
+				if(-1 != Order.BuyItemGrid(B_ID))
 				{
-					if(-1 != Order.BuyItemGrid(B_ID))
-					{
-						SQL & ::Update(BUYITEM) 
+					SQL & ::Update(BUYITEM) 
 							(M_ID,		merch_id)
 							(M_NAME,	title)
 							//(M_MODEL,	Order.BuyItemGrid(M_MODEL))
 							(M_PRICE,	price)
 							.Where(B_ID == Order.BuyItemGrid(B_ID));
-					}
-				}
-				catch(SqlExc &e)
-				{
-					continue;
-					Exclamation("[* " + DeQtfLf(e) + "]");
 				}
 			}
 		}
@@ -1943,6 +1935,12 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 		Order.BuyItemGrid.Set(M_NAME,title);	
 		Order.BuyItemGrid.Set(M_PRICE,price);	
     }
+}
+catch(SqlExc &e)
+{
+	SysLog.Error(e+"\n");
+	Exclamation("[* " + DeQtfLf(e) + "]");
+}
 }
 
 
