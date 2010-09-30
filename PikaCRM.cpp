@@ -1144,54 +1144,67 @@ void PikaCRM::OpenMainFrom()
 	}
 
 	
-	mSplash.ShowSplashStatus(t_("Loading Database..."));
-	SysLog.Info(t_("Loading Database..."))<<"\n";
+	mSplash.ShowSplashStatus(t_("Checking Database..."));
+	SysLog.Info(t_("Checking Database..."))<<"\n";
 	if(IsHaveDBFile(database_file_path))
 	{
-		SysLog.Info("open the database file\n");
+		mSplash.ShowSplashStatus(t_("Loading Database..."));
+		SysLog.Info(t_("Loading Database..."))<<"\n";
 		CreateOrOpenDB(database_file_path);//OpenDB
-		/*if(GetDBVersion()<DATABASE_VERSION)
+
+	}
+	else
+	{
+		SysLog.Info("setup the database file\n");
+		mSplash.HideSplash();
+		///@todo first welcome
+		if(!IsSetupDB(config_file_path)) return;
+		mSplash.ShowSplash();
+		mSplash.ShowSplashStatus(t_("Creating the database..."));
+		SysLog.Info(t_("Creating the database..."))<<"\n";;
+		CreateOrOpenDB(database_file_path);//CreateDB
+		InitialDB();///@todo this must be after IsDBWork
+	}
+	
+	//test if database OK-----------------------------------------------------
+	bool is_sql_ok=SQL.Execute("PRAGMA database_list;");
+	
+	if(is_sql_ok)
+		;//donothing
+	else //pw error or not the file?
+	{
+		String msg = t_("Failed to load database! Maybe file is encrypted.\n"
+						"Last error: ")	+ SQL.GetLastError();
+		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		///@remark setkey(password), wrong password may cause this
+		///if make multi database, must do reset pw and forget pw  
+	}
+	//end test if database OK-----------------------------------------------------
+	
+	
+	//if db empty(GetDBVersion()=0) InitialDB();
+			/*if(GetDBVersion()<DATABASE_VERSION)
 			UpdateDB();
 		else if(GetDBVersion()>DATABASE_VERSION)
 			show can not up compatibility, please use the Latest version
 		
 		
 		
-		*/
-	}
-	else
-	{
-		SysLog.Info("create the database file\n");
-		mSplash.HideSplash();
-		///@todo first welcome
-		if(!IsSetupDB(config_file_path)) return;
-		mSplash.ShowSplash();
-		CreateOrOpenDB(database_file_path);//CreateDB
-		InitialDB();
-	}
-	/*
-	if(IsDBWork())
-		//donothing
-	else
-	{
-		//pw error or not the file?
-		showErrorMsg();
-		goto enter PW
-	}
-	
-	
-	*/	
-	//test if database OK
-	bool is_sql_ok=SQL.Execute("select * from System;");
+		*/	
+	is_sql_ok=SQL.Execute("select * from System;");
 	if(is_sql_ok)
 		while(SQL.Fetch())//user,ap_ver,sqlite_ver,db_ver
 			SysLog.Debug("") << SQL[USER]<<", "<<SQL[CTIME]<<", "<<
 								SQL[AP_VER]<<", "<<SQL[SQLITE_VER]<<", "<<SQL[DB_VER]<<"\n";
 	else
 	{
-		SysLog.Error(SQL.GetLastError()+"\n");
+		String msg = t_("Failed to load database! Maybe file is encrypted.\n"
+						"Last error: ")	+ SQL.GetLastError();
+		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		///@remark setkey(password), wrong password may cause this
+		///if make multi database, must do reset pw and forget pw  
 	}
-
+	
 	//Load and set customer field(UI+data)
 	LoadSetAllField();
 	//Load all tab data
@@ -1262,8 +1275,8 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 	mSqlite3Session.Close();
 	if(!mSqlite3Session.Open(database_file_path))
 	{
-		SysLog.Error("can't create or open database file: "+database_file_path+"\n");
-		///@todo thow 
+		String msg = t_("Can't create or open database file: ")	+ database_file_path;
+		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
 	}
 	SysLog.Debug("created or opened database file: "+database_file_path+"\n");
 	
@@ -1287,19 +1300,21 @@ void PikaCRM::InitialDB()
 {
 	SysLog.Info("initial the database file\n");
 	FileIn initial("initial.sql");
-	if(!initial)
+	if(!initial.IsOpen())
 	{
-		SysLog.Error("can't open database initial file: initial.sql\n");
-		///@todo thow 
+		throw ApExc("Can't open database initial file: ./initial.sql").SetHandle(ApExc::SYS_FAIL);
 	}
-	bool is_sql_ok = SqlPerformScript(mSqlite3Session,initial);
+	if(!SqlPerformScript(mSqlite3Session,initial))
+	{
+		throw ApExc("Perform Script ./initial.sql Fail!").SetHandle(ApExc::SYS_FAIL);
+	}
 	
-	is_sql_ok=SQL.Execute("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
+	SQL.ExecuteX("INSERT INTO System (user,ap_ver,sqlite_ver,db_ver) VALUES (?,?,?,?);",
 							"System",SOFTWARE_VERSION,mSqlite3Session.VersionInfo(),DATABASE_VERSION);
 							///@todo set user name
 	//@todo handel is_sql_ok						
 #ifdef _DEBUG
-	//in ebug
+	//in debug
 	String out=ExportSch(mSqlite3Session, "main");						
 	SaveFile("sql.sch", out);	
 	SaveFile("sql.ids", ExportIds(mSqlite3Session, "main"));
@@ -1480,8 +1495,10 @@ void PikaCRM::SaveConfig(const String & config_file_path)
 	}
 	else
 	{
-		SysLog.Error("Save config file fail\n");
-		///@todo thow can't save
+		String msg = t_("Can't write the application config directory!\n"
+						"Please check you have the privilege to write:\n")
+						+ config_file_path;
+		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
 	}
 }
 
@@ -1549,8 +1566,9 @@ String PikaCRM::GetSystemKey()
 		key=getMD5(output);
 	else
 	{
-		SysLog.Error(output+"\n");///@remark throw error?
-		//throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		SysLog.Error(output+"\n");
+		///@remark throw error? or just disable remember PW?
+		//throw ApExc(output+"\n").SetHandle(ApExc::SYS_FAIL);
 	}
 	
 	
