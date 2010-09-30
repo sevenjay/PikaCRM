@@ -6,7 +6,7 @@
 
 GUI_APP_MAIN
 {	
-	//RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log
+	RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log //this is must for log.old bug
 try
 {
 	SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
@@ -55,6 +55,10 @@ try
 }
 catch(ApExc & e)
 {
+	if(e.GetHandle()&ApExc::EXIT) SysLog.Critical(e+"\n");
+	else SysLog.Error(e+"\n");
+	
+	
 	if(e.GetHandle()&ApExc::REPORT) e+="\nAnd please report this issue to xxxweb.";
 	
 	if(e.GetHandle()&ApExc::NOTICE) Exclamation("[* " + DeQtfLf(e) + "]");

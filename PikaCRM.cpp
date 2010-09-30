@@ -1405,16 +1405,25 @@ void PikaCRM::CheckPWSame(WithInitialDBLayout<TopWindow> * d)
 void PikaCRM::LoadConfig(const String & config_file_path)
 {
 	if(FileExists(config_file_path))
-	{
+	{	
+		FileIn in(config_file_path);
+		if(in.IsOpen())
+			;
+		else
+		{
+			String msg= t_("The config file can not be open!\n"
+						"Please check you have the privilege to open:\n")
+						+ config_file_path;
+			throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		}
+		
 		if(mConfig.Load(config_file_path))
 		{
 			SysLog.Info("loaded the config file\n");
 		}
 		else
 		{
-			SysLog.Error("load the config file fail\n");
-			///@todo thow and renew outside
-			throw ApExc("load the config file fail\n");
+			throw ApExc("load the config file fail\n").SetHandle(ApExc::SYS_FAIL);
 		}
 	}
 	else
@@ -1509,6 +1518,7 @@ void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw)
 
 String PikaCRM::GetSystemKey()
 {
+	SysLog.Info("Get the System Key\n");	
 	int		pos;
 	String 	output;
 	String	key;
@@ -1522,13 +1532,11 @@ String PikaCRM::GetSystemKey()
 			if ( fread(buf,sizeof(char),100,p_process) > 0) 
 			{
 				output=buf;
-				//printf("printf %s\n",buf);
 			}
 			pclose(p_process);
 		}
 		else 
 		{
-		    //perror("fail to execute hdsn");
 		    output="fail to execute hdsn";
 		}
 
@@ -1540,7 +1548,10 @@ String PikaCRM::GetSystemKey()
 	if( -1 != (pos=output.Find("serial_no:")) )
 		key=getMD5(output);
 	else
+	{
 		SysLog.Error(output+"\n");///@remark throw error?
+		//throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+	}
 	
 	
 	return key;
@@ -2087,8 +2098,8 @@ String PikaCRM::getConfigDirPath()
 		{
 			//RLOG("can't create the application config directory!");//in ~/.upp/PikaCRM/PikaCRM.log
 			String msg;
-			msg =	"Can't create the application config directory!\n"
-					"Please check you have the privilege to create:\n"
+			msg =t_("Can't create the application config directory!\n"
+					"Please check you have the privilege to create:\n")
 					+ full_directory_path;
 			throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
 		}
