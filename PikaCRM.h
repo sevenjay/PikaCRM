@@ -279,6 +279,7 @@ private :
 	void SetupUI();
 	bool IsHaveDBFile(const String & database_file_path);
 	void CreateOrOpenDB(const String & database_file_path);
+	int  GetDBVersion();
 	void InitialDB();
 	bool IsSetupDB(const String config_file_path);
 		void OnOptPWAction(WithInitialDBLayout<TopWindow> * d);

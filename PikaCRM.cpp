@@ -1163,7 +1163,7 @@ void PikaCRM::OpenMainFrom()
 		mSplash.ShowSplashStatus(t_("Creating the database..."));
 		SysLog.Info(t_("Creating the database..."))<<"\n";;
 		CreateOrOpenDB(database_file_path);//CreateDB
-		InitialDB();///@todo this must be after IsDBWork
+		//InitialDB();///@todo this must be after IsDBWork
 	}
 	
 	//test if database OK-----------------------------------------------------
@@ -1181,29 +1181,22 @@ void PikaCRM::OpenMainFrom()
 	}
 	//end test if database OK-----------------------------------------------------
 	
-	
-	//if db empty(GetDBVersion()=0) InitialDB();
-			/*if(GetDBVersion()<DATABASE_VERSION)
-			UpdateDB();
-		else if(GetDBVersion()>DATABASE_VERSION)
-			show can not up compatibility, please use the Latest version
-		
-		
-		
-		*/	
-	is_sql_ok=SQL.Execute("select * from System;");
-	if(is_sql_ok)
-		while(SQL.Fetch())//user,ap_ver,sqlite_ver,db_ver
-			SysLog.Debug("") << SQL[USER]<<", "<<SQL[CTIME]<<", "<<
-								SQL[AP_VER]<<", "<<SQL[SQLITE_VER]<<", "<<SQL[DB_VER]<<"\n";
-	else
+	if(0==GetDBVersion()) InitialDB();
+	/*
+	int past_db_ver=GetDBVersion();
+	if(past_db_ver<DATABASE_VERSION)
 	{
-		String msg = t_("Failed to load database! Maybe file is encrypted.\n"
-						"Last error: ")	+ SQL.GetLastError();
-		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
-		///@remark setkey(password), wrong password may cause this
-		///if make multi database, must do reset pw and forget pw  
+		for(int i=past_db_ver;i<DATABASE_VERSION;++i)
+		{
+				UpdateToDB(i+1);
+		}	
 	}
+	else if(past_db_ver>DATABASE_VERSION)
+	{
+		show can not up compatibility, please use the Latest version
+	}	
+	*/		
+	
 	
 	//Load and set customer field(UI+data)
 	LoadSetAllField();
@@ -1294,6 +1287,26 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 			SysLog.Error("sqlite3 set key error\n");
 			///@note we dont know how to deal this error, undefine		
 		}
+	}
+}
+int PikaCRM::GetDBVersion()
+{
+	int ver;
+	int is_sql_ok=SQL.Execute("select * from System;");
+	///@remark "PRAGMA user_version = integer ;" is useful?
+	if(is_sql_ok)
+	{
+		while(SQL.Fetch())//user,ap_ver,sqlite_ver,db_ver
+		{
+			SysLog.Debug("") << SQL[USER]<<", "<<SQL[CTIME]<<", "<<
+								SQL[AP_VER]<<", "<<SQL[SQLITE_VER]<<", "<<SQL[DB_VER]<<"\n";
+			ver=SQL[DB_VER];
+		}
+		return ver;
+	}
+	else
+	{
+		return 0;
 	}
 }
 void PikaCRM::InitialDB()
@@ -1498,7 +1511,7 @@ void PikaCRM::SaveConfig(const String & config_file_path)
 		String msg = t_("Can't write the application config directory!\n"
 						"Please check you have the privilege to write:\n")
 						+ config_file_path;
-		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		throw ApExc(msg).SetHandle(ApExc::NOTICE);
 	}
 }
 

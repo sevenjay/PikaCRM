@@ -16,7 +16,7 @@ CREATE TABLE "Merchandise" ("m_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL 
 
 CREATE TABLE "Orders" ("o_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "c_id" INTEGER NOT NULL , "o_ship_add" CHAR, "o_bill_add" CHAR, "o_order_date" DATETIME, "o_ship_date" DATETIME, "o_status" CHAR, "o_ctime" DATETIME NOT NULL  DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')), "o_mtime" DATETIME, "o_note" TEXT);
 
-CREATE TABLE "System" ("user" CHAR NOT NULL , "ctime" DATETIME NOT NULL  DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')), "ap_ver" CHAR NOT NULL , "sqlite_ver" CHAR NOT NULL , "db_ver" CHAR NOT NULL );
+CREATE TABLE "System" ("user" CHAR NOT NULL , "ctime" DATETIME NOT NULL  DEFAULT (datetime(CURRENT_TIMESTAMP,'localtime')), "ap_ver" CHAR NOT NULL , "sqlite_ver" CHAR NOT NULL , "db_ver" INTEGER NOT NULL );
 
 CREATE TABLE "UnlimitedField" ("u_id" INTEGER PRIMARY KEY  AUTOINCREMENT  NOT NULL , "u_name" CHAR NOT NULL );
 
