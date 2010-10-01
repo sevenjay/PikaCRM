@@ -1507,6 +1507,7 @@ bool PikaCRM::IsInputPWCheck()
 	String config_file_path=getConfigDirPath()+FILE_CONFIG;
 	WithInputPWLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d,t_("Pika Customer Relationship Management"));
+	d.esPassword.Password();
 	d.ok.WhenPush = THISBACK2(CheckPWRight, &d, mConfig.Password);
 	d.optRememberPW = mConfig.IsRememberPW;
 	if(d.Run() == IDOK) {
@@ -1558,7 +1559,7 @@ String PikaCRM::GetSystemKey()
 
 #elif defined(PLATFORM_WIN32)
 	///@todo include SystemInfo
-
+	output="Win32 Not implement GetSystemKey";
 #endif
 
 	if( -1 != (pos=output.Find("serial_no:")) )
