@@ -122,7 +122,7 @@ void PikaCRM::SetupUI()
 	//Customer.Grid.SetToolBar();
 	//Customer Search------------------------------------------
 	Customer.Add(customer_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
-		Customer.Grid.FindBar(customer_search_bar, 140);
+		Customer.Grid.FindBar(customer_search_bar, Ctrl::HorzLayoutZoom(80));
 	Customer.btnSearchClear <<= THISBACK(BtnSearchClearClick);
 	Customer.btnSearchGo <<= THISBACK(BtnSearchGoClick);
 	
@@ -156,7 +156,7 @@ void PikaCRM::SetupUI()
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
 	//Contact Search------------------------------------------
 	Contact.Add(contact_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
-		Contact.Grid.FindBar(contact_search_bar, 140);
+		Contact.Grid.FindBar(contact_search_bar, Ctrl::HorzLayoutZoom(80));
 	Contact.btnSearchClear <<= callback2(&(Contact.Grid),&GridCtrl::ClearFound,true,true);
 	Contact.btnSearchGo <<= callback(&(Contact.Grid),&GridCtrl::DoFind);
 	
@@ -186,7 +186,7 @@ void PikaCRM::SetupUI()
 	Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
 	//Event Search------------------------------------------
 	Event.Add(event_search_bar.LeftPosZ(147, 82).TopPosZ(4, 19));
-		Event.Grid.FindBar(event_search_bar, 140);
+		Event.Grid.FindBar(event_search_bar, Ctrl::HorzLayoutZoom(80));
 	Event.btnSearchClear <<= callback2(&(Event.Grid),&GridCtrl::ClearFound,true,true);
 	Event.btnSearchGo <<= callback(&(Event.Grid),&GridCtrl::DoFind);
 	
@@ -216,7 +216,7 @@ void PikaCRM::SetupUI()
 	Merchandise.Grid.WhenRemoveRow = THISBACK(RemoveMerchandise);
 	//Merchandise Search------------------------------------------
 	Merchandise.Add(merchandise_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
-		Merchandise.Grid.FindBar(merchandise_search_bar, 140);
+		Merchandise.Grid.FindBar(merchandise_search_bar, Ctrl::HorzLayoutZoom(80));
 	Merchandise.btnSearchClear <<= callback2(&(Merchandise.Grid),&GridCtrl::ClearFound,true,true);
 	Merchandise.btnSearchGo <<= callback(&(Merchandise.Grid),&GridCtrl::DoFind);
 	
@@ -254,7 +254,7 @@ void PikaCRM::SetupUI()
 	Order.btnFilterSet.Tip("Not yet").Disable();
 	//Order Search------------------------------------------
 	Order.Add(order_search_bar.LeftPosZ(239, 82).TopPosZ(4, 19));
-		Order.Grid.FindBar(order_search_bar, 140);
+		Order.Grid.FindBar(order_search_bar, Ctrl::HorzLayoutZoom(80));
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
 	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);
 	//Order.ContactDrop-------------------------------------
@@ -1203,7 +1203,7 @@ void PikaCRM::OpenMainFrom()
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
-	double base=Ctrl::VertLayoutZoom(1000);
+	double base=Ctrl::HorzLayoutZoom(1000);
 	double fac=1000/base;
 		mConfig.CWidth.Get(~C_TITLE)=round(Customer.Grid.FindColWidth(C_TITLE)*fac);
 		mConfig.CWidth.Get(~C_PHONE)=round(Customer.Grid.FindColWidth(C_PHONE)*fac);
