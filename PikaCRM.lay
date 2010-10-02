@@ -11,8 +11,8 @@ LAYOUT(InitialDBLayout, 412, 204)
 	ITEM(Option, optRequire, SetLabel(t_("Require the user to enter this password when start.")).LeftPosZ(36, 292).TopPosZ(136, 16))
 	ITEM(Label, dv___6, SetLabel(t_("Re-Enter Password:")).LeftPosZ(36, 104).TopPosZ(108, 20))
 	ITEM(Label, dv___7, SetLabel(t_("Enter new Password:")).LeftPosZ(36, 100).TopPosZ(80, 20))
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(288, 24).TopPosZ(172, 20))
-	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(164, 148).TopPosZ(172, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(288, 24).BottomPosZ(12, 20))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(164, 148).BottomPosZ(12, 20))
 	ITEM(Option, optRevealPW, SetLabel(t_("Reveal Passwords")).LeftPosZ(280, 108).TopPosZ(80, 20))
 END_LAYOUT
 
@@ -20,8 +20,8 @@ LAYOUT(InputPWLayout, 300, 120)
 	ITEM(EditString, esPassword, MaxChars(16).LeftPosZ(120, 116).TopPosZ(36, 19))
 	ITEM(Label, dv___1, SetLabel(t_("Password:")).LeftPosZ(52, 64).TopPosZ(36, 20))
 	ITEM(Option, optRememberPW, SetLabel(t_("Remember the Password")).LeftPosZ(52, 160).TopPosZ(64, 16))
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(180, 32).TopPosZ(88, 20))
-	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(52, 160).TopPosZ(88, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(180, 32).BottomPosZ(12, 20))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(52, 160).BottomPosZ(12, 20))
 	ITEM(Label, dv___5, SetLabel(t_("Enter your password to use PikaCRM")).LeftPosZ(52, 192).TopPosZ(12, 20))
 END_LAYOUT
 
@@ -156,11 +156,11 @@ LAYOUT(PreferenceLayout, 596, 400)
 END_LAYOUT
 
 LAYOUT(ModifyFieldsLayout, 196, 252)
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(116, 8).TopPosZ(224, 20))
-	ITEM(Label, dv___1, SetLabel(t_("Modified")).LeftPosZ(104, 60).TopPosZ(4, 16))
-	ITEM(LabelBox, dv___2, LeftPosZ(8, 180).TopPosZ(20, 196))
-	ITEM(Label, dv___3, SetLabel(t_("Original")).LeftPosZ(16, 60).TopPosZ(4, 16))
-	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(8, 112).TopPosZ(224, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HCenterPosZ(72, 54).BottomPosZ(8, 20))
+	ITEM(StaticText, dv___1, SetText(t_("Modified")).HCenterPosZ(60, 36).TopPosZ(4, 16))
+	ITEM(LabelBox, dv___2, HCenterPosZ(180, 0).TopPosZ(20, 196))
+	ITEM(StaticText, dv___3, SetText(t_("Original")).HCenterPosZ(60, -52).TopPosZ(4, 16))
+	ITEM(Button, ok, SetLabel(t_("OK")).HCenterPosZ(76, -52).BottomPosZ(8, 20))
 END_LAYOUT
 
 LAYOUT(ExportLayout, 400, 200)
@@ -170,7 +170,7 @@ LAYOUT(ExportLayout, 400, 200)
 	ITEM(Label, dv___3, SetLabel(t_("File")).LeftPosZ(8, 40).TopPosZ(124, 20))
 	ITEM(EditString, esFilePath, NotNull(true).LeftPosZ(52, 244).TopPosZ(124, 19))
 	ITEM(Button, btnBrowse, SetLabel(t_("Browse")).LeftPosZ(312, 52).TopPosZ(124, 20))
-	ITEM(Button, ok, SetLabel(t_("Export")).LeftPosZ(240, 52).TopPosZ(172, 20))
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(312, 52).TopPosZ(172, 20))
+	ITEM(Button, ok, SetLabel(t_("Export")).LeftPosZ(240, 52).BottomPosZ(8, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(312, 52).BottomPosZ(8, 20))
 END_LAYOUT
 

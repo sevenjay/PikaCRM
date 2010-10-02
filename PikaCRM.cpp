@@ -121,7 +121,7 @@ void PikaCRM::SetupUI()
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
 	//Customer.Grid.SetToolBar();
 	//Customer Search------------------------------------------
-	Customer.Add(customer_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+	Customer.Add(customer_search_bar.LeftPosZ(286, 84).TopPosZ(4, 20));
 		Customer.Grid.FindBar(customer_search_bar, Ctrl::HorzLayoutZoom(80));
 	Customer.btnSearchClear <<= THISBACK(BtnSearchClearClick);
 	Customer.btnSearchGo <<= THISBACK(BtnSearchGoClick);
@@ -155,7 +155,7 @@ void PikaCRM::SetupUI()
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
 	//Contact Search------------------------------------------
-	Contact.Add(contact_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+	Contact.Add(contact_search_bar.LeftPosZ(286, 84).TopPosZ(4, 20));
 		Contact.Grid.FindBar(contact_search_bar, Ctrl::HorzLayoutZoom(80));
 	Contact.btnSearchClear <<= callback2(&(Contact.Grid),&GridCtrl::ClearFound,true,true);
 	Contact.btnSearchGo <<= callback(&(Contact.Grid),&GridCtrl::DoFind);
@@ -185,7 +185,7 @@ void PikaCRM::SetupUI()
 	Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
 	Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
 	//Event Search------------------------------------------
-	Event.Add(event_search_bar.LeftPosZ(147, 82).TopPosZ(4, 19));
+	Event.Add(event_search_bar.LeftPosZ(147, 84).TopPosZ(4, 20));
 		Event.Grid.FindBar(event_search_bar, Ctrl::HorzLayoutZoom(80));
 	Event.btnSearchClear <<= callback2(&(Event.Grid),&GridCtrl::ClearFound,true,true);
 	Event.btnSearchGo <<= callback(&(Event.Grid),&GridCtrl::DoFind);
@@ -215,7 +215,7 @@ void PikaCRM::SetupUI()
 	Merchandise.Grid.WhenUpdateRow = THISBACK(UpdateMerchandise);
 	Merchandise.Grid.WhenRemoveRow = THISBACK(RemoveMerchandise);
 	//Merchandise Search------------------------------------------
-	Merchandise.Add(merchandise_search_bar.LeftPosZ(286, 82).TopPosZ(4, 19));
+	Merchandise.Add(merchandise_search_bar.LeftPosZ(286, 84).TopPosZ(4, 20));
 		Merchandise.Grid.FindBar(merchandise_search_bar, Ctrl::HorzLayoutZoom(80));
 	Merchandise.btnSearchClear <<= callback2(&(Merchandise.Grid),&GridCtrl::ClearFound,true,true);
 	Merchandise.btnSearchGo <<= callback(&(Merchandise.Grid),&GridCtrl::DoFind);
@@ -253,7 +253,7 @@ void PikaCRM::SetupUI()
 	Order.dlFilter.SetIndex(0);
 	Order.btnFilterSet.Tip("Not yet").Disable();
 	//Order Search------------------------------------------
-	Order.Add(order_search_bar.LeftPosZ(239, 82).TopPosZ(4, 19));
+	Order.Add(order_search_bar.LeftPosZ(239, 84).TopPosZ(4, 20));
 		Order.Grid.FindBar(order_search_bar, Ctrl::HorzLayoutZoom(80));
 	Order.btnSearchClear <<= callback2(&(Order.Grid),&GridCtrl::ClearFound,true,true);
 	Order.btnSearchGo <<= callback(&(Order.Grid),&GridCtrl::DoFind);
@@ -345,7 +345,7 @@ void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 	TopWindow d;
 	Button ok, cancel;
 
-	d.Title(t_("Create a custom field")).SetRect(0, 0, 300, 150);
+	d.Title(t_("Create a custom field")).SetRect(0, 0, Ctrl::HorzLayoutZoom(180), Ctrl::VertLayoutZoom(80));
 	d.Add(ok.SetLabel("OK").LeftPosZ(20, 45).TopPosZ(50, 16));
 	d.Add(cancel.SetLabel("Cancel").LeftPosZ(100, 45).TopPosZ(50, 16));
 	ok.Ok() <<= d.Acceptor(IDOK);
@@ -1622,9 +1622,9 @@ void PikaCRM::CustomerGridContactBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+    d.Title("Select contacts (Multiple select)").SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -1713,9 +1713,9 @@ void PikaCRM::EventGridCustomerBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+    d.Title("Select one customer").SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -1806,9 +1806,9 @@ void PikaCRM::OrderGridCustomerBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+    d.Title("Select one customer").SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -1874,9 +1874,9 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).TopPosZ(175, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).TopPosZ(175, 24));
+    d.Title("Select one product").SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
