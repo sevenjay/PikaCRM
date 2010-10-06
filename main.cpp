@@ -9,7 +9,7 @@ GUI_APP_MAIN
 	RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log //this is must for log.old bug
 try
 {
-	SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
+	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
 	
 	PikaCRM pikaCRM;
 	SysLog.Open(GetExeTitle());

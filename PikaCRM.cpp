@@ -46,14 +46,7 @@ public:
 
 PikaCRM::PikaCRM()
 {
-	//mLanguage=LNG_('Z','H','T','W');
-	//mLanguage=LNG_('E','N','U','S');
-	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
-
-
-
 	SetAllFieldMap();
-
 }
 
 PikaCRM::~PikaCRM()
@@ -62,7 +55,9 @@ PikaCRM::~PikaCRM()
 void PikaCRM::Initial()
 {
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
-	SysLog.Info(t_("Loading Settings..."))<<"\n";
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	
+	SysLog.Info("Loading Settings...")<<"\n";
 	LoadConfig(config_file_path);
 		
 	SetLanguage( SetLNGCharset( mConfig.Language, CHARSET_UTF8 ) );
@@ -71,8 +66,84 @@ void PikaCRM::Initial()
 	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(mConfig.Language),SrcImages::Logo(),mConfig.Language);	
 	mSplash.ShowSplash();
 
-	
 	SetupUI();
+
+	if(mConfig.IsDBEncrypt)
+	{
+		mSplash.HideSplash();
+		if(mConfig.IsRememberPW)
+		{
+			SysLog.Info("config: Remeber the PW\n");
+			String key=CombineKey(GetSystemKey(), mConfig.Password);
+			SysLog.Debug("systemPWKey:"+key+"\n");
+			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
+			{
+				SysLog.Info("config: application is running on different PC\n");
+				if(!IsInputPWCheck()) return;//false
+			}
+			//else
+			//	;//just using mConfig.Password;
+		}
+		else//not Remember PW 
+		{
+			SysLog.Info("config: Not Remeber the PW\n");
+			if(!IsInputPWCheck()) return;
+		}
+		mSplash.ShowSplash();
+	}
+
+	
+	mSplash.ShowSplashStatus(t_("Checking Database..."));
+	SysLog.Info(t_("Checking Database..."))<<"\n";
+	if(IsHaveDBFile(database_file_path))
+	{
+		mSplash.ShowSplashStatus(t_("Loading Database..."));
+		SysLog.Info(t_("Loading Database..."))<<"\n";
+		CreateOrOpenDB(database_file_path);//OpenDB
+
+	}
+	else
+	{
+		SysLog.Info("setup the database file\n");
+		mSplash.HideSplash();
+		///@todo first welcome
+		if(!IsSetupDB(config_file_path)) return;
+		mSplash.ShowSplash();
+		mSplash.ShowSplashStatus(t_("Creating the database..."));
+		SysLog.Info(t_("Creating the database..."))<<"\n";;
+		CreateOrOpenDB(database_file_path);//CreateDB
+	}
+	
+	//test if database OK-----------------------------------------------------
+	bool is_sql_ok=SQL.Execute("PRAGMA database_list;");
+	
+	if(is_sql_ok)
+		;//donothing
+	else //pw error or not the file?
+	{
+		String msg = t_("Failed to load database! Maybe file is encrypted.\n"
+						"Last error: ")	+ SQL.GetLastError();
+		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		///@remark setkey(password), wrong password may cause this
+		///if make multi database, must do reset pw and forget pw  
+	}
+	//end test if database OK-----------------------------------------------------
+	
+	if(0==GetDBVersion()) InitialDB();
+	/*
+	int past_db_ver=GetDBVersion();
+	if(past_db_ver<DATABASE_VERSION)
+	{
+		for(int i=past_db_ver;i<DATABASE_VERSION;++i)
+		{
+				UpdateToDB(i+1);
+		}	
+	}
+	else if(past_db_ver>DATABASE_VERSION)
+	{
+		show can not up compatibility, please use the Latest version
+	}	
+	*/		
 }
 void PikaCRM::SetupUI()
 {
@@ -1095,89 +1166,7 @@ String PikaCRM::GetLogPath()
 	return getConfigDirPath()+FILE_LOG;	
 }
 void PikaCRM::OpenMainFrom()
-{
-
-	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
-	
-	String database_file_path = getConfigDirPath()+FILE_DATABASE;
-
-	if(mConfig.IsDBEncrypt)
-	{
-		mSplash.HideSplash();
-		if(mConfig.IsRememberPW)
-		{
-			SysLog.Info("config: Remeber the PW\n");
-			String key=CombineKey(GetSystemKey(), mConfig.Password);
-			SysLog.Debug("systemPWKey:"+key+"\n");
-			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
-			{
-				SysLog.Info("config: application is running on different PC\n");
-				if(!IsInputPWCheck()) return;//false
-			}
-			//else
-			//	;//just using mConfig.Password;
-		}
-		else//not Remember PW 
-		{
-			SysLog.Info("config: Not Remeber the PW\n");
-			if(!IsInputPWCheck()) return;
-		}
-		mSplash.ShowSplash();
-	}
-
-	
-	mSplash.ShowSplashStatus(t_("Checking Database..."));
-	SysLog.Info(t_("Checking Database..."))<<"\n";
-	if(IsHaveDBFile(database_file_path))
-	{
-		mSplash.ShowSplashStatus(t_("Loading Database..."));
-		SysLog.Info(t_("Loading Database..."))<<"\n";
-		CreateOrOpenDB(database_file_path);//OpenDB
-
-	}
-	else
-	{
-		SysLog.Info("setup the database file\n");
-		mSplash.HideSplash();
-		///@todo first welcome
-		if(!IsSetupDB(config_file_path)) return;
-		mSplash.ShowSplash();
-		mSplash.ShowSplashStatus(t_("Creating the database..."));
-		SysLog.Info(t_("Creating the database..."))<<"\n";;
-		CreateOrOpenDB(database_file_path);//CreateDB
-	}
-	
-	//test if database OK-----------------------------------------------------
-	bool is_sql_ok=SQL.Execute("PRAGMA database_list;");
-	
-	if(is_sql_ok)
-		;//donothing
-	else //pw error or not the file?
-	{
-		String msg = t_("Failed to load database! Maybe file is encrypted.\n"
-						"Last error: ")	+ SQL.GetLastError();
-		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
-		///@remark setkey(password), wrong password may cause this
-		///if make multi database, must do reset pw and forget pw  
-	}
-	//end test if database OK-----------------------------------------------------
-	
-	if(0==GetDBVersion()) InitialDB();
-	/*
-	int past_db_ver=GetDBVersion();
-	if(past_db_ver<DATABASE_VERSION)
-	{
-		for(int i=past_db_ver;i<DATABASE_VERSION;++i)
-		{
-				UpdateToDB(i+1);
-		}	
-	}
-	else if(past_db_ver>DATABASE_VERSION)
-	{
-		show can not up compatibility, please use the Latest version
-	}	
-	*/		
-	
+{	
 	try
 	{
 		//Load and set customer field(UI+data)
@@ -1208,6 +1197,7 @@ void PikaCRM::OpenMainFrom()
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
+	SysLog.Info("close application\n");
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
 	double base=Ctrl::HorzLayoutZoom(1000);
 	double fac=1000/base;
@@ -1499,7 +1489,7 @@ void PikaCRM::SaveConfig(const String & config_file_path)
 {
 	if(mConfig.Save(config_file_path))
 	{
-		SysLog.Debug("Save the config file\n");
+		SysLog.Info("Saved the config file\n");
 	}
 	else
 	{
@@ -2072,6 +2062,7 @@ void PikaCRM::ConfigDB()
 
 void PikaCRM::SavePreference()
 {
+	SysLog.Info("save the preference\n");
 	int index=Preference.dlLang.GetIndex();
 	//test-------------------------------------------------------
 	int tt0=LNG_('Z','H','T','W');//860823
