@@ -46,7 +46,8 @@ try
 	SysLog.EnableSysLog(false);
 
 	SysLog(SystemLog::LDEBUG) << "Start logging\n";
-
+	
+	pikaCRM.Initial();
 	pikaCRM.OpenMainFrom();
 	
 	Ctrl::EventLoop();

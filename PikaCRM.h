@@ -207,8 +207,6 @@ private :
 	
 	
 	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
-	int	mLanguage;
-
 	SplashSV mSplash;
 	
 	Config mConfig;
@@ -222,8 +220,8 @@ private :
 
 	//private utility-------------------------------------------------------------------
 	String  getConfigDirPath();
-	String	getLang4Char();
-	Image	getLangLogo();
+	String	getLang4Char(int language);
+	Image	getLangLogo(int language);
 	String	getMD5(const String & text);
 	String	getSwap1st2ndChar(const String & text);
 	void	test(){PromptOK("test");};
@@ -305,6 +303,7 @@ public:
 	
 	//main control--------------------------------------------------------------
 	String GetLogPath();
+	void   Initial();
 	void   OpenMainFrom();
 	
 	//interactive with GUI==============================================================

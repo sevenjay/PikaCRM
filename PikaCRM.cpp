@@ -50,24 +50,37 @@ PikaCRM::PikaCRM()
 	//mLanguage=LNG_('E','N','U','S');
 	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
 
-	Upp::CtrlLayout(MainFrom);
-	
-	int QtfHigh=20;
-	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(),SrcImages::Logo(),mLanguage);
+
 
 	SetAllFieldMap();
 
-	MainFrom.WhenClose=THISBACK(CloseMainFrom);
-	MainFrom.Sizeable().Zoomable();
 }
 
 PikaCRM::~PikaCRM()
 {
 }
+void PikaCRM::Initial()
+{
+	String config_file_path = getConfigDirPath()+FILE_CONFIG;
+	SysLog.Info(t_("Loading Settings..."))<<"\n";
+	LoadConfig(config_file_path);
+		
+	SetLanguage( SetLNGCharset( mConfig.Language, CHARSET_UTF8 ) );
+	
+	int QtfHigh=20;
+	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(mConfig.Language),SrcImages::Logo(),mConfig.Language);	
+	mSplash.ShowSplash();
 
+	
+	SetupUI();
+}
 void PikaCRM::SetupUI()
 {
+	CtrlLayout(MainFrom);		
+	MainFrom.WhenClose=THISBACK(CloseMainFrom);
+	MainFrom.Sizeable().Zoomable();
 	MainFrom.Title(t_("Pika Customer Relationship Management"));
+	
 	//TabCtrl----------------------------------------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
 	CtrlLayout(Customer);
@@ -1083,17 +1096,10 @@ String PikaCRM::GetLogPath()
 }
 void PikaCRM::OpenMainFrom()
 {
-	mSplash.ShowSplash();
+
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
+	
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
-	
-	mSplash.ShowSplashStatus(t_("Loading Settings..."));
-	SysLog.Info(t_("Loading Settings..."))<<"\n";
-	LoadConfig(config_file_path);
-	
-	SetLanguage( SetLNGCharset( mConfig.Language, CHARSET_UTF8 ) );
-	
-	SetupUI();
 
 	if(mConfig.IsDBEncrypt)
 	{
@@ -2121,16 +2127,16 @@ String PikaCRM::getConfigDirPath()
 
 	return full_directory_path;
 }
-String PikaCRM::getLang4Char()
+String PikaCRM::getLang4Char(int language)
 {
-	String lang4=LNGAsText(mLanguage);//EN-US
+	String lang4=LNGAsText(language & 0xfffff);//EN-US UTF8 & 0xfffff = EN-US
 	if(!lang4.IsEmpty()) lang4.Remove(2,1); //remove "-"
 	return lang4;
 }
-Image PikaCRM::getLangLogo()
+Image PikaCRM::getLangLogo(int language)
 {
 	String logo_name;
-	logo_name="Logo"+getLang4Char();//LogoENUS, LogoZHTW, ...
+	logo_name="Logo"+getLang4Char(language);//LogoENUS, LogoZHTW, ...
 	int id=SrcImages::Find(logo_name);
 							
 	Image image;							
