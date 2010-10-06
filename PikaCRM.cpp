@@ -1333,9 +1333,12 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	d.ok.WhenPush = THISBACK1(CheckPWSame, &d);
 	
 	String note,note2;
-	note<<"[1 "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
+	Font ff= GetStdFont();
+	SysLog.Debug(ff.GetFaceName()+"\n");
+	
+	note<<"[1G "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
 	d.rtNoteEncrypted.SetQTF(note);
-	note2<<"[1 "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";
+	note2<<"[1G "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";	
 	d.rtNoteEncrypted2.SetQTF(note2);
 	
 	//Load from Config
