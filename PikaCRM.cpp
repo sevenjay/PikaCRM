@@ -1331,6 +1331,7 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	String note,note2;
 	Font ff= GetStdFont();
 	SysLog.Debug(ff.GetFaceName()+"\n");
+	SysLog.Debug("h: ")<<ff.GetHeight();
 	
 	note<<"[1G "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
 	d.rtNoteEncrypted.SetQTF(note);

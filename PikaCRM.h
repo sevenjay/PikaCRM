@@ -206,7 +206,7 @@ private :
 	MultiButtonNotNULL mBuyItemGridMerchBtn;
 	
 	
-	//must initial in PikaCRM(), OpenMainFrom()	------------------------------------
+	//must initial in PikaCRM(), Initial(), OpenMainFrom()	------------------------------------
 	SplashSV mSplash;
 	
 	Config mConfig;
