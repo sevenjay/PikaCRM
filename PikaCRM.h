@@ -9,9 +9,14 @@ using namespace Upp;
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
 #include <plugin/sqlite3/Sqlite3.h>
-//#include "boost/smart_ptr.hpp"
 #include <DropGrid/DropGrid.h>
 #include <GridCtrl/GridCtrl.h> //must include before *.lay
+
+#include <string>
+#include <vector>
+//#include "boost/smart_ptr.hpp"
+//#include "boost/tokenizer.hpp"
+
 //end useful library---------------------------------------------------
 
 #define LAYOUTFILE <PikaCRM/PikaCRM.lay>
@@ -28,10 +33,6 @@ using namespace Upp;
 
 #endif
 //end platform dependent------------------------------------------------
-
-//#include <string>
-//#include <vector>
-
 
 
 #define SOFTWARE_NAME					"PikaCRM"
@@ -333,4 +334,7 @@ public:
 	void	SavePreference();
 };
 
+//some function-----------------------------------------------
+String Replace(String str, String find, String replace);
+std::vector<std::string> ParserCsvLine(const char * line);
 #endif

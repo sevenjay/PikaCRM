@@ -12,6 +12,11 @@
 
 #include <PikaCRM/sql/sql.ids>	//for convenient use tables/columns name
 
+//#include <string>
+//#include <vector>
+//#include "boost/smart_ptr.hpp"
+#include "boost/tokenizer.hpp"
+
 struct ConvContactNames : Convert
 {
 	Value Format(const Value &q) const
@@ -2019,7 +2024,10 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 			if(!grid->GetColumn(j).IsHidden())
 			{
 				if(isFirstOne==false) line<<",";
-				line<<"\""<<grid->Get(i,j)<<"\"";
+				
+				String temp=grid->Get(i,j);
+				String out=Replace(temp,"\"","\"\"");
+				if(!out.IsEmpty())line<<"\""<<out<<"\"";
 				isFirstOne=false;
 			}		
 		}
@@ -2081,16 +2089,29 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid)
 }
 void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 {
-	String temp;
+	std::string temp;
+	std::vector<std::string> v2;
 	//Vector<String> vs1=Split(file, '\n', true);
 	while(!file.IsEof()){
-		//Vector<String> vs2=Split(~file.GetLine(), ',', false);
-		data.Add(Split(~file.GetLine(), ',', false));
-		//for(int i=0;i<vs2.GetCount();++i)
-		//{
-		//	temp=vs2[i];
-			
-		//}
+		Vector<String> vs2;
+		
+		//easy way, but not resolve "a","b,c","d"
+		//1//Vector<String> vs2=Split(~file.GetLine(), ',', false);
+		//data.Add(Split(~file.GetLine(), ',', false));
+		String temp=file.GetLine();
+		//for csv format work-around to fix the default behavior of the boost escaped_list_separator:
+		//First replace all back-slash characters (\) with two back-slash characters (\\) so they are not stripped away.
+		temp=Replace(temp,"\\","\\\\");
+		//Secondly replace all double-quotes ("") with a single back-slash character and a quote (\")
+		temp=Replace(temp,"\"\"","\\\"");
+		v2=ParserCsvLine(~temp);
+		for(int i=0;i<v2.size();++i)
+		{
+			temp=v2[i];
+			vs2.Add(v2[i]);//auto string->String
+		}
+		
+		data.Add(vs2);
 	}
 }
 
@@ -2230,3 +2251,33 @@ String PikaCRM::getSwap1st2ndChar(const String & text)
 }
 	    
 //end private utility---------------------------------------------------------------
+
+//some function-----------------------------------------------
+String Replace(String str, String find, String replace) 
+{ //from Functions4U.cpp
+	String ret;
+	
+	int lenStr = str.GetCount();
+	int lenFind = find.GetCount();
+	int i = 0, j;
+	while ((j = str.Find(find, i)) >= i) {
+		ret += str.Mid(i, j-i) + replace;
+		i = j + lenFind;
+		if (i >= lenStr)
+			break;
+	}
+	ret += str.Mid(i);
+	return ret;
+}
+std::vector<std::string> ParserCsvLine(const char * line)
+{
+	typedef boost::tokenizer< boost::escaped_list_separator<char> > Tokenizer;
+	std::vector< std::string > vec;
+	std::string sline(line);
+
+	Tokenizer tok(sline);
+	vec.assign(tok.begin(),tok.end());
+	
+	return vec;
+}
+//end some function-----------------------------------------------
