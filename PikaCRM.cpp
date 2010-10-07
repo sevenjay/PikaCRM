@@ -175,9 +175,9 @@ void PikaCRM::SetupUI()
 	Customer.btnModifyF <<= THISBACK2(ModifyField, &(Customer.Grid), "c");
 	Customer.btnDeleteF.Disable();
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
-	Customer.btnImport.Disable();
-	Customer.btnPrint.Disable();
+	Customer.btnImport <<= THISBACK2(ImportFile, &(Customer.Grid), "Customers");
 	Customer.btnExport <<= THISBACK2(ExportFile, &(Customer.Grid), "Customers");
+	Customer.btnPrint.Disable();
 	
 	Customer.Grid.Absolute();
 	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
@@ -2025,6 +2025,72 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 		}
 		outAppend.Put(line+"\r\n");
 		line.Clear();
+	}
+}
+void PikaCRM::ImportFile(GridCtrl * grid, String name)
+{
+	SysLog.Info("Import File\n");	
+	//UI--------------------------------------------
+	WithImportLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d,t_("Import File"));
+	d.swFormat <<= 0;
+	d.btnBrowse <<= THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
+
+	d.swFormat.DisableCase(1);
+	d.swFormat.DisableCase(2);
+	
+	int cols=grid->GetColumnCount();
+	for(int i=0;i<cols;++i)
+	{
+		if(!grid->GetColumn(i).IsHidden())
+		{
+			d.Grid.AddColumn(grid->GetColumn(i).GetName());
+		}		
+	}
+	//end UI--------------------------------------------
+
+		
+	if(d.Run()==IDOK) {
+		//ImportCSV(grid, ~(d.esFilePath), name);
+	}
+}
+void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid)
+{
+	Vector< Vector<String> > griddata;
+	
+	FileSel fileSel;
+	fileSel.Type("CSV file (*.csv)", "*.csv");
+	fileSel.Type("Text file (*.txt)", "*.txt");
+	if(fileSel.ExecuteOpen()){
+		FileIn csv(~fileSel);
+		if(csv.IsOpen())
+		{
+			*path=~fileSel;
+			ParserCSVFile(csv, griddata);
+			for(int i=0;i<griddata.GetCount();++i){
+				grid->Add();
+				for(int j=0;j<griddata[i].GetCount();++j)
+					grid->Set(i,j,griddata[i][j]);
+			}
+		}
+		else
+		{
+			Exclamation("The file can not be opened.");
+		}
+	}
+}
+void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
+{
+	String temp;
+	//Vector<String> vs1=Split(file, '\n', true);
+	while(!file.IsEof()){
+		//Vector<String> vs2=Split(~file.GetLine(), ',', false);
+		data.Add(Split(~file.GetLine(), ',', false));
+		//for(int i=0;i<vs2.GetCount();++i)
+		//{
+		//	temp=vs2[i];
+			
+		//}
 	}
 }
 

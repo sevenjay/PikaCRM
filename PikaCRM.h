@@ -320,10 +320,13 @@ public:
 	void	BuyItemGridMerchBtnClick();
 	
 	void	ExportFile(GridCtrl * grid, String name);
-			void	SelectExportDir(EditString * path, String & name);
+			void	SelectExportDir(EditString * path, String & name);	
+	void	ImportFile(GridCtrl * grid, String name);
+			void	SelectImportDir(EditString * path, GridCtrl * grid);
 	
 	//File Operation------------------------------------------------------
 	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
+	void 	ParserCSVFile(FileIn & file, Vector< Vector<String> > & data);
 	
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();
