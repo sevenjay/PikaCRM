@@ -2090,28 +2090,28 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid)
 void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 {
 	std::string temp;
-	std::vector<std::string> v2;
+	std::vector<std::string> std_csv_row;
 	//Vector<String> vs1=Split(file, '\n', true);
 	while(!file.IsEof()){
-		Vector<String> vs2;
+		Vector<String> csv_row;
 		
-		//easy way, but not resolve "a","b,c","d"
-		//1//Vector<String> vs2=Split(~file.GetLine(), ',', false);
-		//data.Add(Split(~file.GetLine(), ',', false));
+		//(1)easy way, but not resolve "a","b,c","d"
+		//vs2=Split(~file.GetLine(), ',', false);
+		
+		//(2)hard way, use boost::tokenizer
 		String temp=file.GetLine();
 		//for csv format work-around to fix the default behavior of the boost escaped_list_separator:
 		//First replace all back-slash characters (\) with two back-slash characters (\\) so they are not stripped away.
 		temp=Replace(temp,"\\","\\\\");
 		//Secondly replace all double-quotes ("") with a single back-slash character and a quote (\")
 		temp=Replace(temp,"\"\"","\\\"");
-		v2=ParserCsvLine(~temp);
-		for(int i=0;i<v2.size();++i)
+		std_csv_row=ParserCsvLine(~temp);
+		for(int i=0;i<std_csv_row.size();++i)
 		{
-			temp=v2[i];
-			vs2.Add(v2[i]);//auto string->String
+			csv_row.Add(std_csv_row[i]);//auto string->String
 		}
 		
-		data.Add(vs2);
+		data.Add(csv_row);
 	}
 }
 
