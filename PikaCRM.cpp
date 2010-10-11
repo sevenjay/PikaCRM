@@ -2089,10 +2089,13 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector
 		if(csv.IsOpen())
 		{
 			*path=~fileSel;
+			griddata->Clear();
+			grid->Clear();
 			ParserCSVFile(csv, *griddata);
 			for(int i=0;i<griddata->GetCount();++i){
 				grid->Add();
-				for(int j=0;j<grid->GetColumnCount();++j){
+				for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
+				{
 					grid->Set(i,j,(*griddata)[i][j]);
 					//grid->GetCell(i,j).SetDisplay(Single<CellRedBackDisplay>());
 				}
@@ -2176,7 +2179,7 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 		int cols=d.GridMatch.GetColumnCount();
 		for(int i=0;i<cols;++i)
 		{
-			//match_map->
+			//save to match map
 			(*match_map)[i]=d.GridMatch.Get(match_map->GetKey(i));		
 		}
 		
@@ -2184,7 +2187,7 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 		for(int i=0;i<griddata->GetCount();++i)
 		{
 			grid->Add();
-			for(int j=0;j<grid->GetColumnCount();++j)
+			for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
 			{
 				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
 			}
