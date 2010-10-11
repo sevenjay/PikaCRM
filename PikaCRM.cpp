@@ -48,6 +48,18 @@ public:
     	Display::PaintBackground(w, r, q, ink, paper, style);
 	};
 };
+class CellRedBackDisplay : public GridDisplay
+{
+public:
+	void Paint(Draw &w, int x, int y, int cx, int cy, const Value &val, dword style,
+						Color &fg, Color &bg, Font &fnt, bool found, int fs, int fe)
+	//virtual void PaintBackground(Draw& w, const Rect& r, const Value& q,
+	//                             Color ink, Color paper, dword style) const
+	{
+    	Color new_bg = Color(255, 223, 223);
+    	GridDisplay::Paint(w, x, y, cx, cy, val, style, fg, new_bg, fnt, found, fs, fe);
+	};
+};
 
 PikaCRM::PikaCRM()
 {
@@ -2038,11 +2050,14 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 void PikaCRM::ImportFile(GridCtrl * grid, String name)
 {
 	SysLog.Info("Import File\n");	
+	Vector< Vector<String> > griddata;
+	VectorMap<int, int> match_map;
 	//UI--------------------------------------------
 	WithImportLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d,t_("Import File"));
 	d.swFormat <<= 0;
-	d.btnBrowse <<= THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
+	d.btnBrowse <<= callback3(this, &PikaCRM::SelectImportDir,&(d.esFilePath),&(d.Grid),&griddata);//THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
+	d.btnChangMatch <<= callback3(this, &PikaCRM::ImportChangMatch,&(d.Grid),&griddata,&match_map);
 
 	d.swFormat.DisableCase(1);
 	d.swFormat.DisableCase(2);
@@ -2053,6 +2068,7 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 		if(!grid->GetColumn(i).IsHidden())
 		{
 			d.Grid.AddColumn(grid->GetColumn(i).GetName());
+			match_map.Add(i, d.Grid.GetColumnCount()-1);
 		}		
 	}
 	//end UI--------------------------------------------
@@ -2062,9 +2078,8 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 		//ImportCSV(grid, ~(d.esFilePath), name);
 	}
 }
-void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid)
+void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector<String> > * griddata)
 {
-	Vector< Vector<String> > griddata;
 	
 	FileSel fileSel;
 	fileSel.Type("CSV file (*.csv)", "*.csv");
@@ -2074,11 +2089,13 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid)
 		if(csv.IsOpen())
 		{
 			*path=~fileSel;
-			ParserCSVFile(csv, griddata);
-			for(int i=0;i<griddata.GetCount();++i){
+			ParserCSVFile(csv, *griddata);
+			for(int i=0;i<griddata->GetCount();++i){
 				grid->Add();
-				for(int j=0;j<griddata[i].GetCount();++j)
-					grid->Set(i,j,griddata[i][j]);
+				for(int j=0;j<(*griddata)[i].GetCount();++j){
+					grid->Set(i,j,(*griddata)[i][j]);
+					//grid->GetCell(i,j).SetDisplay(Single<CellRedBackDisplay>());
+				}
 			}
 		}
 		else
@@ -2112,6 +2129,35 @@ void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 		}
 		
 		data.Add(csv_row);
+	}
+}
+void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<int, int> * match_map)
+{
+	SysLog.Info("Chang Import Match\n");	
+	//UI--------------------------------------------
+	WithImportMatchLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d,t_("Change match column"));
+	/*d.swFormat <<= 0;
+	d.btnBrowse <<= callback3(this, &PikaCRM::SelectImportDir,&(d.esFilePath),&(d.Grid),griddata);//THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
+	d.btnChangMatch <<= callback3(this, &PikaCRM::ImportChangMatch,&(d.Grid),griddata,match_map);
+
+	d.swFormat.DisableCase(1);
+	d.swFormat.DisableCase(2);
+	
+	int cols=grid->GetColumnCount();
+	for(int i=0;i<cols;++i)
+	{
+		if(!grid->GetColumn(i).IsHidden())
+		{
+			d.Grid.AddColumn(grid->GetColumn(i).GetName());
+			match_map.Add(i, d.Grid.GetColumnCount()-1);
+		}		
+	}*/
+	//end UI--------------------------------------------
+	
+	
+	if(d.Run()==IDOK) {
+		//ImportCSV(grid, ~(d.esFilePath), name);
 	}
 }
 
