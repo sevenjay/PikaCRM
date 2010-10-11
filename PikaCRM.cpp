@@ -2051,7 +2051,7 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 {
 	SysLog.Info("Import File\n");	
 	Vector< Vector<String> > griddata;
-	VectorMap<int, int> match_map;
+	VectorMap<Id, int> match_map;
 	//UI--------------------------------------------
 	WithImportLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d,t_("Import File"));
@@ -2067,8 +2067,8 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	{
 		if(!grid->GetColumn(i).IsHidden())
 		{
-			d.Grid.AddColumn(grid->GetColumn(i).GetName());
-			match_map.Add(i, d.Grid.GetColumnCount()-1);
+			d.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName());
+			match_map.Add(grid->GetColumnId(i), d.Grid.GetColumnCount()-1);
 		}		
 	}
 	//end UI--------------------------------------------
@@ -2092,7 +2092,7 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector
 			ParserCSVFile(csv, *griddata);
 			for(int i=0;i<griddata->GetCount();++i){
 				grid->Add();
-				for(int j=0;j<(*griddata)[i].GetCount();++j){
+				for(int j=0;j<grid->GetColumnCount();++j){
 					grid->Set(i,j,(*griddata)[i][j]);
 					//grid->GetCell(i,j).SetDisplay(Single<CellRedBackDisplay>());
 				}
@@ -2131,33 +2131,66 @@ void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 		data.Add(csv_row);
 	}
 }
-void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<int, int> * match_map)
+void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
 {
 	SysLog.Info("Chang Import Match\n");	
 	//UI--------------------------------------------
 	WithImportMatchLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d,t_("Change match column"));
-	/*d.swFormat <<= 0;
-	d.btnBrowse <<= callback3(this, &PikaCRM::SelectImportDir,&(d.esFilePath),&(d.Grid),griddata);//THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
-	d.btnChangMatch <<= callback3(this, &PikaCRM::ImportChangMatch,&(d.Grid),griddata,match_map);
-
-	d.swFormat.DisableCase(1);
-	d.swFormat.DisableCase(2);
 	
+	Array<DropList> dlCsvId;
+	int max_csv_col=0;
+	
+	d.GridMatch.Tip("double click data to change");
+	//GridCsv-----------------------------------------------
+	for(int i=0;i<griddata->GetCount();++i)
+	{
+		d.GridCsv.Add();
+		for(int j=0;j<(*griddata)[i].GetCount();++j)
+		{
+			if(0==i) d.GridCsv.AddColumn(AsString(j));
+			d.GridCsv.Set(i,j,(*griddata)[i][j]);
+			//grid->GetCell(i,j).SetDisplay(Single<CellRedBackDisplay>());
+			if(j>max_csv_col) max_csv_col=j;
+		}
+	}
+	
+	//GridMatch-----------------------------------------------	
 	int cols=grid->GetColumnCount();
 	for(int i=0;i<cols;++i)
 	{
-		if(!grid->GetColumn(i).IsHidden())
-		{
-			d.Grid.AddColumn(grid->GetColumn(i).GetName());
-			match_map.Add(i, d.Grid.GetColumnCount()-1);
-		}		
-	}*/
+		dlCsvId.Add(new DropList());
+		for(int j=0;j<max_csv_col+1;++j) dlCsvId.Top().Add(j);//DropList 0~
+		d.GridMatch.AddColumn(match_map->GetKey(i), grid->GetColumn(i).GetName()).Edit(dlCsvId.Top());
+		if(0==i) d.GridMatch.Add();
+		d.GridMatch.Set(0,i,(*match_map)[i]);	
+	}
+	d.GridMatch.Editing();
+	
+
 	//end UI--------------------------------------------
 	
 	
 	if(d.Run()==IDOK) {
 		//ImportCSV(grid, ~(d.esFilePath), name);
+		int cols=d.GridMatch.GetColumnCount();
+		for(int i=0;i<cols;++i)
+		{
+			//match_map->
+			(*match_map)[i]=d.GridMatch.Get(match_map->GetKey(i));		
+		}
+		
+		grid->Clear();
+		for(int i=0;i<griddata->GetCount();++i)
+		{
+			grid->Add();
+			for(int j=0;j<grid->GetColumnCount();++j)
+			{
+				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
+			}
+		}
+		
+		
 	}
 }
 

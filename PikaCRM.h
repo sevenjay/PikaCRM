@@ -324,7 +324,7 @@ public:
 			void	SelectExportDir(EditString * path, String & name);	
 	void	ImportFile(GridCtrl * grid, String name);
 			void	SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector<String> > * griddata);
-			void	ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata,  VectorMap<int, int> * match_map);
+			void	ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata,  VectorMap<Id, int> * match_map);
 
 	//File Operation------------------------------------------------------
 	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);

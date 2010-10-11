@@ -190,10 +190,14 @@ LAYOUT(ImportLayout, 400, 328)
 	ITEM(Button, btnBrowse, SetLabel(t_("Browse")).LeftPosZ(320, 52).TopPosZ(8, 20))
 END_LAYOUT
 
-LAYOUT(ImportMatchLayout, 400, 220)
-	ITEM(GridCtrl, dv___0, LeftPosZ(8, 380).TopPosZ(12, 56))
-	ITEM(GridCtrl, dv___1, LeftPosZ(8, 380).TopPosZ(84, 100))
+LAYOUT(ImportMatchLayout, 456, 220)
+	ITEM(GridCtrl, GridMatch, LeftPosZ(64, 380).TopPosZ(12, 52))
+	ITEM(GridCtrl, GridCsv, LeftPosZ(64, 380).TopPosZ(84, 100))
 	ITEM(Button, ok, SetLabel(t_("OK")).LeftPosZ(260, 52).BottomPosZ(8, 20))
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(336, 52).BottomPosZ(8, 20))
+	ITEM(Label, dv___4, SetLabel(t_("CSV ID")).LeftPosZ(4, 57).TopPosZ(84, 20))
+	ITEM(Label, dv___5, SetLabel(t_("CSV Data")).LeftPosZ(4, 57).TopPosZ(108, 20))
+	ITEM(Label, dv___6, SetLabel(t_("Match\nCSV ID")).LeftPosZ(4, 57).TopPosZ(32, 28))
+	ITEM(Label, dv___7, SetLabel(t_("Column")).LeftPosZ(4, 57).TopPosZ(12, 20))
 END_LAYOUT
 
