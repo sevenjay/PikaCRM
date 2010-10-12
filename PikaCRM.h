@@ -329,6 +329,7 @@ public:
 	//File Operation------------------------------------------------------
 	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
 	void 	ParserCSVFile(FileIn & file, Vector< Vector<String> > & data);
+	void 	ImportCSV(GridCtrl * datagrid, const String & name);
 	
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();

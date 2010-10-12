@@ -53,8 +53,6 @@ class CellRedBackDisplay : public GridDisplay
 public:
 	void Paint(Draw &w, int x, int y, int cx, int cy, const Value &val, dword style,
 						Color &fg, Color &bg, Font &fnt, bool found, int fs, int fe)
-	//virtual void PaintBackground(Draw& w, const Rect& r, const Value& q,
-	//                             Color ink, Color paper, dword style) const
 	{
     	Color new_bg = Color(255, 223, 223);
     	GridDisplay::Paint(w, x, y, cx, cy, val, style, fg, new_bg, fnt, found, fs, fe);
@@ -717,6 +715,7 @@ void PikaCRM::InsertContact()
 	{
 		SQL & Insert(CONTACT)
 			(CO_NAME,  Contact.Grid(CO_NAME))
+			(C_ID,  	Contact.Grid(C_ID))
 			(CO_PHONE,  Contact.Grid(CO_PHONE))
 			(CO_ADDRESS,Contact.Grid(CO_ADDRESS))
 			(CO_EMAIL,  Contact.Grid(CO_EMAIL))
@@ -2072,10 +2071,9 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 		}		
 	}
 	//end UI--------------------------------------------
-
-		
+	
 	if(d.Run()==IDOK) {
-		//ImportCSV(grid, ~(d.esFilePath), name);
+		ImportCSV(&(d.Grid), name);
 	}
 }
 void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector<String> > * griddata)
@@ -2134,6 +2132,53 @@ void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 		data.Add(csv_row);
 	}
 }
+void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
+{
+	if("Customers"==name)
+	{
+		int c0=datagrid->FindCol(C_0);
+		int c1=datagrid->FindCol(C_1);
+		int c2=datagrid->FindCol(C_2);
+		int c3=datagrid->FindCol(C_3);
+		for(int i=0;i<datagrid->GetRowCount();++i)
+		{
+			Customer.Grid.Add();
+			//int x=Customer.Grid(C_ID);
+			Customer.Grid(C_TITLE) = datagrid->Get(i,C_TITLE);
+			Customer.Grid(C_PHONE) = datagrid->Get(i,C_PHONE);
+			Customer.Grid(C_ADDRESS) = datagrid->Get(i,C_ADDRESS);
+			Customer.Grid(C_EMAIL) = datagrid->Get(i,C_EMAIL);
+			Customer.Grid(C_WEBSITE) = datagrid->Get(i,C_WEBSITE);
+			VectorMap<int, String> temp_contact_map;
+			if(!datagrid->Get(i,CO_NAME).IsNull())
+			{
+				Contact.Grid.Add();
+				Contact.Grid(CO_NAME)=datagrid->Get(i,CO_NAME);
+				Contact.Grid(C_ID)=-1;
+				InsertContact();
+				temp_contact_map.Add(Contact.Grid(CO_ID), Contact.Grid(CO_NAME));
+			}
+			const Value & raw_map = RawToValue(temp_contact_map);
+			Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+			Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
+			
+			if(-1!=c0) Customer.Grid(C_0) = datagrid->Get(i,C_0);
+			if(-1!=c1) Customer.Grid(C_1) = datagrid->Get(i,C_1);
+			if(-1!=c2) Customer.Grid(C_2) = datagrid->Get(i,C_2);
+			if(-1!=c3) Customer.Grid(C_3) = datagrid->Get(i,C_3);
+			InsertCustomer();
+		}
+	}
+	else if("Cu stomers"==name)
+	{
+		
+	}
+	else
+	{
+		
+	}
+	
+}
 void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
 {
 	SysLog.Info("Chang Import Match\n");	
@@ -2170,12 +2215,9 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 	}
 	d.GridMatch.Editing();
 	
-
 	//end UI--------------------------------------------
-	
-	
+		
 	if(d.Run()==IDOK) {
-		//ImportCSV(grid, ~(d.esFilePath), name);
 		int cols=d.GridMatch.GetColumnCount();
 		for(int i=0;i<cols;++i)
 		{
@@ -2191,9 +2233,7 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 			{
 				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
 			}
-		}
-		
-		
+		}		
 	}
 }
 
