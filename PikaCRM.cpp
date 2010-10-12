@@ -54,8 +54,9 @@ public:
 	void Paint(Draw &w, int x, int y, int cx, int cy, const Value &val, dword style,
 						Color &fg, Color &bg, Font &fnt, bool found, int fs, int fe)
 	{
-    	Color new_bg = Color(255, 223, 223);
-    	GridDisplay::Paint(w, x, y, cx, cy, val, style, fg, new_bg, fnt, found, fs, fe);
+    	//Color new_bg = bg;
+    	if( IsNull(val) ) bg = Color(255, 223, 223);
+    	GridDisplay::Paint(w, x, y, cx, cy, val, style, fg, bg, fnt, found, fs, fe);
 	};
 };
 
@@ -2066,7 +2067,10 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	{
 		if(!grid->GetColumn(i).IsHidden())
 		{
-			d.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName());
+			if(0==d.Grid.GetColumnCount())//every grid import first column is not null;
+				d.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName()).SetDisplay(Single<CellRedBackDisplay>());
+			else
+				d.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName());
 			match_map.Add(grid->GetColumnId(i), d.Grid.GetColumnCount()-1);
 		}		
 	}
@@ -2095,7 +2099,6 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector
 				for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
 				{
 					grid->Set(i,j,(*griddata)[i][j]);
-					//grid->GetCell(i,j).SetDisplay(Single<CellRedBackDisplay>());
 				}
 			}
 		}
@@ -2142,6 +2145,7 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 		int c3=datagrid->FindCol(C_3);
 		for(int i=0;i<datagrid->GetRowCount();++i)
 		{
+			if( IsNull(datagrid->Get(i,C_TITLE)) ) continue;
 			Customer.Grid.Add();
 			//int x=Customer.Grid(C_ID);
 			Customer.Grid(C_TITLE) = datagrid->Get(i,C_TITLE);
