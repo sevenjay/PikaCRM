@@ -214,6 +214,8 @@ private :
 	
 	Sqlite3Session mSqlite3Session;
 	
+	RichTextCtrl * mImporWarning;
+	
 	//private data-------------------------------------------------------------------
 	VectorMap< String, Vector<FieldId> > mFieldMap;
 	Array<EditString> mFieldEditList;

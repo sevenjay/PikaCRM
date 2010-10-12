@@ -2058,7 +2058,8 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	d.swFormat <<= 0;
 	d.btnBrowse <<= callback3(this, &PikaCRM::SelectImportDir,&(d.esFilePath),&(d.Grid),&griddata);//THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
 	d.btnChangMatch <<= callback3(this, &PikaCRM::ImportChangMatch,&(d.Grid),&griddata,&match_map);
-
+	mImporWarning=&(d.rtWarning);///@todo if have time, make it better
+	
 	d.swFormat.DisableCase(1);
 	d.swFormat.DisableCase(2);
 	
@@ -2093,12 +2094,20 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector
 			*path=~fileSel;
 			griddata->Clear();
 			grid->Clear();
+			mImporWarning->Clear();
 			ParserCSVFile(csv, *griddata);
 			for(int i=0;i<griddata->GetCount();++i){
 				grid->Add();
 				for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
 				{
 					grid->Set(i,j,(*griddata)[i][j]);
+					if(0==j)
+						if( IsNull((*griddata)[i][j]) )
+						{
+							String  note;
+							note<<"[1G@3 "<<t_("There is a wrong data with red color and the row can't be import.")<<" ]";
+							mImporWarning->SetQTF(note);
+						}
 				}
 			}
 		}
@@ -2192,7 +2201,7 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 	
 	Array<DropList> dlCsvId;
 	int max_csv_col=0;
-	
+	mImporWarning->Clear();
 	d.GridMatch.Tip("double click data to change");
 	//GridCsv-----------------------------------------------
 	for(int i=0;i<griddata->GetCount();++i)
@@ -2236,6 +2245,13 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 			for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
 			{
 				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
+					if(0==j)
+						if( IsNull( (*griddata)[i][(*match_map)[j]] ) )
+						{
+							String note;
+							note<<"[1G@3 "<<t_("There is a wrong data with red color and the row can't be import.")<<" ]";	
+							mImporWarning->SetQTF(note);
+						}
 			}
 		}		
 	}
