@@ -73,7 +73,7 @@ void PikaCRM::Initial()
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
 	
-	SysLog.Info("Loading Settings...")<<"\n";
+	SysLog.Info("Loading Settings...\n");
 	LoadConfig(config_file_path);
 		
 	SetLanguage( SetLNGCharset( mConfig.Language, CHARSET_UTF8 ) );
@@ -1218,6 +1218,7 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;
 	double base=Ctrl::HorzLayoutZoom(1000);
 	double fac=1000/base;
+	//save all width of each column
 		mConfig.CWidth.Get(~C_TITLE)=round(Customer.Grid.FindColWidth(C_TITLE)*fac);
 		mConfig.CWidth.Get(~C_PHONE)=round(Customer.Grid.FindColWidth(C_PHONE)*fac);
 		mConfig.CWidth.Get(~C_ADDRESS)=round(Customer.Grid.FindColWidth(C_ADDRESS)*fac);
@@ -1997,7 +1998,7 @@ void PikaCRM::SelectExportDir(EditString * path, String & name)
 
 void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & name)
 {
-	SysLog.Info("Export CSV File\n");	
+	SysLog.Info("Exporting CSV File\n");	
 	FileOut out(path);//clear file
 	FileAppend outAppend(path);
 	
@@ -2068,7 +2069,7 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	{
 		if(!grid->GetColumn(i).IsHidden())
 		{
-			if(0==d.Grid.GetColumnCount())//every grid import first column is not null;
+			if(0==d.Grid.GetColumnCount()) //every grid import first column is not null;
 				d.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName()).SetDisplay(Single<CellRedBackDisplay>());
 			else
 				d.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName());
@@ -2082,8 +2083,8 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	}
 }
 void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector<String> > * griddata)
-{
-	
+{	
+	SysLog.Debug("Selecting Import Dir\n");
 	FileSel fileSel;
 	fileSel.Type("CSV file (*.csv)", "*.csv");
 	fileSel.Type("Text file (*.txt)", "*.txt");
@@ -2101,27 +2102,32 @@ void PikaCRM::SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector
 				for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
 				{
 					grid->Set(i,j,(*griddata)[i][j]);
-					if(0==j)
+					if(0==j) //every grid import first column is not null;
+					{
 						if( IsNull((*griddata)[i][j]) )
 						{
 							String  note;
-							note<<"[1G@3 "<<t_("There is a wrong data with red color and the row can't be import.")<<" ]";
+							note<<"[1G@3 "<<t_("There is a wrong data with red color and the data of the row can't be imported.")<<" ]";
 							mImporWarning->SetQTF(note);
+							SysLog.Warning("The data of the row can't be imported. row:"+AsString(i)+"\n");
 						}
+					}
 				}
 			}
 		}
 		else
 		{
+			SysLog.Error("Import file: The file can not be opened\n");
 			Exclamation("The file can not be opened.");
 		}
 	}
 }
 void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 {
+	SysLog.Debug("Parsering CSV File\n");
 	std::string temp;
 	std::vector<std::string> std_csv_row;
-	//Vector<String> vs1=Split(file, '\n', true);
+	
 	while(!file.IsEof()){
 		Vector<String> csv_row;
 		
@@ -2146,6 +2152,7 @@ void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 }
 void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 {
+	SysLog.Info("Importing CSV File\n");
 	if("Customers"==name)
 	{
 		int c0=datagrid->FindCol(C_0);
@@ -2194,7 +2201,7 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 }
 void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
 {
-	SysLog.Info("Chang Import Match\n");	
+	SysLog.Info("Changing Import Match\n");	
 	//UI--------------------------------------------
 	WithImportMatchLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d,t_("Change match column"));
@@ -2202,7 +2209,8 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 	Array<DropList> dlCsvId;
 	int max_csv_col=0;
 	mImporWarning->Clear();
-	d.GridMatch.Tip("double click data to change");
+	d.GridMatch.Tip("Double click data to change");
+	d.GridMatch.SetToolBar();
 	//GridCsv-----------------------------------------------
 	for(int i=0;i<griddata->GetCount();++i)
 	{
@@ -2211,7 +2219,6 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 		{
 			if(0==i) d.GridCsv.AddColumn(AsString(j));
 			d.GridCsv.Set(i,j,(*griddata)[i][j]);
-			//grid->GetCell(i,j).SetDisplay(Single<CellRedBackDisplay>());
 			if(j>max_csv_col) max_csv_col=j;
 		}
 	}
@@ -2245,13 +2252,16 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 			for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
 			{
 				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
-					if(0==j)
+					if(0==j) //every grid import first column is not null;
+					{
 						if( IsNull( (*griddata)[i][(*match_map)[j]] ) )
 						{
 							String note;
-							note<<"[1G@3 "<<t_("There is a wrong data with red color and the row can't be import.")<<" ]";	
+							note<<"[1G@3 "<<t_("There is a wrong data with red color and the data of the row can't be imported.")<<" ]";	
 							mImporWarning->SetQTF(note);
+							SysLog.Warning("The data of the row can't be imported. row:"+AsString(i)+"\n");
 						}
+					}
 			}
 		}		
 	}
