@@ -297,9 +297,9 @@ void PikaCRM::SetupUI()
 	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
 	Merchandise.btnModifyF <<= THISBACK2(ModifyField, &(Merchandise.Grid), "m");
 	Merchandise.btnDeleteF.Disable();
-	Merchandise.btnImport.Disable();
-	Merchandise.btnPrint.Disable();
+	Merchandise.btnImport <<= THISBACK2(ImportFile, &(Merchandise.Grid), "Merchandises");
 	Merchandise.btnExport <<= THISBACK2(ExportFile, &(Merchandise.Grid), "Merchandises");
+	Merchandise.btnPrint.Disable();
 	
 	Merchandise.Grid.Absolute();
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
@@ -689,7 +689,7 @@ void PikaCRM::RemoveCustomer()
 			//clear Contact.Grid(C_TITLE);
 			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 			Contact.Grid.Set(contact_row,C_TITLE,"");
-			Contact.Grid.Set(contact_row,C_ID,NULL);//there is no use for Contact.Grid.Set(C_ID,NULL) with ever set some data		
+			Contact.Grid.Set(contact_row,C_ID,NULL);//there is no use for Contact.Grid.Set(C_ID,NULL) with ever set some data	
 		}
 	}
 	catch(SqlExc &e)
@@ -2229,9 +2229,30 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 			//end add new cusotmer-----------------------------------------
 		}		
 	}
+	else if("Merchandises"==name)
+	{
+		int m0=datagrid->FindCol(M_0);
+		int m1=datagrid->FindCol(M_1);
+		int m2=datagrid->FindCol(M_2);
+		int m3=datagrid->FindCol(M_3);
+		for(int i=0;i<datagrid->GetRowCount();++i)
+		{
+			if( IsNull(datagrid->Get(i,M_NAME)) ) continue;
+			Merchandise.Grid.Add();
+			Merchandise.Grid(M_NAME) = datagrid->Get(i,M_NAME);
+			Merchandise.Grid(M_MODEL) = datagrid->Get(i,M_MODEL);
+			Merchandise.Grid(M_PRICE) = StrDbl(datagrid->Get(i,M_PRICE).ToString());
+			
+			if(-1!=m0) Merchandise.Grid(M_0) = datagrid->Get(i,M_0);
+			if(-1!=m1) Merchandise.Grid(M_1) = datagrid->Get(i,M_1);
+			if(-1!=m2) Merchandise.Grid(M_2) = datagrid->Get(i,M_2);
+			if(-1!=m3) Merchandise.Grid(M_3) = datagrid->Get(i,M_3);
+			InsertMerchandise();
+		}
+	}
 	else
 	{
-		
+		;//do nothing
 	}
 	
 }
