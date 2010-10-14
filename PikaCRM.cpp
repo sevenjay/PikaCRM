@@ -233,9 +233,9 @@ void PikaCRM::SetupUI()
 	Contact.btnCreateF <<= THISBACK2(CreateField, &(Contact.Grid), "co");
 	Contact.btnModifyF <<= THISBACK2(ModifyField, &(Contact.Grid), "co");
 	Contact.btnDeleteF.Disable();
-	Contact.btnImport.Disable();
-	Contact.btnPrint.Disable();
+	Contact.btnImport <<= THISBACK2(ImportFile, &(Contact.Grid), "Contacts");
 	Contact.btnExport <<= THISBACK2(ExportFile, &(Contact.Grid), "Contacts");
+	Contact.btnPrint.Disable();
 	
 	Contact.Grid.Absolute();
 	Contact.Grid.AddIndex(CO_ID);
@@ -264,7 +264,7 @@ void PikaCRM::SetupUI()
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
 	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
 	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
-	Event.btnImport.Disable();
+	//Event.btnImport.Disable();
 	Event.btnPrint.Disable();
 	Event.btnExport <<= THISBACK2(ExportFile, &(Event.Grid), "Events");
 	
@@ -324,7 +324,7 @@ void PikaCRM::SetupUI()
 	Order.btnCreate <<= callback(&(Order.Grid),&GridCtrl::DoAppend);
 	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
 	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
-	Order.btnImport.Disable();
+	//Order.btnImport.Disable();
 	Order.btnPrint.Disable();
 	Order.btnExport <<= THISBACK2(ExportFile, &(Order.Grid), "Orders");
 	
@@ -689,7 +689,7 @@ void PikaCRM::RemoveCustomer()
 			//clear Contact.Grid(C_TITLE);
 			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 			Contact.Grid.Set(contact_row,C_TITLE,"");
-			Contact.Grid.Set(contact_row,C_ID,NULL);		
+			Contact.Grid.Set(contact_row,C_ID,NULL);//there is no use for Contact.Grid.Set(C_ID,NULL) with ever set some data		
 		}
 	}
 	catch(SqlExc &e)
@@ -776,12 +776,14 @@ void PikaCRM::RemoveContact()
 	try
 	{
 		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
-		
+	
 		//UpdateCustomerContact1(Contact.Grid(C_ID));----------------------------
-		if(Contact.Grid(C_ID).IsNull()) return;
+		if( Contact.Grid(C_ID).IsNull() || -1==Contact.Grid(C_ID) ) return;
 		
 		int customer_id=Contact.Grid(C_ID);
 		int customer_row=Customer.Grid.Find(customer_id,C_ID);
+		if(-1==customer_row) return; //there is no use for Contact.Grid.Set(C_ID,NULL) with ever set some data,
+									 //Contact.Grid(C_ID) will be 0, not null. So we check one more time;
 		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
 		VectorMap<int, String> new_contact_map = contact_map;
 		new_contact_map.RemoveKey(Contact.Grid(CO_ID));
@@ -2189,9 +2191,43 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 			InsertCustomer();
 		}
 	}
-	else if("Cu stomers"==name)
+	else if("Contacts"==name)
 	{
-		
+		int co0=datagrid->FindCol(CO_0);
+		int co1=datagrid->FindCol(CO_1);
+		int co2=datagrid->FindCol(CO_2);
+		int co3=datagrid->FindCol(CO_3);
+		for(int i=0;i<datagrid->GetRowCount();++i)
+		{
+			if( IsNull(datagrid->Get(i,CO_NAME)) ) continue;
+			Contact.Grid.Add();
+			//int x=Customer.Grid(C_ID);
+			Contact.Grid(CO_NAME) = datagrid->Get(i,CO_NAME);
+			Contact.Grid(CO_PHONE) = datagrid->Get(i,CO_PHONE);
+			Contact.Grid(CO_ADDRESS) = datagrid->Get(i,CO_ADDRESS);
+			Contact.Grid(CO_EMAIL) = datagrid->Get(i,CO_EMAIL);
+			if(-1!=co0) Contact.Grid(CO_0) = datagrid->Get(i,CO_0);
+			if(-1!=co1) Contact.Grid(CO_1) = datagrid->Get(i,CO_1);
+			if(-1!=co2) Contact.Grid(CO_2) = datagrid->Get(i,CO_2);
+			if(-1!=co3) Contact.Grid(CO_3) = datagrid->Get(i,CO_3);
+			InsertContact();
+			//add new cusotmer--------------------------------------------
+			if(!datagrid->Get(i,C_TITLE).IsNull())
+			{
+				VectorMap<int, String> temp_contact_map;
+				
+				Customer.Grid.Add();
+				Customer.Grid(C_TITLE)=datagrid->Get(i,C_TITLE);
+				
+				temp_contact_map.Add(Contact.Grid(CO_ID), Contact.Grid(CO_NAME));
+				const Value & raw_map = RawToValue(temp_contact_map);
+				Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+				Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
+				
+				InsertCustomer();
+			}
+			//end add new cusotmer-----------------------------------------
+		}		
 	}
 	else
 	{
