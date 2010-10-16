@@ -174,7 +174,7 @@ END_LAYOUT
 
 LAYOUT(ImportLayout, 400, 360)
 	ITEM(Label, dv___0, SetLabel(t_("Import format：")).LeftPosZ(16, 84).TopPosZ(36, 20))
-	ITEM(DropList, dv___1, LeftPosZ(160, 140).TopPosZ(112, 19))
+	ITEM(DropList, dlEncode, LeftPosZ(160, 140).TopPosZ(112, 19))
 	ITEM(Switch, swFormat, SetLabel(t_("CSV\nMicrosoft Excel file format\nSQL (PikaCRM Original Column)")).LeftPosZ(68, 176).TopPosZ(56, 44))
 	ITEM(RichTextCtrl, rtWarning, LeftPosZ(152, 236).TopPosZ(156, 36))
 	ITEM(Label, dv___4, SetLabel(t_("Character encoding")).LeftPosZ(16, 112).TopPosZ(112, 20))

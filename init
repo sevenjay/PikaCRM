@@ -7,4 +7,5 @@
 #include "SystemLog/init"
 #include "GridCtrl/init"
 #include "DropGrid/init"
+#include "DBCharset/init"
 #endif

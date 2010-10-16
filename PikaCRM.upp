@@ -5,7 +5,8 @@ uses
 	SplashSV,
 	SystemLog,
 	GridCtrl,
-	DropGrid;
+	DropGrid,
+	DBCharset;
 
 file
 	sql/sql.ids,

@@ -168,6 +168,8 @@ private :
 	WithOrderLayout<ParentCtrl> Order;
 	WithMerchandiseLayout<ParentCtrl> Merchandise;
 	WithPreferenceLayout<ParentCtrl> Preference;
+	
+	WithImportLayout<TopWindow> Import;
 
 	//Customer.Grid
 	EditStringNotNull cesn;
@@ -214,7 +216,7 @@ private :
 	
 	Sqlite3Session mSqlite3Session;
 	
-	RichTextCtrl * mImporWarning;
+	//RichTextCtrl * mImporWarning;
 	
 	//private data-------------------------------------------------------------------
 	VectorMap< String, Vector<FieldId> > mFieldMap;
@@ -325,8 +327,9 @@ public:
 	void	ExportFile(GridCtrl * grid, String name);
 			void	SelectExportDir(EditString * path, String & name);	
 	void	ImportFile(GridCtrl * grid, String name);
-			void	SelectImportDir(EditString * path, GridCtrl * grid, Vector< Vector<String> > * griddata);
-			void	ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata,  VectorMap<Id, int> * match_map);
+			void	SelectImportDir(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
+			void	ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
+			void	SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
 
 	//File Operation------------------------------------------------------
 	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
