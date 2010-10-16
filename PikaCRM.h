@@ -329,11 +329,12 @@ public:
 	void	ImportFile(GridCtrl * grid, String name);
 			void	SelectImportDir(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
 			void	ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
+			void	ImportChangEncode(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
 			void	SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
-
+			String	EncodeToUtf8(String & src);
 	//File Operation------------------------------------------------------
 	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
-	void 	ParserCSVFile(FileIn & file, Vector< Vector<String> > & data);
+	void 	ParserCSVFile(Stream & content, Vector< Vector<String> > & data);
 	void 	ImportCSV(GridCtrl * datagrid, const String & name);
 	
 	//Preference Tab------------------------------------------------------

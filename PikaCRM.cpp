@@ -2053,6 +2053,7 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 		line.Clear();
 	}
 }
+
 void PikaCRM::ImportFile(GridCtrl * grid, String name)
 {
 	SysLog.Info("Import File\n");	
@@ -2070,10 +2071,14 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	
 	Import.dlEncode.Add("Utf8");
 	Import.dlEncode.Add("Big5");
+	AddCodePage("Big5","CodePage/CP950.TXT");
 	Import.dlEncode.SetIndex(0);
+	Import.dlEncode.WhenAction = callback3(this, &PikaCRM::ImportChangEncode,&(Import.Grid),&griddata,&match_map);
 	
+	Import.esFilePath.Clear();
 	Import.rtWarning.Clear();
 	Import.Grid.Reset();
+	
 	int cols=grid->GetColumnCount();
 	for(int i=0;i<cols;++i)
 	{
@@ -2105,9 +2110,9 @@ void PikaCRM::SelectImportDir(GridCtrl * grid, Vector< Vector<String> > * gridda
 		if(csv.IsOpen())
 		{
 			Import.esFilePath=~fileSel;
-			griddata->Clear();
 			Import.rtWarning.Clear();
-			ParserCSVFile(csv, *griddata);
+			StringStream content(LoadStreamBOM(csv));
+			ParserCSVFile(content, *griddata);
 			SetCsvGridData(grid, griddata, match_map);
 		}
 		else
@@ -2117,20 +2122,22 @@ void PikaCRM::SelectImportDir(GridCtrl * grid, Vector< Vector<String> > * gridda
 		}
 	}
 }
-void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
+void PikaCRM::ParserCSVFile(Stream & content, Vector< Vector<String> > & data)
 {
 	SysLog.Debug("Parsering CSV File\n");
 	std::string temp;
 	std::vector<std::string> std_csv_row;
 	
-	while(!file.IsEof()){
+	data.Clear();
+	while(!content.IsEof()){
 		Vector<String> csv_row;
 		
 		//(1)easy way, but not resolve "a","b,c","d"
 		//vs2=Split(~file.GetLine(), ',', false);
 		
 		//(2)hard way, use boost::tokenizer
-		String temp=file.GetLine();
+		String temp=content.GetLine();
+		temp=EncodeToUtf8(temp);
 		//for csv format work-around to fix the default behavior of the boost escaped_list_separator:
 		//First replace all back-slash characters (\) with two back-slash characters (\\) so they are not stripped away.
 		temp=Replace(temp,"\\","\\\\");
@@ -2145,6 +2152,101 @@ void PikaCRM::ParserCSVFile(FileIn & file, Vector< Vector<String> > & data)
 		data.Add(csv_row);
 	}
 }
+void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
+{
+	SysLog.Info("Changing Import Match\n");	
+	//UI--------------------------------------------
+	WithImportMatchLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d,t_("Change match column"));
+	
+	Array<DropList> dlCsvId;
+	int max_csv_col=0;
+	Import.rtWarning.Clear();
+	d.GridMatch.Tip("Double click data to change");
+	d.GridMatch.SetToolBar();
+	//GridCsv-----------------------------------------------
+	for(int i=0;i<griddata->GetCount();++i)
+	{
+		d.GridCsv.Add();
+		for(int j=0;j<(*griddata)[i].GetCount();++j)
+		{
+			if(0==i) d.GridCsv.AddColumn(AsString(j));
+			d.GridCsv.Set(i,j,(*griddata)[i][j]);
+			if(j>max_csv_col) max_csv_col=j;
+		}
+	}
+	
+	//GridMatch-----------------------------------------------	
+	int cols=grid->GetColumnCount();
+	for(int i=0;i<cols;++i)
+	{
+		dlCsvId.Add(new DropList());
+		for(int j=0;j<max_csv_col+1;++j) dlCsvId.Top().Add(j);//DropList 0~
+		d.GridMatch.AddColumn(match_map->GetKey(i), grid->GetColumn(i).GetName()).Edit(dlCsvId.Top());
+		if(0==i) d.GridMatch.Add();
+		d.GridMatch.Set(0,i,(*match_map)[i]);	
+	}
+	d.GridMatch.Editing();
+	
+	//end UI--------------------------------------------
+		
+	if(d.Run()==IDOK) {
+		int cols=d.GridMatch.GetColumnCount();
+		for(int i=0;i<cols;++i)
+		{
+			//save to match map
+			(*match_map)[i]=d.GridMatch.Get(match_map->GetKey(i));		
+		}
+		
+		SetCsvGridData(grid, griddata, match_map);
+	}
+}
+void PikaCRM::ImportChangEncode(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
+{
+	FileIn csv( ~(Import.esFilePath.GetData().ToString()) );
+		if(csv.IsOpen())
+		{
+			Import.rtWarning.Clear();
+			StringStream content(LoadStreamBOM(csv));
+			ParserCSVFile(content, *griddata);
+			SetCsvGridData(grid, griddata, match_map);
+		}
+		else
+		{
+			SysLog.Error("Import file: The file can not be opened\n");
+			Exclamation("The file can not be opened.");
+		}
+}
+void PikaCRM::SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
+{
+		grid->Clear();
+		for(int i=0;i<griddata->GetCount();++i)
+		{
+			grid->Add();
+			for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
+			{
+				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
+					if(0==j) //every grid import first column is not null;
+					{
+						if( IsNull( (*griddata)[i][(*match_map)[j]] ) )
+						{
+							String note;
+							note<<"[1G@3 "<<t_("There is a wrong data with red color and the data of the row can't be imported.")<<" ]";	
+							Import.rtWarning.SetQTF(note);
+							SysLog.Warning("The data of the row can't be imported. row:"+AsString(i)+"\n");
+						}
+					}
+			}
+		}		
+}
+String PikaCRM::EncodeToUtf8(String & src)
+{
+	String code=Import.dlEncode.GetData();	
+	if("Utf8"==code) return src;
+	
+	return DBCSToUtf8(src, code);	
+}
+
 void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 {
 	SysLog.Info("Importing CSV File\n");
@@ -2248,77 +2350,6 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 		;//do nothing
 	}
 	
-}
-void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
-{
-	SysLog.Info("Changing Import Match\n");	
-	//UI--------------------------------------------
-	WithImportMatchLayout<TopWindow> d;
-	CtrlLayoutOKCancel(d,t_("Change match column"));
-	
-	Array<DropList> dlCsvId;
-	int max_csv_col=0;
-	Import.rtWarning.Clear();
-	d.GridMatch.Tip("Double click data to change");
-	d.GridMatch.SetToolBar();
-	//GridCsv-----------------------------------------------
-	for(int i=0;i<griddata->GetCount();++i)
-	{
-		d.GridCsv.Add();
-		for(int j=0;j<(*griddata)[i].GetCount();++j)
-		{
-			if(0==i) d.GridCsv.AddColumn(AsString(j));
-			d.GridCsv.Set(i,j,(*griddata)[i][j]);
-			if(j>max_csv_col) max_csv_col=j;
-		}
-	}
-	
-	//GridMatch-----------------------------------------------	
-	int cols=grid->GetColumnCount();
-	for(int i=0;i<cols;++i)
-	{
-		dlCsvId.Add(new DropList());
-		for(int j=0;j<max_csv_col+1;++j) dlCsvId.Top().Add(j);//DropList 0~
-		d.GridMatch.AddColumn(match_map->GetKey(i), grid->GetColumn(i).GetName()).Edit(dlCsvId.Top());
-		if(0==i) d.GridMatch.Add();
-		d.GridMatch.Set(0,i,(*match_map)[i]);	
-	}
-	d.GridMatch.Editing();
-	
-	//end UI--------------------------------------------
-		
-	if(d.Run()==IDOK) {
-		int cols=d.GridMatch.GetColumnCount();
-		for(int i=0;i<cols;++i)
-		{
-			//save to match map
-			(*match_map)[i]=d.GridMatch.Get(match_map->GetKey(i));		
-		}
-		
-		SetCsvGridData(grid, griddata, match_map);
-	}
-}
-void PikaCRM::SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
-{
-		grid->Clear();
-		for(int i=0;i<griddata->GetCount();++i)
-		{
-			grid->Add();
-			for(int j=0;( j<grid->GetColumnCount() ) && ( j<(*griddata)[i].GetCount() );++j)
-			{
-				grid->Set(i,j,(*griddata)[i][(*match_map)[j]]);
-					if(0==j) //every grid import first column is not null;
-					{
-						if( IsNull( (*griddata)[i][(*match_map)[j]] ) )
-						{
-							String note;
-							note<<"[1G@3 "<<t_("There is a wrong data with red color and the data of the row can't be imported.")<<" ]";	
-							Import.rtWarning.SetQTF(note);
-							SysLog.Warning("The data of the row can't be imported. row:"+AsString(i)+"\n");
-						}
-					}
-			}
-		}		
 }
 
 void PikaCRM::ConfigDB()

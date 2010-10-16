@@ -184,7 +184,7 @@ LAYOUT(ImportLayout, 400, 360)
 	ITEM(Button, ok, SetLabel(t_("Import")).LeftPosZ(264, 52).BottomPosZ(12, 20))
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(336, 52).BottomPosZ(12, 20))
 	ITEM(Label, dv___10, SetLabel(t_("File")).LeftPosZ(16, 40).TopPosZ(8, 20))
-	ITEM(EditString, esFilePath, NotNull(true).LeftPosZ(60, 244).TopPosZ(8, 19))
+	ITEM(EditString, esFilePath, NotNull(true).SetEditable(false).LeftPosZ(60, 244).TopPosZ(8, 19))
 	ITEM(Button, btnBrowse, SetLabel(t_("Browse")).LeftPosZ(320, 52).TopPosZ(8, 20))
 END_LAYOUT
 
