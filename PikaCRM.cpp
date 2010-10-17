@@ -1977,17 +1977,15 @@ void PikaCRM::ExportFile(GridCtrl * grid, String name)
 	d.swFormat <<= 0;
 	d.btnBrowse <<= THISBACK2(SelectExportDir,&(d.esFilePath),name);
 
-
 	d.swFormat.DisableCase(1);
 	d.swFormat.DisableCase(2);
 	d.swFormat.DisableCase(3);
 	
-	d.opUTF8BOM.Disable();
 	//end UI--------------------------------------------
 
 		
 	if(d.Run()==IDOK) {
-		ExportCSV(grid, ~(d.esFilePath), name);
+		ExportCSV(grid, ~(d.esFilePath), name, d.opUTF8BOM.Get());
 	}
 }
 void PikaCRM::SelectExportDir(EditString * path, String & name)
@@ -2001,11 +1999,22 @@ void PikaCRM::SelectExportDir(EditString * path, String & name)
 	}
 }
 
-void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & name)
+void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & name, bool is_bom)
 {
 	SysLog.Info("Exporting CSV File\n");	
 	FileOut out(path);//clear file
-	FileAppend outAppend(path);
+	if(!out.IsOpen() || out.IsError())
+	{ 
+		SysLog.Error("Export file: The file can not be opened\n");
+		Exclamation("The file can not be opened.");
+		return;
+	}
+	
+	if(is_bom)
+	{
+		unsigned char bom[] = {0xEF, 0xBB, 0xBF};
+		out.Put(bom, 3);
+	}
 	
 	int cols=grid->GetColumnCount();
 	int rows=grid->GetCount();//not include fix row title
@@ -2031,7 +2040,7 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 			isFirstOne=false;
 		}		
 	}
-	outAppend.Put(line+"\r\n");
+	out.Put(line+"\r\n");
 	line.Clear();
 	
 	//data start from row=0
@@ -2049,9 +2058,11 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 				isFirstOne=false;
 			}		
 		}
-		outAppend.Put(line+"\r\n");
+		out.Put(line+"\r\n");
 		line.Clear();
 	}
+	
+	out.Close();
 }
 
 void PikaCRM::ImportFile(GridCtrl * grid, String name)
@@ -2203,6 +2214,7 @@ void PikaCRM::ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * gridd
 }
 void PikaCRM::ImportChangEncode(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
 {
+	if(Import.esFilePath.GetData().IsNull()) return;
 	FileIn csv( ~(Import.esFilePath.GetData().ToString()) );
 		if(csv.IsOpen())
 		{

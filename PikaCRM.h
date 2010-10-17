@@ -333,7 +333,7 @@ public:
 			void	SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
 			String	EncodeToUtf8(String & src);
 	//File Operation------------------------------------------------------
-	void	ExportCSV(GridCtrl * grid, const String & path, const String & name);
+	void	ExportCSV(GridCtrl * grid, const String & path, const String & name, bool is_bom);
 	void 	ParserCSVFile(Stream & content, Vector< Vector<String> > & data);
 	void 	ImportCSV(GridCtrl * datagrid, const String & name);
 	
