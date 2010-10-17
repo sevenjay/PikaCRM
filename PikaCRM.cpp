@@ -2319,23 +2319,53 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 			if(-1!=co1) Contact.Grid(CO_1) = datagrid->Get(i,CO_1);
 			if(-1!=co2) Contact.Grid(CO_2) = datagrid->Get(i,CO_2);
 			if(-1!=co3) Contact.Grid(CO_3) = datagrid->Get(i,CO_3);
-			InsertContact();
-			//add new cusotmer--------------------------------------------
-			if(!datagrid->Get(i,C_TITLE).IsNull())
+			
+			if(datagrid->Get(i,C_TITLE).IsNull())
 			{
-				VectorMap<int, String> temp_contact_map;
-				
-				Customer.Grid.Add();
-				Customer.Grid(C_TITLE)=datagrid->Get(i,C_TITLE);
-				
-				temp_contact_map.Add(Contact.Grid(CO_ID), Contact.Grid(CO_NAME));
-				const Value & raw_map = RawToValue(temp_contact_map);
-				Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
-				Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
-				
-				InsertCustomer();
+				InsertContact();
 			}
-			//end add new cusotmer-----------------------------------------
+			else
+			{
+				//find database if there is the same C_TITLE, no need to add
+				SQL * Select(C_ID).From(CUSTOMER).Where(C_TITLE == datagrid->Get(i,C_TITLE)); 
+				if(SQL.Fetch())
+				{
+					Contact.Grid(C_ID)=SQL[C_ID];
+					Contact.Grid(C_TITLE)=datagrid->Get(i,C_TITLE);
+					InsertContact();
+					
+					//UpdateCustomerContactX(Contact.Grid(C_ID));----------------------------
+					int customer_id=Contact.Grid(C_ID);
+					int customer_row=Customer.Grid.Find(customer_id,C_ID);
+					if(-1==customer_row) continue;
+
+					const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+					VectorMap<int, String> new_contact_map = contact_map;
+					new_contact_map.Add(Contact.Grid(CO_ID), Contact.Grid(CO_NAME));
+					Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+			
+					String all_name;
+					all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+					Customer.Grid.Set(customer_row,CO_NAME,all_name);
+				}
+				else
+				{
+					InsertContact();
+					
+					//add new cusotmer--------------------------------------------
+					VectorMap<int, String> temp_contact_map;
+					
+					Customer.Grid.Add();
+					Customer.Grid(C_TITLE)=datagrid->Get(i,C_TITLE);
+					
+					temp_contact_map.Add(Contact.Grid(CO_ID), Contact.Grid(CO_NAME));
+					const Value & raw_map = RawToValue(temp_contact_map);
+					Customer.Grid(CONTACTS_MAP) = raw_map;//this is must, "=" will set the same typeid for Value of GridCtrl with RawDeepToValue
+					Customer.Grid(CO_NAME) = ConvContactNames().Format(Customer.Grid(CONTACTS_MAP));
+					
+					InsertCustomer();
+				}
+			}
 		}		
 	}
 	else if("Merchandises"==name)
