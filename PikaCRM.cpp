@@ -182,9 +182,7 @@ void PikaCRM::SetupUI()
 	CtrlLayout(Merchandise);
 	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
 	CtrlLayout(Preference);
-	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));
-	
-	CtrlLayoutOKCancel(Import,t_("Import File"));
+	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));	
 	//end TabCtrl------------------------------------------------------------------------
 	//Customer Tab-----------------------------------------------------------------------
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
@@ -399,6 +397,21 @@ void PikaCRM::SetupUI()
 	
 	Preference.btnSave <<= THISBACK(SavePreference);
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
+	
+	
+	//WithImportLayout<TopWindow> Import;------------------------------------------------------------
+	CtrlLayoutOKCancel(Import,t_("Import File"));
+	
+	Import.swFormat <<= 0;
+	
+	Import.swFormat.DisableCase(1);
+	Import.swFormat.DisableCase(2);
+	
+	Import.dlEncode.Add("Utf8");
+	Import.dlEncode.Add("Big5");
+	AddCodePage("Big5","CodePage/CP950.TXT");
+	Import.dlEncode.SetIndex(0);
+	
 }
 //database control------------------------------------------------------------
 void PikaCRM::LoadSetAllField()
@@ -2071,19 +2084,8 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 	Vector< Vector<String> > griddata;
 	VectorMap<Id, int> match_map;
 	//UI--------------------------------------------
-	//WithImportLayout<TopWindow> d;
-	//CtrlLayoutOKCancel(d,t_("Import File"));
-	Import.swFormat <<= 0;
 	Import.btnBrowse <<= callback3(this, &PikaCRM::SelectImportDir,&(Import.Grid),&griddata,&match_map);//THISBACK2(SelectImportDir,&(d.esFilePath),&(d.Grid));
 	Import.btnChangMatch <<= callback3(this, &PikaCRM::ImportChangMatch,&(Import.Grid),&griddata,&match_map);
-	
-	Import.swFormat.DisableCase(1);
-	Import.swFormat.DisableCase(2);
-	
-	Import.dlEncode.Add("Utf8");
-	Import.dlEncode.Add("Big5");
-	AddCodePage("Big5","CodePage/CP950.TXT");
-	Import.dlEncode.SetIndex(0);
 	Import.dlEncode.WhenAction = callback3(this, &PikaCRM::ImportChangEncode,&(Import.Grid),&griddata,&match_map);
 	
 	Import.esFilePath.Clear();
