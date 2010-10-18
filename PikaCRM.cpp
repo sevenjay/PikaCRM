@@ -346,11 +346,11 @@ void PikaCRM::SetupUI()
 	//Order Filter------------------------------------------
 	Order.dlFilter.Add(t_("All"));//0
 	Order.dlFilter.Add(t_("Past year"));//1
-	Order.dlFilter.Add(t_("Past half year"));//1
-	Order.dlFilter.Add(t_("Past 2 month"));//2
-	Order.dlFilter.Add(t_("Past month"));//3
-	Order.dlFilter.SetIndex(0);
-	Order.btnFilterSet.Tip("Not yet").Disable();
+	Order.dlFilter.Add(t_("Past half year"));//2
+	Order.dlFilter.Add(t_("Past 2 month"));//3
+	Order.dlFilter.Add(t_("Past month"));//4
+	Order.dlFilter.SetIndex(mConfig.OrderFilter);
+	Order.btnFilterSet <<= THISBACK(OrderFilterSet);
 	//Order Search------------------------------------------
 	Order.Add(order_search_bar.LeftPosZ(239, 84).TopPosZ(4, 20));
 		Order.Grid.FindBar(order_search_bar, Ctrl::HorzLayoutZoom(80));
@@ -986,7 +986,31 @@ void PikaCRM::LoadOrder()
 	String sql ="select o_id, Orders.c_id, c_title, o_ship_add, o_bill_add, "
 				"strftime('%m/%d/%Y',o_order_date) as o_order_date, "
 				"strftime('%m/%d/%Y',o_ship_date) as o_ship_date, "
-				"o_status, o_note from Orders left outer join Customer on Orders.c_id = Customer.c_id;";
+				"o_status, o_note from Orders left outer join Customer on Orders.c_id = Customer.c_id";
+	switch(Order.dlFilter.GetIndex())
+	{
+		default:
+		case 0:	
+			sql<<";";
+			break;
+		
+		case 1:	
+			sql<<" where o_order_date > date('now', '-1 year');";
+			break;
+		
+		case 2:	
+			sql<<" where o_order_date > date('now', '-183 day');";
+			break;
+			
+		case 3:	
+			sql<<" where o_order_date > date('now', '-62 day');";
+			break;
+
+		case 4:	
+			sql<<" where o_order_date > date('now', '-31 day');";
+			break;		
+	}
+	
 	SQL.ExecuteX(sql);
 	while(SQL.Fetch())
 	{
@@ -1513,6 +1537,7 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 		mConfig.MWidth.Add(~M_3, 0);
 		
 		mConfig.IsMaximized=false;
+		mConfig.OrderFilter=0;
 		
 		SaveConfig(config_file_path);
 	}
@@ -1900,6 +1925,15 @@ catch(SqlExc &e)
 	SysLog.Error(e+"\n");
 	Exclamation("[* " + DeQtfLf(e) + "]");
 }
+}
+
+void PikaCRM::OrderFilterSet()
+{
+	mConfig.OrderFilter=Order.dlFilter.GetIndex();
+	String config_file_path=getConfigDirPath()+FILE_CONFIG;
+	SaveConfig(config_file_path);
+	
+	LoadOrder();
 }
 
 void PikaCRM::BuyItemGridMerchBtnClick()

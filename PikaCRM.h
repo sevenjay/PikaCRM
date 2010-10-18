@@ -96,6 +96,7 @@ struct Config {
 	VectorMap<String, int> MWidth;
 	
 	bool	IsMaximized;
+	int		OrderFilter;
 
 	void Xmlize(XmlIO xml){	//necessary for StoreAsXMLFile(), LoadFromXMLFile()
 		xml
@@ -108,6 +109,7 @@ struct Config {
 			("ContactWidth", COWidth)
 			("MerchandiseWidth", MWidth)
 			("IsMaximized", IsMaximized)
+			("OrderFilter", OrderFilter)
 		;
 	}
 	
@@ -322,6 +324,7 @@ public:
 	void	EventNewStatusClick();
 		
 	void	OrderGridCustomerBtnClick();
+	void	OrderFilterSet();
 	
 	void	BuyItemGridMerchBtnClick();
 	
