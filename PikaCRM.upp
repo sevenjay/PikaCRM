@@ -6,7 +6,8 @@ uses
 	SystemLog,
 	GridCtrl,
 	DropGrid,
-	DBCharset;
+	DBCharset,
+	Report;
 
 file
 	sql/sql.ids,

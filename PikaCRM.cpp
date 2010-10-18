@@ -194,7 +194,7 @@ void PikaCRM::SetupUI()
 	//Customer.btnDeleteF <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
 	Customer.btnImport <<= THISBACK2(ImportFile, &(Customer.Grid), "Customers");
 	Customer.btnExport <<= THISBACK2(ExportFile, &(Customer.Grid), "Customers");
-	Customer.btnPrint.Disable();
+	Customer.btnPrint <<= THISBACK2(Print, &(Customer.Grid), "Customers");
 	
 	Customer.Grid.Absolute();
 	Customer.Grid.AddIndex(C_ID).Default(-1);//for when create row before insert row
@@ -2122,7 +2122,7 @@ void PikaCRM::SelectImportDir(GridCtrl * grid, Vector< Vector<String> > * gridda
 		FileIn csv(~fileSelIm);
 		if(csv.IsOpen())
 		{
-			Import.esFilePath=~fileSel;
+			Import.esFilePath=~fileSelIm;
 			Import.rtWarning.Clear();
 			StringStream content(LoadStreamBOM(csv));
 			ParserCSVFile(content, *griddata);
@@ -2394,6 +2394,59 @@ void PikaCRM::ImportCSV(GridCtrl * datagrid, const String & name)
 		;//do nothing
 	}
 	
+}
+
+
+void PikaCRM::Print(GridCtrl * grid, String name)
+{
+	Report r;
+	r.Header("[A2> Page $$P");
+	r << "[* PikaCRM";
+	
+	int cols=grid->GetColumnCount();
+	int rows=grid->GetCount();	
+	String line = name+" data: count "+AsString(rows);
+	SysLog.Info(line+"\n");
+	r << line;	
+	
+	String table;
+	table << "{{";	
+
+
+	String 	row_title;
+	bool 	isFirstOne=true;
+	for(int i=0;i<cols;++i)
+	{
+		if(!grid->GetColumn(i).IsHidden())
+		{
+			if(isFirstOne==false)
+			{
+				table<<":";
+				row_title<<":: ";
+			}
+			table<<"1";
+			row_title<<grid->GetColumn(i).GetName();
+			isFirstOne=false;
+		}		
+	}
+	table<<" "<<row_title;
+	
+	//data start from row=0
+	for(int i=0;i<rows;++i){
+		for(int j=0;j<cols;++j)
+		{
+			if(!grid->GetColumn(j).IsHidden())
+			{
+				String temp=grid->Get(i,j);
+				temp=Replace(temp,"\n","&");
+				table << ":: " << temp;
+			}		
+		}
+	}	
+	
+	r<<table;
+
+	Perform(r);	
 }
 
 void PikaCRM::ConfigDB()

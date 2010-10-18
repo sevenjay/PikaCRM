@@ -11,6 +11,7 @@ using namespace Upp;
 #include <plugin/sqlite3/Sqlite3.h>
 #include <DropGrid/DropGrid.h>
 #include <GridCtrl/GridCtrl.h> //must include before *.lay
+#include <Report/Report.h>
 
 #include <string>
 #include <vector>
@@ -331,7 +332,8 @@ public:
 			void	ImportChangMatch(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
 			void	ImportChangEncode(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
 			void	SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map);
-			String	EncodeToUtf8(String & src);
+			String	EncodeToUtf8(String & src);	
+	void	Print(GridCtrl * grid, String name);
 	//File Operation------------------------------------------------------
 	void	ExportCSV(GridCtrl * grid, const String & path, const String & name, bool is_bom);
 	void 	ParserCSVFile(Stream & content, Vector< Vector<String> > & data);
