@@ -236,7 +236,7 @@ void PikaCRM::SetupUI()
 	Contact.btnDeleteF.Disable();
 	Contact.btnImport <<= THISBACK2(ImportFile, &(Contact.Grid), "Contacts");
 	Contact.btnExport <<= THISBACK2(ExportFile, &(Contact.Grid), "Contacts");
-	Contact.btnPrint.Disable();
+	Contact.btnPrint <<= THISBACK2(Print, &(Contact.Grid), "Contacts");
 	
 	Contact.Grid.Absolute();
 	Contact.Grid.AddIndex(CO_ID);
@@ -265,9 +265,8 @@ void PikaCRM::SetupUI()
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
 	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
 	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
-	//Event.btnImport.Disable();
-	Event.btnPrint.Disable();
 	Event.btnExport <<= THISBACK2(ExportFile, &(Event.Grid), "Events");
+	Event.btnPrint <<= THISBACK2(Print, &(Event.Grid), "Events");
 	
 	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
 	Event.Grid.AddIndex(C_ID);
@@ -300,7 +299,7 @@ void PikaCRM::SetupUI()
 	Merchandise.btnDeleteF.Disable();
 	Merchandise.btnImport <<= THISBACK2(ImportFile, &(Merchandise.Grid), "Merchandises");
 	Merchandise.btnExport <<= THISBACK2(ExportFile, &(Merchandise.Grid), "Merchandises");
-	Merchandise.btnPrint.Disable();
+	Merchandise.btnPrint <<= THISBACK2(Print, &(Merchandise.Grid), "Merchandises");
 	
 	Merchandise.Grid.Absolute();
 	Merchandise.Grid.AddIndex(M_ID).Default(-1);//for when create row before insert row;
@@ -325,9 +324,8 @@ void PikaCRM::SetupUI()
 	Order.btnCreate <<= callback(&(Order.Grid),&GridCtrl::DoAppend);
 	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
 	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
-	//Order.btnImport.Disable();
-	Order.btnPrint.Disable();
 	Order.btnExport <<= THISBACK2(ExportFile, &(Order.Grid), "Orders");
+	Order.btnPrint <<= THISBACK2(Print, &(Order.Grid), "Orders");
 	
 	Order.Grid.AddColumn(O_ID,t_("Order ID")).Default(-1);//for when create row before insert row;
 	Order.Grid.AddIndex(C_ID);
@@ -2065,7 +2063,7 @@ void PikaCRM::ExportCSV(GridCtrl * grid, const String & path, const String & nam
 			{
 				if(isFirstOne==false) line<<",";
 				
-				String temp=grid->Get(i,j);
+				String temp=grid->Get(i,j).ToString();
 				String out=Replace(temp,"\"","\"\"");
 				if(!out.IsEmpty())line<<"\""<<out<<"\"";
 				isFirstOne=false;
@@ -2437,7 +2435,7 @@ void PikaCRM::Print(GridCtrl * grid, String name)
 		{
 			if(!grid->GetColumn(j).IsHidden())
 			{
-				String temp=grid->Get(i,j);
+				String temp=grid->Get(i,j).ToString();
 				temp=Replace(temp,"\n","&");
 				table << ":: " << temp;
 			}		
