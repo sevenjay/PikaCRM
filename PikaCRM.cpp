@@ -1677,8 +1677,9 @@ void PikaCRM::FirstWelcome()
 	CtrlLayoutOKCancel(d, t_("Welcome to use PikaCRM"));
 
 	d.ok.WhenPush = THISBACK1(ChackAgree, &(d.agree));
+	d.cancel.Hide();
 	String note;
-	note<<"[2G "<<t_("Welcome to use PikaCRM")<<" &]";
+	note<<"[2G "<<t_("Welcome to use PikaCRM")<<" &&]";
 	note<<"[1G "<<t_("You must agree the license to use")<<" ]";
 	d.Welcome.SetQTF(note);
 
