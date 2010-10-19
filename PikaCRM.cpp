@@ -123,8 +123,8 @@ void PikaCRM::Initial()
 	{
 		SysLog.Info("setup the database file\n");
 		mSplash.HideSplash();
-		///@todo first welcome
-		if(!IsSetupDB(config_file_path)) return;
+		FirstWelcome();
+		if(!IsSetupDB(config_file_path)) throw ApExc("user cancel").SetHandle(ApExc::EXIT);
 		mSplash.ShowSplash();
 		mSplash.ShowSplashStatus(t_("Creating the database..."));
 		SysLog.Info(t_("Creating the database..."))<<"\n";;
@@ -1670,6 +1670,35 @@ void PikaCRM::SetAllFieldMap()
 }
 //end application control-----------------------------------------------------------
 //interactive with GUI==============================================================
+void PikaCRM::FirstWelcome()
+{
+	SysLog.Info("First Run PikaCRM. Welcome!\n");
+	WithFirstWelcomeLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d, t_("Welcome to use PikaCRM"));
+
+	d.ok.WhenPush = THISBACK1(ChackAgree, &(d.agree));
+	String note;
+	note<<"[2G "<<t_("Welcome to use PikaCRM")<<" &]";
+	note<<"[1G "<<t_("You must agree the license to use")<<" ]";
+	d.Welcome.SetQTF(note);
+
+	Topic t = GetTopic("PikaCRM/srcdoc/License$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
+	if (t.text.IsEmpty()) {
+		t = GetTopic("PikaCRM/srcdoc/License$");
+	}	
+	d.License.SetQTF(t);
+	
+	if(d.Run() == IDOK) {
+		;//do nothing		
+	}
+	else{
+		throw ApExc("user cancel").SetHandle(ApExc::EXIT);
+	}
+}
+void PikaCRM::ChackAgree(Option * agree)
+{
+	if(true!=agree->Get()) Exclamation(t_("You must agree the License."));
+}
 void PikaCRM::CustomerGridContactBtnClick()
 {
 	if(Customer.Grid(C_TITLE).ToString().IsEmpty())

@@ -199,3 +199,11 @@ LAYOUT(ImportMatchLayout, 456, 220)
 	ITEM(Label, dv___7, SetLabel(t_("Column")).LeftPosZ(4, 57).TopPosZ(12, 20))
 END_LAYOUT
 
+LAYOUT(FirstWelcomeLayout, 412, 228)
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(176, 136).BottomPosZ(16, 20))
+	ITEM(Button, ok, SetLabel(t_("Next")).HSizePosZ(292, 20).BottomPosZ(16, 20))
+	ITEM(RichTextCtrl, License, SetFrame(FieldFrame()).LeftPosZ(8, 392).TopPosZ(52, 124))
+	ITEM(RichTextCtrl, Welcome, LeftPosZ(8, 392).TopPosZ(8, 36))
+	ITEM(Option, agree, SetLabel(t_("I agree")).LeftPosZ(108, 56).TopPosZ(192, 16))
+END_LAYOUT
+

@@ -64,7 +64,6 @@ catch(ApExc & e)
 	
 	if(e.GetHandle()&ApExc::NOTICE) Exclamation("[* " + DeQtfLf(e) + "]");
 	
-	if(e.GetHandle()&ApExc::EXIT) exit;//not necessary, it is exiting
 }
 catch(...)
 {	//can not do anything

@@ -315,6 +315,8 @@ public:
 	void   OpenMainFrom();
 	
 	//interactive with GUI==============================================================
+	void	FirstWelcome();
+		void ChackAgree(Option * agree);
 	void	CustomerGridContactBtnClick();
 	
 	void	BtnSearchClearClick(){ Customer.Grid.ClearFound(); };
