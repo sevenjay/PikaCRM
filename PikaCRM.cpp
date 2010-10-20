@@ -2517,9 +2517,6 @@ void PikaCRM::Print(GridCtrl * grid, String name)
 void PikaCRM::ConfigDB()
 {
 	SysLog.Info("configure the database\n");
-	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
-	String database_file_path = getConfigDirPath()+FILE_DATABASE;
-	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db, so we re-open
 	if(mConfig.Password.IsEqual(PW_EMPTY))
 	{
 		;
@@ -2528,6 +2525,10 @@ void PikaCRM::ConfigDB()
 	{
 		if(!IsInputPWCheck()) return;
 	}
+	
+	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db, so we re-open
 	
 	if(IsSetupDB(config_file_path))
 	{
