@@ -19,7 +19,7 @@ END_LAYOUT
 LAYOUT(InputPWLayout, 300, 120)
 	ITEM(EditString, esPassword, MaxChars(16).LeftPosZ(120, 116).TopPosZ(36, 19))
 	ITEM(Label, dv___1, SetLabel(t_("Password:")).LeftPosZ(52, 64).TopPosZ(36, 20))
-	ITEM(Option, optRememberPW, SetLabel(t_("Remember the Password")).LeftPosZ(52, 160).TopPosZ(64, 16))
+	ITEM(Option, optRememberPW, SetLabel(t_("Remember the Password")).Tip(t_("Enabled this function only works on this computer.\nOn others, the encrypted password is different from different hard disk serial number.")).LeftPosZ(52, 160).TopPosZ(64, 16))
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(180, 32).BottomPosZ(12, 20))
 	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(52, 160).BottomPosZ(12, 20))
 	ITEM(Label, dv___5, SetLabel(t_("Enter your password to use PikaCRM")).LeftPosZ(52, 192).TopPosZ(12, 20))

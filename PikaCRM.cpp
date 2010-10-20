@@ -91,12 +91,15 @@ void PikaCRM::Initial()
 		if(mConfig.IsRememberPW)
 		{
 			SysLog.Info("config: Remeber the PW\n");
-			String key=CombineKey(GetSystemKey(), mConfig.Password);
+			String syskey=GetSystemKey();
+			if( syskey.IsEmpty() ) PromptOK( t_("The function of \"Remeber the password\" is not work.&"
+												"To make it active, please excute \"hdsn`_permit.sh\" for getting hard disk serial number."));
+			String key=CombineKey(syskey, mConfig.Password);
 			SysLog.Debug("systemPWKey:"+key+"\n");
 			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
 			{
 				SysLog.Info("config: application is running on different PC\n");
-				if(!IsInputPWCheck()) return;//false
+				if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::EXIT);
 			}
 			//else
 			//	;//just using mConfig.Password;
@@ -104,7 +107,7 @@ void PikaCRM::Initial()
 		else//not Remember PW 
 		{
 			SysLog.Info("config: Not Remeber the PW\n");
-			if(!IsInputPWCheck()) return;
+			if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::EXIT);
 		}
 		mSplash.ShowSplash();
 	}
