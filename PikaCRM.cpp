@@ -187,6 +187,49 @@ void PikaCRM::SetupUI()
 	CtrlLayout(Preference);
 	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));	
 	//end TabCtrl------------------------------------------------------------------------
+	//icon
+	Customer.btnCreate.SetImage(SrcImages::CustomerAdd());
+	Customer.btnModify.SetImage(SrcImages::CustomerEdit());
+	Customer.btnDelete.SetImage(SrcImages::CustomerRemove());
+	Customer.btnCreateF.SetImage(SrcImages::CustomAdd());
+	Customer.btnModifyF.SetImage(SrcImages::CustomEdit());
+	Customer.btnDeleteF.SetImage(SrcImages::CustomRemove());
+	Customer.btnImport.SetImage(SrcImages::Import());
+	Customer.btnExport.SetImage(SrcImages::Export());
+	Customer.btnPrint.SetImage(SrcImages::Print());
+	
+	Contact.btnCreate.SetImage(SrcImages::ContactAdd());
+	Contact.btnModify.SetImage(SrcImages::ContactEdit());
+	Contact.btnDelete.SetImage(SrcImages::ContactRemove());
+	Contact.btnCreateF.SetImage(SrcImages::CustomAdd());
+	Contact.btnModifyF.SetImage(SrcImages::CustomEdit());
+	Contact.btnDeleteF.SetImage(SrcImages::CustomRemove());
+	Contact.btnImport.SetImage(SrcImages::Import());
+	Contact.btnExport.SetImage(SrcImages::Export());
+	Contact.btnPrint.SetImage(SrcImages::Print());
+				
+	Event.btnCreate.SetImage(SrcImages::EventAdd());
+	Event.btnModify.SetImage(SrcImages::EventEdit());
+	Event.btnDelete.SetImage(SrcImages::EventRemove());
+	Event.btnExport.SetImage(SrcImages::Export());
+	Event.btnPrint.SetImage(SrcImages::Print());
+				
+	Order.btnCreate.SetImage(SrcImages::OrderAdd());
+	Order.btnModify.SetImage(SrcImages::OrderEdit());
+	Order.btnDelete.SetImage(SrcImages::OrderRemove());
+	Order.btnExport.SetImage(SrcImages::Export());
+	Order.btnPrint.SetImage(SrcImages::Print());
+		
+	Merchandise.btnCreate.SetImage(SrcImages::MerchandiseAdd());
+	Merchandise.btnModify.SetImage(SrcImages::MerchandiseEdit());
+	Merchandise.btnDelete.SetImage(SrcImages::MerchandiseRemove());
+	Merchandise.btnCreateF.SetImage(SrcImages::CustomAdd());
+	Merchandise.btnModifyF.SetImage(SrcImages::CustomEdit());
+	Merchandise.btnDeleteF.SetImage(SrcImages::CustomRemove());
+	Merchandise.btnImport.SetImage(SrcImages::Import());
+	Merchandise.btnExport.SetImage(SrcImages::Export());
+	Merchandise.btnPrint.SetImage(SrcImages::Print());
+	
 	//Customer Tab-----------------------------------------------------------------------
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
