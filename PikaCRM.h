@@ -232,6 +232,18 @@ private :
 	Image	getLangLogo(int language);
 	String	getMD5(const String & text);
 	String	getSwap1st2ndChar(const String & text);
+	
+	Image	fitScale(const Image & i, int new_len){
+		
+		if(i.GetWidth()<=new_len || new_len<5) return i;
+		
+		ImageDraw iw(new_len, new_len);
+		iw.Alpha().DrawRect(0, 0, new_len, new_len, GrayColor(0));
+		iw.Alpha().DrawImage(0,0,new_len,new_len,i, GrayColor(255));		
+		iw.DrawImage(0,0,new_len,new_len,i);
+		return iw;
+	};
+	
 	void	test(){PromptOK("test");};
 	
 	//database control------------------------------------------------------------

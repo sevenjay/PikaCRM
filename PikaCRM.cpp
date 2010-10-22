@@ -188,10 +188,22 @@ void PikaCRM::SetupUI()
 	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));	
 	//end TabCtrl------------------------------------------------------------------------
 	//icon
-	Customer.btnCreate.SetImage(SrcImages::CustomerAdd());
+	Image ii;
+	int iw=SrcImages::CustomerAdd().GetWidth();
+	int ih=SrcImages::CustomerAdd().GetHeight();
+	
+	int fh= GetStdFont().GetHeight();
+	
+	int bw=Customer.btnCreate.GetRect().Width();
+	int bhr=Customer.btnCreate.GetRect().Height()-8;
+	int scale=ih;
+	if(ih+fh>bhr) //scale image
+		scale=bhr-fh;
+	
+	Customer.btnCreate.SetImage(fitScale(SrcImages::CustomerAdd(),scale));
 	Customer.btnModify.SetImage(SrcImages::CustomerEdit());
 	Customer.btnDelete.SetImage(SrcImages::CustomerRemove());
-	Customer.btnCreateF.SetImage(SrcImages::CustomAdd());
+	Customer.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale));
 	Customer.btnModifyF.SetImage(SrcImages::CustomEdit());
 	Customer.btnDeleteF.SetImage(SrcImages::CustomRemove());
 	Customer.btnImport.SetImage(SrcImages::Import());
@@ -1425,6 +1437,7 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	SysLog.Info("setup the database\n");
 	WithInitialDBLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d, t_("Setup your database"));
+	d.TopMost();
 	d.esPassword.Password();
 	d.esCheckPassword.Password();
 	d.optRequire.SetEditable(false);
