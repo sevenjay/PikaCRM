@@ -195,20 +195,24 @@ void PikaCRM::SetupUI()
 	int fh= GetStdFont().GetHeight();
 	
 	int bw=Customer.btnCreate.GetRect().Width();
-	int bhr=Customer.btnCreate.GetRect().Height()-8;
+	int bhr=Customer.btnCreate.GetRect().Height()-Ctrl::VertLayoutZoom(6);
 	int scale=ih;
 	if(ih+fh>bhr) //scale image
-		scale=bhr-fh;
+		scale=bhr-Ctrl::VertLayoutZoom(fh);
+		//Ctrl::VertLayoutZoom(fh) should be txtsz.cy
+		//Size txtsz = *text ? GetSmartTextSize(text, font, txtcx) : paintrect.GetStdSize();
+		//in LabelBase.cpp, but we can't, so whatever let it go.
+	int ss=Ctrl::VertLayoutZoom(100);
 	
-	Customer.btnCreate.SetImage(fitScale(SrcImages::CustomerAdd(),scale));
-	Customer.btnModify.SetImage(SrcImages::CustomerEdit());
-	Customer.btnDelete.SetImage(SrcImages::CustomerRemove());
-	Customer.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale));
-	Customer.btnModifyF.SetImage(SrcImages::CustomEdit());
-	Customer.btnDeleteF.SetImage(SrcImages::CustomRemove());
-	Customer.btnImport.SetImage(SrcImages::Import());
-	Customer.btnExport.SetImage(SrcImages::Export());
-	Customer.btnPrint.SetImage(SrcImages::Print());
+	Customer.btnCreate.SetImage(fitScale(SrcImages::CustomerAdd(),scale)).SetFont(StdFontS(-1));
+	Customer.btnModify.SetImage(SrcImages::CustomerEdit()).SetFont(StdFontS(-1));
+	Customer.btnDelete.SetImage(SrcImages::CustomerRemove()).SetFont(StdFontS(-1));
+	Customer.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
+	Customer.btnModifyF.SetImage(SrcImages::CustomEdit()).SetFont(StdFontS(-1));
+	Customer.btnDeleteF.SetImage(SrcImages::CustomRemove()).SetFont(StdFontS(-1));
+	Customer.btnImport.SetImage(SrcImages::Import()).SetFont(StdFontS(-1));
+	Customer.btnExport.SetImage(SrcImages::Export()).SetFont(StdFontS(-1));
+	Customer.btnPrint.SetImage(SrcImages::Print()).SetFont(StdFontS(-1));
 	
 	Contact.btnCreate.SetImage(SrcImages::ContactAdd());
 	Contact.btnModify.SetImage(SrcImages::ContactEdit());
@@ -1449,6 +1453,11 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	Font ff= GetStdFont();
 	SysLog.Debug(ff.GetFaceName()+"\n");
 	SysLog.Debug("h: ")<<ff.GetHeight();
+	SysLog.Debug(" fh: ")<<ff.Info().GetFontHeight();
+	SysLog.Debug(" 1zh: ")<<StdFontZ(1);
+	SysLog.Debug(" 10zh: ")<<StdFontZ(10);
+	SysLog.Debug(" 11zh: ")<<StdFontZ(11);
+	SysLog.Debug(" 12zh: ")<<StdFontZ(12);
 	
 	note<<"[1G "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
 	d.rtNoteEncrypted.SetQTF(note);
@@ -2736,4 +2745,10 @@ std::vector<std::string> ParserCsvLine(const char * line)
 	
 	return vec;
 }
+
+Font StdFontS(int scale)
+{
+	return Font(Font::STDFONT, GetStdFont().GetHeight()+scale*GetStdFont().GetHeight()/10); 
+}
+
 //end some function-----------------------------------------------

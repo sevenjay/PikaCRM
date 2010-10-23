@@ -364,4 +364,5 @@ public:
 //some function-----------------------------------------------
 String Replace(String str, String find, String replace);
 std::vector<std::string> ParserCsvLine(const char * line);
+Font StdFontS(int scale);
 #endif
