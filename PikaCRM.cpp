@@ -187,64 +187,60 @@ void PikaCRM::SetupUI()
 	CtrlLayout(Preference);
 	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));	
 	//end TabCtrl------------------------------------------------------------------------
-	//icon
-	Image ii;
-	int iw=SrcImages::CustomerAdd().GetWidth();
-	int ih=SrcImages::CustomerAdd().GetHeight();
+	//set icon---------------------------------------------------------------------------
+	int imageh=SrcImages::CustomerAdd().GetHeight();
 	
-	int fh= GetStdFont().GetHeight();
+	int fonth= GetStdFont().GetHeight();
 	
-	int bw=Customer.btnCreate.GetRect().Width();
-	int bhr=Customer.btnCreate.GetRect().Height()-Ctrl::VertLayoutZoom(6);
-	int scale=ih;
-	if(ih+fh>bhr) //scale image
-		scale=bhr-Ctrl::VertLayoutZoom(fh);
+	int btnRectH=Customer.btnCreate.GetRect().Height()-Ctrl::VertLayoutZoom(6);//6 for 2 x sapce(3), define in Button::Paint
+	int scale=imageh;
+	if(imageh+fonth>btnRectH) //scale image
+		scale=btnRectH-Ctrl::VertLayoutZoom(fonth);
 		//Ctrl::VertLayoutZoom(fh) should be txtsz.cy
 		//Size txtsz = *text ? GetSmartTextSize(text, font, txtcx) : paintrect.GetStdSize();
 		//in LabelBase.cpp, but we can't, so whatever let it go.
-	int ss=Ctrl::VertLayoutZoom(100);
 	
 	Customer.btnCreate.SetImage(fitScale(SrcImages::CustomerAdd(),scale)).SetFont(StdFontS(-1));
-	Customer.btnModify.SetImage(SrcImages::CustomerEdit()).SetFont(StdFontS(-1));
-	Customer.btnDelete.SetImage(SrcImages::CustomerRemove()).SetFont(StdFontS(-1));
+	Customer.btnModify.SetImage(fitScale(SrcImages::CustomerEdit(),scale)).SetFont(StdFontS(-1));
+	Customer.btnDelete.SetImage(fitScale(SrcImages::CustomerRemove(),scale)).SetFont(StdFontS(-1));
 	Customer.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
-	Customer.btnModifyF.SetImage(SrcImages::CustomEdit()).SetFont(StdFontS(-1));
-	Customer.btnDeleteF.SetImage(SrcImages::CustomRemove()).SetFont(StdFontS(-1));
-	Customer.btnImport.SetImage(SrcImages::Import()).SetFont(StdFontS(-1));
-	Customer.btnExport.SetImage(SrcImages::Export()).SetFont(StdFontS(-1));
-	Customer.btnPrint.SetImage(SrcImages::Print()).SetFont(StdFontS(-1));
+	Customer.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
+	Customer.btnDeleteF.SetImage(fitScale(SrcImages::CustomRemove(),scale)).SetFont(StdFontS(-1));
+	Customer.btnImport.SetImage(fitScale(SrcImages::Import(),scale)).SetFont(StdFontS(-1));
+	Customer.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
+	Customer.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 	
-	Contact.btnCreate.SetImage(SrcImages::ContactAdd());
-	Contact.btnModify.SetImage(SrcImages::ContactEdit());
-	Contact.btnDelete.SetImage(SrcImages::ContactRemove());
-	Contact.btnCreateF.SetImage(SrcImages::CustomAdd());
-	Contact.btnModifyF.SetImage(SrcImages::CustomEdit());
-	Contact.btnDeleteF.SetImage(SrcImages::CustomRemove());
-	Contact.btnImport.SetImage(SrcImages::Import());
-	Contact.btnExport.SetImage(SrcImages::Export());
-	Contact.btnPrint.SetImage(SrcImages::Print());
+	Contact.btnCreate.SetImage(fitScale(SrcImages::ContactAdd(),scale)).SetFont(StdFontS(-1));
+	Contact.btnModify.SetImage(fitScale(SrcImages::ContactEdit(),scale)).SetFont(StdFontS(-1));
+	Contact.btnDelete.SetImage(fitScale(SrcImages::ContactRemove(),scale)).SetFont(StdFontS(-1));
+	Contact.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
+	Contact.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
+	Contact.btnDeleteF.SetImage(fitScale(SrcImages::CustomRemove(),scale)).SetFont(StdFontS(-1));
+	Contact.btnImport.SetImage(fitScale(SrcImages::Import(),scale)).SetFont(StdFontS(-1));
+	Contact.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
+	Contact.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 				
-	Event.btnCreate.SetImage(SrcImages::EventAdd());
-	Event.btnModify.SetImage(SrcImages::EventEdit());
-	Event.btnDelete.SetImage(SrcImages::EventRemove());
-	Event.btnExport.SetImage(SrcImages::Export());
-	Event.btnPrint.SetImage(SrcImages::Print());
+	Event.btnCreate.SetImage(fitScale(SrcImages::EventAdd(),scale)).SetFont(StdFontS(-1));
+	Event.btnModify.SetImage(fitScale(SrcImages::EventEdit(),scale)).SetFont(StdFontS(-1));
+	Event.btnDelete.SetImage(fitScale(SrcImages::EventRemove(),scale)).SetFont(StdFontS(-1));
+	Event.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
+	Event.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 				
-	Order.btnCreate.SetImage(SrcImages::OrderAdd());
-	Order.btnModify.SetImage(SrcImages::OrderEdit());
-	Order.btnDelete.SetImage(SrcImages::OrderRemove());
-	Order.btnExport.SetImage(SrcImages::Export());
-	Order.btnPrint.SetImage(SrcImages::Print());
+	Order.btnCreate.SetImage(fitScale(SrcImages::OrderAdd(),scale)).SetFont(StdFontS(-1));
+	Order.btnModify.SetImage(fitScale(SrcImages::OrderEdit(),scale)).SetFont(StdFontS(-1));
+	Order.btnDelete.SetImage(fitScale(SrcImages::OrderRemove(),scale)).SetFont(StdFontS(-1));
+	Order.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
+	Order.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 		
-	Merchandise.btnCreate.SetImage(SrcImages::MerchandiseAdd());
-	Merchandise.btnModify.SetImage(SrcImages::MerchandiseEdit());
-	Merchandise.btnDelete.SetImage(SrcImages::MerchandiseRemove());
-	Merchandise.btnCreateF.SetImage(SrcImages::CustomAdd());
-	Merchandise.btnModifyF.SetImage(SrcImages::CustomEdit());
-	Merchandise.btnDeleteF.SetImage(SrcImages::CustomRemove());
-	Merchandise.btnImport.SetImage(SrcImages::Import());
-	Merchandise.btnExport.SetImage(SrcImages::Export());
-	Merchandise.btnPrint.SetImage(SrcImages::Print());
+	Merchandise.btnCreate.SetImage(fitScale(SrcImages::MerchandiseAdd(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnModify.SetImage(fitScale(SrcImages::MerchandiseEdit(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnDelete.SetImage(fitScale(SrcImages::MerchandiseRemove(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnDeleteF.SetImage(fitScale(SrcImages::CustomRemove(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnImport.SetImage(fitScale(SrcImages::Import(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 	
 	//Customer Tab-----------------------------------------------------------------------
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
