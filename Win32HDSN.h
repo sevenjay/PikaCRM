@@ -1291,22 +1291,17 @@ char *ConvertToString (DWORD diskdata [256],
 
 char * gGetHardDriveSerialNumber (char * buffer)
 {
-   int done = FALSE;
-   // char string [1024];
-   __int64 id = 0;
-   OSVERSIONINFO version;
+	int done = FALSE;
 
-   strcpy (HardDriveSerialNumber, "");
+	strcpy (HardDriveSerialNumber, "");
 
-   memset (&version, 0, sizeof (version));
-   version.dwOSVersionInfoSize = sizeof (OSVERSIONINFO);
-   GetVersionEx (&version);
 
 		  //  this works under WinNT4 or Win2K if you have admin rights
 #ifdef PRINTING_TO_CONSOLE_ALLOWED
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using physical access with admin rights\n");
 #endif
+		SysLog.Debug("reading the HD using physical access with admin rights\n");
 		done = ReadPhysicalDriveInNTWithAdminRights ();
 
 			//  this should work in WinNT or Win2K if previous did not work
@@ -1316,25 +1311,31 @@ char * gGetHardDriveSerialNumber (char * buffer)
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using the SCSI back door\n");
 #endif
-		if ( ! done) 
+		if ( ! done)
+		{
+			SysLog.Debug("reading the HD using the SCSI back door\n");
 			done = ReadIdeDriveAsScsiDriveInNT ();
-
+		}
 		  //  this works under WinNT4 or Win2K or WinXP if you have any rights
 #ifdef PRINTING_TO_CONSOLE_ALLOWED
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using physical access with zero rights\n");
 #endif
 		if ( ! done)
+		{
+			SysLog.Debug("reading the HD using physical access with zero rights\n");
 			done = ReadPhysicalDriveInNTWithZeroRights ();
-
+		}
 		  //  this works under WinNT4 or Win2K or WinXP or Windows Server 2003 or Vista if you have any rights
 #ifdef PRINTING_TO_CONSOLE_ALLOWED
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using Smart\n");
 #endif
 		if ( ! done)
+		{
+			SysLog.Debug("reading the HD using Smart\n");
 			done = ReadPhysicalDriveInNTUsingSmart ();
-
+		}
 
 
 	if(done)
@@ -1349,7 +1350,59 @@ char * gGetHardDriveSerialNumber (char * buffer)
 }
 
 
+typedef struct _STORAGE_DEVICE_NUMBER {
+  DEVICE_TYPE DeviceType;
+  ULONG       DeviceNumber;
+  ULONG       PartitionNumber;
+} STORAGE_DEVICE_NUMBER, *PSTORAGE_DEVICE_NUMBER;
 
+
+int gGetPhysicalDeviceID(char device)
+{
+	int result=0;
+	
+	HANDLE hDevice;
+	DWORD bytesreturned=0;
+	BOOL bResult;
+	STORAGE_DEVICE_NUMBER deviceInfo;
+	char devicename[] = "\\\\.\\C:";
+	devicename[4] = device;
+
+	hDevice = CreateFile(devicename, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hDevice == INVALID_HANDLE_VALUE)
+	{
+		SysLog.Error("INVALID Device ")<<devicename<<"\n";
+	}
+	//1----------------------------------------------------------------------------
+	bResult = DeviceIoControl(hDevice, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &deviceInfo, sizeof(deviceInfo), &bytesreturned, NULL);
+	if (bResult)
+	{
+		char *errormessage=NULL;
+		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, GetLastError(), 0, errormessage, 0, NULL);
+                
+        LocalFree(errormessage);
+	}
+	else
+	{
+		result=deviceInfo.DeviceNumber;
+	}
+		//2----------------------------------------------------------------------------
+		VOLUME_DISK_EXTENTS pVDX;  
+		DWORD dwRetSize;  
+		memset(&pVDX, 0, sizeof(VOLUME_DISK_EXTENTS));  
+		if(DeviceIoControl(hDevice,        IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, &pVDX, sizeof(VOLUME_DISK_EXTENTS), &dwRetSize, NULL)) 
+		{
+			//result=pVDX.Extents[0].DiskNumber;  
+			printf("VOLUME_GET_VOLUME_DISK_EXTENTS: %d\n", pVDX.Extents[0].DiskNumber);
+		}
+        
+        
+        
+        
+        
+        CloseHandle(hDevice);
+        return result;
+}
 
 /*
 int main (int argc, char * argv [])
