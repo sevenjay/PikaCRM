@@ -1656,6 +1656,10 @@ void PikaCRM::CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw)
 		Exclamation(t_("The Password is incorrect!"));
 }
 
+
+#ifdef PLATFORM_WIN32
+#include "Win32HDSN.h"
+#endif
 String PikaCRM::GetSystemKey()
 {
 	SysLog.Info("Get the System Key\n");	
@@ -1681,8 +1685,9 @@ String PikaCRM::GetSystemKey()
 		}
 
 #elif defined(PLATFORM_WIN32)
-	///@todo include SystemInfo
-	output="Win32 Not implement GetSystemKey";
+	char buf[1024]={};
+	char * sn = gGetHardDriveSerialNumber (buf);
+	output=sn;
 #endif
 
 	if( -1 != (pos=output.Find("serial_no:")) )
@@ -1694,7 +1699,7 @@ String PikaCRM::GetSystemKey()
 		//throw ApExc(output+"\n").SetHandle(ApExc::SYS_FAIL);
 	}
 	
-	
+	SysLog.Debug(output+"\n");
 	return key;
 }
 
@@ -2644,7 +2649,8 @@ String PikaCRM::getConfigDirPath()
 #endif
 
 #ifdef PLATFORM_WIN32
-	String full_directory_path = GetHomeDirFile("Application Data/"+directory_path+"/");
+	//String full_directory_path = GetHomeDirFile("Application Data/"+directory_path+"/");
+	String full_directory_path = "Data/"; //portable path
 	//win_full_directory_path=WinPath(full_directory_path);///@todo test if we need do it 
 #endif
 
