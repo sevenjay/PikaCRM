@@ -1371,37 +1371,61 @@ int gGetPhysicalDeviceID(char device)
 	hDevice = CreateFile(devicename, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (hDevice == INVALID_HANDLE_VALUE)
 	{
-		SysLog.Error("INVALID Device ")<<devicename<<"\n";
+		LPVOID lpMsgBuf;
+		DWORD dw = GetLastError(); 
+
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+	        FORMAT_MESSAGE_FROM_SYSTEM |
+	        FORMAT_MESSAGE_IGNORE_INSERTS,
+	        NULL,
+	        dw,
+	        MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
+	        (LPTSTR) &lpMsgBuf,
+	        0, NULL );
+
+		SysLog.Error("INVALID Device ")<<devicename<<", error: "<<GetLastError()<<(char *)lpMsgBuf<<"\n";
+		LocalFree(lpMsgBuf);
+		//return -1;
 	}
-	//1----------------------------------------------------------------------------
+	//method 1----------------------------------------------------------------------------
 	bResult = DeviceIoControl(hDevice, IOCTL_STORAGE_GET_DEVICE_NUMBER, NULL, 0, &deviceInfo, sizeof(deviceInfo), &bytesreturned, NULL);
 	if (bResult)
 	{
-		char *errormessage=NULL;
-		FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER, NULL, GetLastError(), 0, errormessage, 0, NULL);
-                
-        LocalFree(errormessage);
+		result=deviceInfo.DeviceNumber;
 	}
 	else
 	{
-		result=deviceInfo.DeviceNumber;
+		LPVOID lpMsgBuf;
+		DWORD dw = GetLastError(); 
+
+		FormatMessage(
+			FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+	        FORMAT_MESSAGE_FROM_SYSTEM |
+	        FORMAT_MESSAGE_IGNORE_INSERTS,
+	        NULL,
+	        dw,
+	        MAKELANGID(LANG_ENGLISH, SUBLANG_DEFAULT),
+	        (LPTSTR) &lpMsgBuf,
+	        0, NULL );
+		
+		SysLog.Error("Device ")<<device<<" error: "<<dw<<(char *)lpMsgBuf<<"\n";
+		LocalFree(lpMsgBuf);
+		return -1;
 	}
-		//2----------------------------------------------------------------------------
-		VOLUME_DISK_EXTENTS pVDX;  
-		DWORD dwRetSize;  
-		memset(&pVDX, 0, sizeof(VOLUME_DISK_EXTENTS));  
-		if(DeviceIoControl(hDevice,        IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, &pVDX, sizeof(VOLUME_DISK_EXTENTS), &dwRetSize, NULL)) 
-		{
-			//result=pVDX.Extents[0].DiskNumber;  
-			printf("VOLUME_GET_VOLUME_DISK_EXTENTS: %d\n", pVDX.Extents[0].DiskNumber);
-		}
-        
-        
-        
-        
-        
-        CloseHandle(hDevice);
-        return result;
+	
+	//method 2----------------------------------------------------------------------------
+	/*VOLUME_DISK_EXTENTS pVDX;  
+	DWORD dwRetSize;  
+	memset(&pVDX, 0, sizeof(VOLUME_DISK_EXTENTS));  
+	if(DeviceIoControl(hDevice,        IOCTL_VOLUME_GET_VOLUME_DISK_EXTENTS, NULL, 0, &pVDX, sizeof(VOLUME_DISK_EXTENTS), &dwRetSize, NULL)) 
+	{
+		//result=pVDX.Extents[0].DiskNumber;  
+		printf("VOLUME_GET_VOLUME_DISK_EXTENTS: %d\n", pVDX.Extents[0].DiskNumber);
+	}*/
+
+	CloseHandle(hDevice);
+	return result;
 }
 
 /*
