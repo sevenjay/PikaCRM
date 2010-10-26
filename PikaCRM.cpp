@@ -99,7 +99,7 @@ void PikaCRM::Initial()
 			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
 			{
 				SysLog.Info("config: application is running on different PC\n");
-				if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::EXIT);
+				if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::NONE);
 			}
 			//else
 			//	;//just using mConfig.Password;
@@ -107,7 +107,7 @@ void PikaCRM::Initial()
 		else//not Remember PW 
 		{
 			SysLog.Info("config: Not Remeber the PW\n");
-			if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::EXIT);
+			if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::NONE);
 		}
 		mSplash.ShowSplash();
 	}
@@ -127,7 +127,7 @@ void PikaCRM::Initial()
 		SysLog.Info("setup the database file\n");
 		mSplash.HideSplash();
 		FirstWelcome();
-		if(!IsSetupDB(config_file_path)) throw ApExc("user cancel").SetHandle(ApExc::EXIT);
+		if(!IsSetupDB(config_file_path)) throw ApExc("user cancel").SetHandle(ApExc::NONE);
 		mSplash.ShowSplash();
 		mSplash.ShowSplashStatus(t_("Creating the database..."));
 		SysLog.Info(t_("Creating the database..."))<<"\n";;
@@ -1765,7 +1765,7 @@ void PikaCRM::FirstWelcome()
 		;//do nothing		
 	}
 	else{
-		throw ApExc("user cancel").SetHandle(ApExc::EXIT);
+		throw ApExc("user cancel").SetHandle(ApExc::NONE);
 	}
 }
 void PikaCRM::ChackAgree(Option * agree)
