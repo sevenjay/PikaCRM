@@ -236,12 +236,12 @@ BOOL DoIDENTIFY (HANDLE, PSENDCMDINPARAMS, PSENDCMDOUTPARAMS, BYTE, BYTE,
 #define  MAX_IDE_DRIVES  16
 
 
-int ReadPhysicalDriveInNTWithAdminRights (void)
+int ReadPhysicalDriveInNTWithAdminRights (int drive)
 {
    int done = FALSE;
-   int drive = 0;
+   //int drive = 0;
 
-   for (drive = 0; drive < MAX_IDE_DRIVES; drive++)
+   //for (drive = 0; drive < MAX_IDE_DRIVES; drive++)
    {
       HANDLE hPhysicalDriveIOCTL = 0;
 
@@ -413,12 +413,12 @@ typedef struct _IDENTIFY_DATA {
 
 
 
-int ReadPhysicalDriveInNTUsingSmart (void)
+int ReadPhysicalDriveInNTUsingSmart (int drive)
 {
    int done = FALSE;
-   int drive = 0;
+   //int drive = 0;
 
-   for (drive = 0; drive < MAX_IDE_DRIVES; drive++)
+   //for (drive = 0; drive < MAX_IDE_DRIVES; drive++)
    {
       HANDLE hPhysicalDriveIOCTL = 0;
 
@@ -828,12 +828,12 @@ char * flipAndCodeBytes (const char * str,
 
 
 
-int ReadPhysicalDriveInNTWithZeroRights (void)
+int ReadPhysicalDriveInNTWithZeroRights (int drive)
 {
    int done = FALSE;
-   int drive = 0;
+   //int drive = 0;
 
-   for (drive = 0; drive < MAX_IDE_DRIVES; drive++)
+   //for (drive = 0; drive < MAX_IDE_DRIVES; drive++)
    {
       HANDLE hPhysicalDriveIOCTL = 0;
 
@@ -1289,7 +1289,7 @@ char *ConvertToString (DWORD diskdata [256],
 
 
 
-char * gGetHardDriveSerialNumber (char * buffer)
+char * gGetHardDriveSerialNumber (int drive, char * buffer)
 {
 	int done = FALSE;
 
@@ -1304,7 +1304,7 @@ char * gGetHardDriveSerialNumber (char * buffer)
 		if ( ! done)
 		{
 			SysLog.Debug("reading the HD using physical access with admin rights\n");
-			done = ReadPhysicalDriveInNTWithAdminRights ();
+			done = ReadPhysicalDriveInNTWithAdminRights (drive);
 		}
 		
 		//  this works under WinNT4 or Win2K or WinXP if you have any rights
@@ -1315,7 +1315,7 @@ char * gGetHardDriveSerialNumber (char * buffer)
 		if ( ! done)
 		{
 			SysLog.Debug("reading the HD using physical access with zero rights\n");
-			done = ReadPhysicalDriveInNTWithZeroRights ();
+			done = ReadPhysicalDriveInNTWithZeroRights (drive);
 		}
 		
 		//  this works under WinNT4 or Win2K or WinXP or Windows Server 2003 or Vista if you have any rights
@@ -1326,7 +1326,7 @@ char * gGetHardDriveSerialNumber (char * buffer)
 		if ( ! done)
 		{
 			SysLog.Debug("reading the HD using Smart\n");
-			done = ReadPhysicalDriveInNTUsingSmart ();
+			done = ReadPhysicalDriveInNTUsingSmart (drive);
 		}
 
 		//  this should work in WinNT or Win2K if previous did not work

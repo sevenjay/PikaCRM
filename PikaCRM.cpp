@@ -1686,10 +1686,10 @@ String PikaCRM::GetSystemKey()
 
 #elif defined(PLATFORM_WIN32)
 	String path=GetExeFilePath();
-	int x=gGetPhysicalDeviceID('f');
-	SysLog.Debug("id: ")<<x<<"\n";
+	int driveID=gGetPhysicalDeviceID(path[0]);
+	SysLog.Debug("driveID: ")<<driveID<<"\n";
 	char buf[1024]={};
-	char * sn = gGetHardDriveSerialNumber (buf);
+	char * sn = gGetHardDriveSerialNumber (driveID, buf);
 	output=sn;
 #endif
 
