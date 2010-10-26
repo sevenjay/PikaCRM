@@ -186,6 +186,8 @@ void PikaCRM::SetupUI()
 	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
 	CtrlLayout(Preference);
 	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));	
+	CtrlLayout(Help);
+	MainFrom.tabMain.Add(Help.SizePos(), t_("Help"));	
 	//end TabCtrl------------------------------------------------------------------------
 	//set icon---------------------------------------------------------------------------
 	int imageh=SrcImages::CustomerAdd().GetHeight();
@@ -472,6 +474,12 @@ void PikaCRM::SetupUI()
 	Preference.btnSave <<= THISBACK(SavePreference);
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
 	
+	//Help Tab-----------------------------------------------------------------------
+	Topic t = GetTopic("PikaCRM/srcdoc/About$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
+	if (t.text.IsEmpty()) {
+		t = GetTopic("PikaCRM/srcdoc/About$");
+	}	
+	Help.About.SetQTF(t);
 	
 	//WithImportLayout<TopWindow> Import;------------------------------------------------------------
 	CtrlLayoutOKCancel(Import,t_("Import File"));

@@ -181,6 +181,7 @@ private :
 	WithOrderLayout<ParentCtrl> Order;
 	WithMerchandiseLayout<ParentCtrl> Merchandise;
 	WithPreferenceLayout<ParentCtrl> Preference;
+	WithHelpLayout<ParentCtrl> Help;
 	
 	WithImportLayout<TopWindow> Import;
 
