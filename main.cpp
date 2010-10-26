@@ -12,8 +12,8 @@ try
 	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
 	
 	PikaCRM pikaCRM;
-	SysLog.Open(GetExeTitle());
-	SetVppLogName(pikaCRM.GetLogPath());	
+	SetVppLogName(pikaCRM.GetLogPath());
+	SysLog.Open(GetExeTitle());	
 #ifdef _DEBUG
 	SysLog.SetLevels(SystemLog::LALLDEBUG);// enables all log levels
 #else
@@ -46,7 +46,7 @@ try
 	SysLog.EnableSysLog(false);
 
 	SysLog(SystemLog::LDEBUG) << "Start logging\n";
-	
+	//SysLog(SystemLog::LDEBUG) << _WIN32_WINNT;
 	pikaCRM.Initial();
 	pikaCRM.OpenMainFrom();
 	

@@ -195,8 +195,8 @@ void PikaCRM::SetupUI()
 	int btnRectH=Customer.btnCreate.GetRect().Height()-Ctrl::VertLayoutZoom(6);//6 for 2 x sapce(3), define in Button::Paint
 	int scale=imageh;
 	if(imageh+fonth>btnRectH) //scale image
-		scale=btnRectH-Ctrl::VertLayoutZoom(fonth);
-		//Ctrl::VertLayoutZoom(fh) should be txtsz.cy
+		scale=btnRectH-fonth;
+		//fonth should be txtsz.cy
 		//Size txtsz = *text ? GetSmartTextSize(text, font, txtcx) : paintrect.GetStdSize();
 		//in LabelBase.cpp, but we can't, so whatever let it go.
 	

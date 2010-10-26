@@ -5,6 +5,28 @@
 
 using namespace Upp;
 
+//platform dependent---------------------------------------------------
+#ifdef PLATFORM_POSIX
+
+//#include <sys/ioctl.h>//for open
+//#include <sys/fcntl.h>
+//#include <linux/hdreg.h>
+
+#elif defined(PLATFORM_WIN32)
+/*
+Windows 7						_WIN32_WINNT_WIN7 (0x0601)
+Windows Server 2008				_WIN32_WINNT_WS08 (0x0600)
+Windows Vista					_WIN32_WINNT_VISTA (0x0600)
+Windows Server 2003 with SP1,
+		Windows XP with SP2		_WIN32_WINNT_WS03 (0x0502)
+Windows Server 2003, Windows XP	_WIN32_WINNT_WINXP (0x0501)
+Windows 2000					_WIN32_WINNT_WIN2K (0x0500)
+*/
+//#define WINVER 0x0501 //<--this must define before include <windef.h> in Mingw
+						//but it is included by <CtrlLib/CtrlLib.h>
+#endif
+//end platform dependent------------------------------------------------
+
 //useful library------------------------------------------------------
 #include <SystemLog/SystemLog.h>
 #include <SplashSV/splash-sv.h>						//this is   for Splash
@@ -23,21 +45,9 @@ using namespace Upp;
 #define LAYOUTFILE <PikaCRM/PikaCRM.lay>
 #include <CtrlCore/lay.h>
 
-//platform dependent---------------------------------------------------
-#ifdef PLATFORM_POSIX
-
-//#include <sys/ioctl.h>//for open
-//#include <sys/fcntl.h>
-//#include <linux/hdreg.h>
-
-#elif defined(PLATFORM_WIN32)
-
-#endif
-//end platform dependent------------------------------------------------
-
 
 #define SOFTWARE_NAME					"PikaCRM"
-#define SOFTWARE_VERSION				"0.8"
+#define SOFTWARE_VERSION				"0.9"
 #define DATABASE_VERSION				"1"
 #define BUILD_DATE						Date(2010, 9, 1)
 
