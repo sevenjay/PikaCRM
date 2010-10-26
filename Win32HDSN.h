@@ -1301,22 +1301,13 @@ char * gGetHardDriveSerialNumber (char * buffer)
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using physical access with admin rights\n");
 #endif
-		SysLog.Debug("reading the HD using physical access with admin rights\n");
-		done = ReadPhysicalDriveInNTWithAdminRights ();
-
-			//  this should work in WinNT or Win2K if previous did not work
-			//  this is kind of a backdoor via the SCSI mini port driver into
-			//     the IDE drives
-#ifdef PRINTING_TO_CONSOLE_ALLOWED
-		printf ("\n--------------------------------------------------------------------\n");
-		printf ("\nTrying to read the drive IDs using the SCSI back door\n");
-#endif
 		if ( ! done)
 		{
-			SysLog.Debug("reading the HD using the SCSI back door\n");
-			done = ReadIdeDriveAsScsiDriveInNT ();
+			SysLog.Debug("reading the HD using physical access with admin rights\n");
+			done = ReadPhysicalDriveInNTWithAdminRights ();
 		}
-		  //  this works under WinNT4 or Win2K or WinXP if you have any rights
+		
+		//  this works under WinNT4 or Win2K or WinXP if you have any rights
 #ifdef PRINTING_TO_CONSOLE_ALLOWED
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using physical access with zero rights\n");
@@ -1326,7 +1317,8 @@ char * gGetHardDriveSerialNumber (char * buffer)
 			SysLog.Debug("reading the HD using physical access with zero rights\n");
 			done = ReadPhysicalDriveInNTWithZeroRights ();
 		}
-		  //  this works under WinNT4 or Win2K or WinXP or Windows Server 2003 or Vista if you have any rights
+		
+		//  this works under WinNT4 or Win2K or WinXP or Windows Server 2003 or Vista if you have any rights
 #ifdef PRINTING_TO_CONSOLE_ALLOWED
 		printf ("\n--------------------------------------------------------------------\n");
 		printf ("\nTrying to read the drive IDs using Smart\n");
@@ -1335,6 +1327,19 @@ char * gGetHardDriveSerialNumber (char * buffer)
 		{
 			SysLog.Debug("reading the HD using Smart\n");
 			done = ReadPhysicalDriveInNTUsingSmart ();
+		}
+
+		//  this should work in WinNT or Win2K if previous did not work
+		//  this is kind of a backdoor via the SCSI mini port driver into
+		//     the IDE drives
+#ifdef PRINTING_TO_CONSOLE_ALLOWED
+		printf ("\n--------------------------------------------------------------------\n");
+		printf ("\nTrying to read the drive IDs using the SCSI back door\n");
+#endif
+		if ( ! done)
+		{
+			SysLog.Debug("reading the HD using the SCSI back door\n");
+			done = ReadIdeDriveAsScsiDriveInNT ();
 		}
 
 
