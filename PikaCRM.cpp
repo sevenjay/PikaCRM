@@ -484,6 +484,7 @@ void PikaCRM::SetupUI()
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
 	
 	//Help Tab-----------------------------------------------------------------------
+	Help.btnLicense << THISBACK(ShowLicense);
 	String lan = ToLower(LNGAsText(mConfig.Language & 0xfffff));
 	Topic about = GetTopic("PikaCRM/srcdoc/About$"+lan);
 	if (about.text.IsEmpty()) {
@@ -2818,6 +2819,30 @@ void PikaCRM::SavePreference()
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	SaveConfig(config_file_path);
 	PromptOK(t_("The setting has been saved and will take effect the next time you start this application."));
+}
+
+void PikaCRM::ShowLicense()
+{
+	//UI--------------------------------------------
+	TopWindow d;
+	Button ok;
+	RichTextView license;
+	
+	d.Title(t_("License")).SetRect(0, 0, 600, 550);
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(500, 45).TopPosZ(445, 24));
+	ok.Ok() <<= d.Acceptor(IDOK);
+
+	Topic t = GetTopic("PikaCRM/srcdoc/License$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
+	if (t.text.IsEmpty()) {
+		t = GetTopic("PikaCRM/srcdoc/License$");
+	}	
+	license.SetQTF(t);
+
+	d.Add(license.LeftPosZ(5, 540).TopPosZ(5, 435));
+	//end UI--------------------------------------------
+	if(d.Run()==IDOK) {
+		;
+	}	
 }
 //end interactive with GUI==========================================================
 //private utility-------------------------------------------------------------------

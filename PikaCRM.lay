@@ -211,6 +211,6 @@ LAYOUT(HelpLayout, 740, 476)
 	ITEM(LabelBox, dv___0, SetLabel(t_("About PikaCRM")).LeftPosZ(8, 452).TopPosZ(4, 464))
 	ITEM(RichTextView, About, AutoHideSb(true).LeftPosZ(16, 436).TopPosZ(20, 440))
 	ITEM(RichTextCtrl, Link, LeftPosZ(468, 252).TopPosZ(12, 152))
-	ITEM(Button, dv___3, SetLabel(t_("License")).LeftPosZ(472, 56).TopPosZ(444, 24))
+	ITEM(Button, btnLicense, SetLabel(t_("License")).LeftPosZ(472, 56).TopPosZ(444, 24))
 END_LAYOUT
 
