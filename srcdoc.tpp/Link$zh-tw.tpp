@@ -1,4 +1,4 @@
-topic "回報錯誤";
+topic "連結";
 [ $$0,0#00000000000000000000000000000000:Default]
 [{_}%ZH-TW 
 [s0; [^http`:`/`/pika`.sevenjay`.tw`/zh`-hant`/node`/add`/forum`/2^2 回報軟體錯誤
