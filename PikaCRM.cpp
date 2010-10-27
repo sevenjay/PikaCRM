@@ -475,11 +475,19 @@ void PikaCRM::SetupUI()
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
 	
 	//Help Tab-----------------------------------------------------------------------
-	Topic t = GetTopic("PikaCRM/srcdoc/About$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
-	if (t.text.IsEmpty()) {
-		t = GetTopic("PikaCRM/srcdoc/About$");
+	String lan = ToLower(LNGAsText(mConfig.Language & 0xfffff));
+	Topic about = GetTopic("PikaCRM/srcdoc/About$"+lan);
+	if (about.text.IsEmpty()) {
+		about = GetTopic("PikaCRM/srcdoc/About$");
 	}	
-	Help.About.SetQTF(t);
+	Help.About.SetQTF(about);
+	
+	Topic link = GetTopic("PikaCRM/srcdoc/Link$"+lan);
+	if (link.text.IsEmpty()) {
+		link = GetTopic("PikaCRM/srcdoc/Link$");
+	}	
+	Help.Link.SetQTF(link);
+	Help.Link.Tip("http");
 	
 	//WithImportLayout<TopWindow> Import;------------------------------------------------------------
 	CtrlLayoutOKCancel(Import,t_("Import File"));
