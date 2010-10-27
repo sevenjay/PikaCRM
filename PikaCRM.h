@@ -47,9 +47,9 @@ Windows 2000					_WIN32_WINNT_WIN2K (0x0500)
 
 
 #define SOFTWARE_NAME					"PikaCRM"
-#define SOFTWARE_VERSION				"0.9"
+#define SOFTWARE_VERSION				"1.0 beta1"
 #define DATABASE_VERSION				"1"
-#define BUILD_DATE						Date(2010, 9, 1)
+#define BUILD_DATE						Date(2010, 10, 27)
 
 #define PW_MAGIC_WORD					"sevenjay777"
 #define PW_EMPTY						getMD5(PW_MAGIC_WORD) //avoid clear config file pw hack

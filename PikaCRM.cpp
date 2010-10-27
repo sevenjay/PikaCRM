@@ -480,6 +480,9 @@ void PikaCRM::SetupUI()
 	if (about.text.IsEmpty()) {
 		about = GetTopic("PikaCRM/srcdoc/About$");
 	}	
+	about.text=Replace(about.text,"##SoftwareVersion",SOFTWARE_VERSION);
+	about.text=Replace(about.text,"##DatabaseVersion",DATABASE_VERSION);
+	about.text=Replace(about.text,"##BuildDate",Format(BUILD_DATE));
 	Help.About.SetQTF(about);
 	
 	Topic link = GetTopic("PikaCRM/srcdoc/Link$"+lan);
