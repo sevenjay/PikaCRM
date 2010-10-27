@@ -92,8 +92,17 @@ void PikaCRM::Initial()
 		{
 			SysLog.Info("config: Remeber the PW\n");
 			String syskey=GetSystemKey();
-			if( syskey.IsEmpty() ) PromptOK( t_("The function of \"Remeber the password\" is not work.&"
-												"To make it active, please excute \"hdsn`_permit.sh\" for getting hard disk serial number."));
+			if( syskey.IsEmpty() )
+			{
+				String msg = t_("The function of \"Remeber the password\" is not work.");
+			#ifdef PLATFORM_POSIX
+				PromptOK( msg + "&" +
+					t_("To make it active, please excute \"hdsn`_permit.sh\" for PikaCRM to get reading hard disk serial number permission."));
+			#elif defined(PLATFORM_WIN32)
+				PromptOK( msg + "&" +
+					t_("To make it active, please give PikaCRM the permission to reading hard disk serial number."));			
+			#endif
+			}
 			String key=CombineKey(syskey, mConfig.Password);
 			SysLog.Debug("systemPWKey:"+key+"\n");
 			if(mConfig.SystemPWKey.IsEmpty() || key!=mConfig.SystemPWKey)//use different PC
@@ -425,7 +434,7 @@ void PikaCRM::SetupUI()
 	Order.dlFilter.Add(t_("All"));//0
 	Order.dlFilter.Add(t_("Past year"));//1
 	Order.dlFilter.Add(t_("Past half year"));//2
-	Order.dlFilter.Add(t_("Past 2 month"));//3
+	Order.dlFilter.Add(t_("Past 2 months"));//3
 	Order.dlFilter.Add(t_("Past month"));//4
 	Order.dlFilter.SetIndex(mConfig.OrderFilter);
 	Order.btnFilterSet <<= THISBACK(OrderFilterSet);
@@ -490,7 +499,6 @@ void PikaCRM::SetupUI()
 		link = GetTopic("PikaCRM/srcdoc/Link$");
 	}	
 	Help.Link.SetQTF(link);
-	Help.Link.Tip("http");
 	
 	//WithImportLayout<TopWindow> Import;------------------------------------------------------------
 	CtrlLayoutOKCancel(Import,t_("Import File"));
@@ -555,8 +563,8 @@ void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 	Button ok, cancel;
 
 	d.Title(t_("Create a custom field")).SetRect(0, 0, Ctrl::HorzLayoutZoom(180), Ctrl::VertLayoutZoom(80));
-	d.Add(ok.SetLabel("OK").LeftPosZ(20, 45).TopPosZ(50, 16));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(100, 45).TopPosZ(50, 16));
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(20, 45).TopPosZ(50, 16));
+	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(100, 45).TopPosZ(50, 16));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -571,7 +579,7 @@ void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 		grid->Ready(false);
 		
 		is_no_field=true;
-		for(int i=0; i<mFieldMap.Get(f_table).GetCount(); ++i){ ///@todo there is a magic number 9
+		for(int i=0; i<mFieldMap.Get(f_table).GetCount(); ++i){
 			FieldId & field=mFieldMap.Get(f_table)[i];//"c" [0] is FieldId with C_0
 			if(false==field.IsUsed){
 				is_no_field=false;
@@ -603,7 +611,7 @@ void PikaCRM::CreateField(GridCtrl * grid, String f_table)
 			
 		grid->Ready(true);
 		
-		if(is_no_field) Exclamation("There is no more customer field!");
+		if(is_no_field) Exclamation(t_("There is no more column for custom field."));
 	}
 }
 void PikaCRM::ModifyField(GridCtrl * grid, String f_table)
@@ -1817,7 +1825,7 @@ String PikaCRM::GetSystemKey()
 		//throw ApExc(output+"\n").SetHandle(ApExc::SYS_FAIL);
 	}
 	
-	SysLog.Debug(output+"\n");
+	SysLog.Debug("System key: "+key+"\n");
 	return key;
 }
 
