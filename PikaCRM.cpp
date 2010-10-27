@@ -488,7 +488,7 @@ void PikaCRM::SetupUI()
 	String lan = ToLower(LNGAsText(mConfig.Language & 0xfffff));
 	Topic about = GetTopic("PikaCRM/srcdoc/About$"+lan);
 	if (about.text.IsEmpty()) {
-		about = GetTopic("PikaCRM/srcdoc/About$");
+		about = GetTopic("PikaCRM/srcdoc/About$en-us");
 	}	
 	about.text=Replace(about.text,"##SoftwareVersion",SOFTWARE_VERSION);
 	about.text=Replace(about.text,"##DatabaseVersion",DATABASE_VERSION);
@@ -497,7 +497,7 @@ void PikaCRM::SetupUI()
 	
 	Topic link = GetTopic("PikaCRM/srcdoc/Link$"+lan);
 	if (link.text.IsEmpty()) {
-		link = GetTopic("PikaCRM/srcdoc/Link$");
+		link = GetTopic("PikaCRM/srcdoc/Link$en-us");
 	}	
 	Help.Link.SetQTF(link);
 	
@@ -1899,7 +1899,7 @@ void PikaCRM::FirstWelcome()
 
 	Topic t = GetTopic("PikaCRM/srcdoc/License$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
 	if (t.text.IsEmpty()) {
-		t = GetTopic("PikaCRM/srcdoc/License$");
+		t = GetTopic("PikaCRM/srcdoc/License$en-us");
 	}	
 	d.License.SetQTF(t);
 	
@@ -2828,13 +2828,13 @@ void PikaCRM::ShowLicense()
 	Button ok;
 	RichTextView license;
 	
-	d.Title(t_("License")).SetRect(0, 0, 600, 550);
-	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(500, 45).TopPosZ(445, 24));
+	d.Title(t_("License")).SetRect( 0, 0, Ctrl::HorzLayoutZoom(600), Ctrl::VertLayoutZoom(550));
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(500, 45).TopPosZ(445, 24));///@todo fix layout
 	ok.Ok() <<= d.Acceptor(IDOK);
 
 	Topic t = GetTopic("PikaCRM/srcdoc/License$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
 	if (t.text.IsEmpty()) {
-		t = GetTopic("PikaCRM/srcdoc/License$");
+		t = GetTopic("PikaCRM/srcdoc/License$en-us");
 	}	
 	license.SetQTF(t);
 

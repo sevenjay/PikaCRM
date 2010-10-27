@@ -18,16 +18,8 @@ TOPIC("Splash$zh-tw")
 #include "Splash$zh-tw.tppi"
 END_TOPIC
 
-TOPIC("License$")
-#include "License$.tppi"
-END_TOPIC
-
 TOPIC("Link$zh-tw")
 #include "Link$zh-tw.tppi"
-END_TOPIC
-
-TOPIC("Link$")
-#include "Link$.tppi"
 END_TOPIC
 
 TOPIC("About$zh-tw")
@@ -36,10 +28,6 @@ END_TOPIC
 
 TOPIC("About$zh-cn")
 #include "About$zh-cn.tppi"
-END_TOPIC
-
-TOPIC("About$")
-#include "About$.tppi"
 END_TOPIC
 
 TOPIC("Splash$")
