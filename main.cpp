@@ -6,13 +6,13 @@
 
 GUI_APP_MAIN
 {	
-	RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log //this is must for log.old bug
+	//RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log //this is must for log.old bug
 try
 {
 	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
 	
 	PikaCRM pikaCRM;
-	SetVppLogName(pikaCRM.GetLogPath());
+	FirstSetVppLogName(pikaCRM.GetLogPath());
 	SysLog.Open(GetExeTitle());	
 #ifdef _DEBUG
 	SysLog.SetLevels(SystemLog::LALLDEBUG);// enables all log levels
