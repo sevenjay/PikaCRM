@@ -68,7 +68,7 @@ catch(ApExc & e)
 catch(...)
 {	//can not do anything
 	String what= t_("Sorry, there is an unknown error.\n"
-					"If it always happens, you can report to xxxweb with the log and last error:\n")
+					"If it always happens, you can report to our web site (Help->Report bugs) with the log and last error:\n")
 				+GetLastErrorMessage();
 	Exclamation("[* " + DeQtfLf(what) + "]");
 }

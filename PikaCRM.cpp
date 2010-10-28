@@ -1386,7 +1386,7 @@ void PikaCRM::OpenMainFrom()
 		mSplash.HideSplash();
 		SysLog.Error(e+"\n");
 		Exclamation( t_("There is a database operation error.\n"
-						"If data is not correct, please report to xxxweb with the log and last error: \n")
+						"If data is not correct, please report to our web site (Help->Report bugs) with the log and last error: \n")
 						+ SQL.GetLastError());
 	}
 	
@@ -1925,9 +1925,9 @@ void PikaCRM::CustomerGridContactBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.Title("Select contacts (Multiple select)").SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
+    d.Title(t_("Select contacts (Multiple select)")).SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -2016,9 +2016,9 @@ void PikaCRM::EventGridCustomerBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.Title("Select one customer").SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
+    d.Title(t_("Select one customer")).SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -2086,8 +2086,8 @@ void PikaCRM::EventNewStatusClick()
 	Button ok, cancel;
 
 	d.Title(t_("New status")).SetRect(0, 0, 300, 150);
-	d.Add(ok.SetLabel("OK").LeftPosZ(20, 45).TopPosZ(50, 16));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(100, 45).TopPosZ(50, 16));
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(20, 45).TopPosZ(50, 16));
+	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(100, 45).TopPosZ(50, 16));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -2109,9 +2109,9 @@ void PikaCRM::OrderGridCustomerBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.Title("Select one customer").SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
+    d.Title(t_("Select one customer")).SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -2186,9 +2186,9 @@ void PikaCRM::BuyItemGridMerchBtnClick()
 	TopWindow d;
 	Button ok, cancel;
 
-    d.Title("Select one product").SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel("OK").LeftPosZ(40, 64).BottomPosZ(12, 24));
-	d.Add(cancel.SetLabel("Cancel").LeftPosZ(130, 64).BottomPosZ(12, 24));
+    d.Title(t_("Select one product")).SetRect(0, 0, 400, 400);
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(40, 64).BottomPosZ(12, 24));
+	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
 	cancel.Cancel() <<= d.Rejector(IDCANCEL);
 	
@@ -2829,7 +2829,7 @@ void PikaCRM::ShowLicense()
 	RichTextView license;
 	
 	d.Title(t_("License")).SetRect( 0, 0, Ctrl::HorzLayoutZoom(600), Ctrl::VertLayoutZoom(550));
-	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(500, 45).TopPosZ(445, 24));///@todo fix layout
+	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(550, 45).TopPosZ(520, 24));///@todo fix layout
 	ok.Ok() <<= d.Acceptor(IDOK);
 
 	Topic t = GetTopic("PikaCRM/srcdoc/License$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
@@ -2838,7 +2838,7 @@ void PikaCRM::ShowLicense()
 	}	
 	license.SetQTF(t);
 
-	d.Add(license.LeftPosZ(5, 540).TopPosZ(5, 435));
+	d.Add(license.LeftPosZ(5, 590).TopPosZ(5, 510));
 	//end UI--------------------------------------------
 	if(d.Run()==IDOK) {
 		;
