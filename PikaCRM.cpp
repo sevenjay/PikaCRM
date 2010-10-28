@@ -316,7 +316,7 @@ void PikaCRM::SetupUI()
 	Contact.Grid.Absolute();
 	Contact.Grid.AddIndex(CO_ID);
 	Contact.Grid.AddColumn(CO_NAME,t_("Name_")).Edit(coesn).Width(mConfig.COWidth.Get(~CO_NAME));
-	Contact.Grid.AddIndex(C_ID);
+	Contact.Grid.AddIndex(C_ID).Default(-1);
 	Contact.Grid.AddColumn(C_TITLE,t_("Customer")).Width(mConfig.COWidth.Get(~C_TITLE));
 	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1).Width(mConfig.COWidth.Get(~CO_PHONE));
 	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2).Width(mConfig.COWidth.Get(~CO_ADDRESS));
@@ -821,11 +821,11 @@ void PikaCRM::RemoveCustomer()
 		{
 			int contact_id=contact_map.GetKey(i);
 			
-			SQL.ExecuteX("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+			SQL.ExecuteX("UPDATE main.Contact SET c_id = -1 WHERE co_id = ?;", contact_id);
 			//clear Contact.Grid(C_TITLE);
 			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 			Contact.Grid.Set(contact_row,C_TITLE,"");
-			Contact.Grid.Set(contact_row,C_ID,NULL);//there is no use for Contact.Grid.Set(C_ID,NULL) with ever set some data	
+			Contact.Grid.Set(contact_row,C_ID,-1);//there is no use for Contact.Grid.Set(C_ID,NULL) with ever set some data	
 		}
 	}
 	catch(SqlExc &e)
@@ -898,7 +898,7 @@ void PikaCRM::UpdateContact()
 			.Where(CO_ID == Contact.Grid(CO_ID));
 			
 		//UpdateCustomerContact2(Contact.Grid(C_ID));----------------------------
-		if(Contact.Grid(C_ID).IsNull()) return;
+		if(-1==Contact.Grid(C_ID)) return;
 		
 		int customer_id=Contact.Grid(C_ID);
 		int customer_row=Customer.Grid.Find(customer_id,C_ID);
@@ -926,7 +926,7 @@ void PikaCRM::RemoveContact()
 		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
 	
 		//UpdateCustomerContact1(Contact.Grid(C_ID));----------------------------
-		if( Contact.Grid(C_ID).IsNull() || -1==Contact.Grid(C_ID) ) return;
+		if( -1==Contact.Grid(C_ID) ) return;
 		
 		int customer_id=Contact.Grid(C_ID);
 		int customer_row=Customer.Grid.Find(customer_id,C_ID);
@@ -1953,7 +1953,7 @@ void PikaCRM::CustomerGridContactBtnClick()
 try
 {
 	//add no costomer contact to select
-	SQL & Select(CO_ID, CO_NAME).From(CONTACT).Where(IsNull(C_ID));
+	SQL & Select(CO_ID, CO_NAME).From(CONTACT).Where(C_ID==-1);
 	while(SQL.Fetch())
 		list.Add(SQL[CO_ID], SQL[CO_NAME],true);
 	
@@ -1966,12 +1966,12 @@ try
 			int contact_id=contact_map.GetKey(i);
 
 			//SQL & ::Update(CONTACT) (C_ID, NULL).Where(CO_ID == contact_id);//fail, NULL will be 0
-			SQL.ExecuteX("UPDATE main.Contact SET c_id = NULL WHERE co_id = ?;", contact_id);
+			SQL.ExecuteX("UPDATE main.Contact SET c_id = -1 WHERE co_id = ?;", contact_id);
 				
 			//clear Contact.Grid(C_TITLE);
 			int contact_row=Contact.Grid.Find(contact_id,CO_ID);
 			Contact.Grid.Set(contact_row,C_TITLE,"");
-			Contact.Grid.Set(contact_row,C_ID,NULL);		
+			Contact.Grid.Set(contact_row,C_ID,-1);		
 		}
 		
 		VectorMap<int, String> new_contact_map;
