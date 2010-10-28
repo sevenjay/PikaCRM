@@ -965,7 +965,7 @@ void PikaCRM::LoadEvent()
 {
 	SysLog.Info("Load Events\n");
 	Event.Grid.Clear();
-	String sql ="select e_id, Event.c_id, c_title, e_ask, e_status, "
+	String sql ="select e_id, Event.c_id, Event.c_title, e_ask, e_status, "
 				"strftime('%m/%d/%Y %H:%M',e_rtime) as e_rtime, "
 				"strftime('%m/%d/%Y %H:%M',e_ctime) as e_ctime, "
 				"e_note from Event left outer join Customer on Event.c_id = Customer.c_id;";
@@ -982,6 +982,7 @@ void PikaCRM::InsertEvent()
 	{
 		SQL & Insert(EVENT)
 			(C_ID,		Event.Grid(C_ID))
+			(C_TITLE,	Event.Grid(C_TITLE))
 			(E_ASK,		Event.Grid(E_ASK))
 			(E_STATUS,  Event.Grid(E_STATUS))
 			(E_RTIME,	Event.Grid(E_RTIME))
@@ -1003,6 +1004,7 @@ void PikaCRM::UpdateEvent()
 	{
 		SQL & ::Update(EVENT)
 			(C_ID,		Event.Grid(C_ID))
+			(C_TITLE,	Event.Grid(C_TITLE))
 			(E_ASK,		Event.Grid(E_ASK))
 			(E_STATUS,  Event.Grid(E_STATUS))
 			(E_RTIME,	Event.Grid(E_RTIME))
@@ -1129,7 +1131,7 @@ void PikaCRM::LoadOrder()
 {
 	SysLog.Info("Load Orders\n");
 	Order.Grid.Clear();
-	String sql ="select o_id, Orders.c_id, c_title, o_ship_add, o_bill_add, "
+	String sql ="select o_id, Orders.c_id, Orders.c_title, o_ship_add, o_bill_add, "
 				"strftime('%m/%d/%Y',o_order_date) as o_order_date, "
 				"strftime('%m/%d/%Y',o_ship_date) as o_ship_date, "
 				"o_status, o_note from Orders left outer join Customer on Orders.c_id = Customer.c_id";
@@ -1198,6 +1200,7 @@ void PikaCRM::InsertOrder()
 	{
 		SQL & Insert(ORDERS)
 			(C_ID,	Order.Grid(C_ID))
+			(C_TITLE,	Order.Grid(C_TITLE))
 			(O_SHIP_ADD,	Order.Grid(O_SHIP_ADD))
 			(O_BILL_ADD,	Order.Grid(O_BILL_ADD))
 			(O_ORDER_DATE,	Order.Grid(O_ORDER_DATE))
@@ -1221,6 +1224,7 @@ void PikaCRM::UpdateOrder()
 	{
 		SQL & ::Update(ORDERS)
 			(C_ID,	Order.Grid(C_ID))
+			(C_TITLE,	Order.Grid(C_TITLE))
 			(O_SHIP_ADD,	Order.Grid(O_SHIP_ADD))
 			(O_BILL_ADD,	Order.Grid(O_BILL_ADD))
 			(O_ORDER_DATE,	Order.Grid(O_ORDER_DATE))
@@ -2064,7 +2068,7 @@ try
 				//update in the database
 				if(-1 != Event.Grid(E_ID))
 				{
-					SQL & ::Update(EVENT) (C_ID,  costomer_id).Where(E_ID == Event.Grid(E_ID));
+					SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
 				}
 			}
 		}
@@ -2155,7 +2159,7 @@ try{
 				//update in the database
 				if(-1 != Order.Grid(O_ID))
 				{
-					SQL & ::Update(ORDERS) (C_ID,  costomer_id).Where(O_ID == Order.Grid(O_ID));
+					SQL & ::Update(ORDERS) (C_ID, costomer_id) (C_TITLE,title).Where(O_ID == Order.Grid(O_ID));
 				}
 			}
 		}
