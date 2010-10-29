@@ -1,7 +1,7 @@
 topic "About (En)";
-[ $$0,0#00000000000000000000000000000000:Default]
+[G+117 $$0,0#00000000000000000000000000000000:Default]
 [{_}%EN-US 
-[s0;l96; [G 
+[s0;l96; 
 @@image:2925&1000
 ŠƒÔ €€€€€€€€€€ø‡œí‡ô–ÅÃ÷ÿŸ‚‘‚‚ÜÀˆ¡Ç„š ÚÄßúï¢¹½«ÍŠ€Ô—Â‘–ÊèÁ¤‰¾ô‚ˆˆ¨Ê ‘Áú—”À
 £¤÷’‚¡Á€®ş÷Ÿ½¿¹˜ûææ÷™ıÚ¸¢ş¿Çãá¼åÙé»³÷îÌÜ¹÷Õ«€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€
@@ -144,14 +144,14 @@ topic "About (En)";
 İ’ĞíÜ¹óÅùŠ•óåÊ¥…¿ËñòòÊšµŠë±âÅš·îœ¼öìØƒ‡ƒâÄœ€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€
 €€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€€
 €€€€€€€€Œ µóÿ€ÿ»¼”
-]&]
+&]
 [s0;l96; copyright Â© 2010 sevenjay. All rights reserved&]
 [s0;l96; Software Ver.  ##SoftwareVersion  ##BuildDate&]
 [s0;l96; Database Ver. ##DatabaseVersion&]
 [s0;l96; &]
 [s0;l96; Beta version with full function&]
 [s0;l96; &]
-[ {{2134:7866<64;>544; [s0;l96; Web]
+[ {{2262:7738<64;>96; [s0;l96; Web]
 :: [s0;l96; [^http`:`/`/pika`.sevenjay`.tw`/^ http://pika.sevenjay.tw/]]
 :: [s0;l96; Forum]
 :: [s0;l96; [^http`:`/`/pika`.sevenjay`.tw`/forum^ http://pika.sevenjay.tw/forum]]
@@ -159,7 +159,7 @@ topic "About (En)";
 :: [s0;l96; [^mailto`:job`@sevenjay`.tw^ job`@sevenjay.tw]]}}&]
 [s0;l96; &]
 [s0;l96; We use these useful tools. We would like to thank the developers&]
-[ {{2134:7866<64;>544;h1;@(204) [s0;l96; Name]
+[ {{2262:7738<64;>96;h1;@(204) [s0;l96; Name]
 :: [s0;l96; Authors]
 ::@2 [s0;l96; [^http`:`/`/www`.ultimatepp`.org`/^ Ultimate`+`+]]
 :: [s0;l96; Mirek_FÃ­dler, Koldo_Ramirez, TomÃ¡Å¡_Rylek, [^http`:`/`/www`.digitalsoftware`.pl^ D

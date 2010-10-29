@@ -3,17 +3,17 @@ LAYOUT(PikaCRMLayout, 750, 500)
 END_LAYOUT
 
 LAYOUT(InitialDBLayout, 412, 228)
-	ITEM(Option, optPW, SetLabel(t_("Use password to encrypt your database.")).LeftPosZ(20, 240).TopPosZ(16, 16))
-	ITEM(RichTextCtrl, rtNoteEncrypted, LeftPosZ(36, 352).TopPosZ(36, 32))
-	ITEM(RichTextCtrl, rtNoteEncrypted2, LeftPosZ(36, 352).TopPosZ(64, 32))
-	ITEM(EditString, esPassword, MaxChars(16).SetEditable(false).WantFocus(false).LeftPosZ(148, 116).TopPosZ(96, 19))
-	ITEM(EditString, esCheckPassword, MaxChars(16).SetEditable(false).WantFocus(false).LeftPosZ(148, 116).TopPosZ(124, 19))
-	ITEM(Option, optRequire, SetLabel(t_("Require the user to enter this password when start.")).LeftPosZ(36, 292).TopPosZ(152, 16))
-	ITEM(Label, dv___6, SetLabel(t_("Re-Enter Password:")).LeftPosZ(36, 104).TopPosZ(124, 20))
-	ITEM(Label, dv___7, SetLabel(t_("Enter new Password:")).LeftPosZ(36, 100).TopPosZ(96, 20))
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(288, 24).BottomPosZ(20, 20))
-	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(164, 148).BottomPosZ(20, 20))
-	ITEM(Option, optRevealPW, SetLabel(t_("Reveal Passwords")).LeftPosZ(280, 108).TopPosZ(96, 20))
+	ITEM(Option, optPW, SetLabel(t_("Use password to encrypt your database.")).LeftPosZ(20, 240).TopPosZ(12, 16))
+	ITEM(RichTextCtrl, rtNoteEncrypted, NoSb(true).LeftPosZ(36, 368).TopPosZ(36, 32))
+	ITEM(RichTextCtrl, rtNoteEncrypted2, NoSb(true).LeftPosZ(36, 368).TopPosZ(68, 32))
+	ITEM(EditString, esPassword, MaxChars(16).SetEditable(false).WantFocus(false).LeftPosZ(148, 116).TopPosZ(104, 19))
+	ITEM(EditString, esCheckPassword, MaxChars(16).SetEditable(false).WantFocus(false).LeftPosZ(148, 116).TopPosZ(132, 19))
+	ITEM(Option, optRequire, SetLabel(t_("Require the user to enter this password when start.")).LeftPosZ(36, 292).TopPosZ(160, 16))
+	ITEM(Label, dv___6, SetLabel(t_("Re-Enter Password:")).LeftPosZ(36, 104).TopPosZ(132, 20))
+	ITEM(Label, dv___7, SetLabel(t_("Enter new Password:")).LeftPosZ(36, 100).TopPosZ(104, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(288, 24).BottomPosZ(12, 24))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(164, 148).BottomPosZ(12, 24))
+	ITEM(Option, optRevealPW, SetLabel(t_("Reveal Passwords")).LeftPosZ(280, 108).TopPosZ(104, 20))
 END_LAYOUT
 
 LAYOUT(InputPWLayout, 300, 120)
@@ -200,17 +200,17 @@ LAYOUT(ImportMatchLayout, 456, 220)
 END_LAYOUT
 
 LAYOUT(FirstWelcomeLayout, 412, 228)
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(8, 304).BottomPosZ(8, 20))
-	ITEM(Button, ok, SetLabel(t_("Next")).HSizePosZ(296, 16).BottomPosZ(8, 20))
-	ITEM(RichTextCtrl, License, SetFrame(FieldFrame()).LeftPosZ(8, 392).TopPosZ(60, 124))
-	ITEM(RichTextCtrl, Welcome, LeftPosZ(8, 392).TopPosZ(4, 56))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(8, 304).BottomPosZ(8, 24))
+	ITEM(Button, ok, SetLabel(t_("Next")).HSizePosZ(296, 16).BottomPosZ(8, 24))
+	ITEM(RichTextCtrl, License, SetFrame(FieldFrame()).LeftPosZ(8, 392).TopPosZ(40, 144))
+	ITEM(RichTextCtrl, Welcome, LeftPosZ(8, 392).TopPosZ(4, 36))
 	ITEM(Option, agree, SetLabel(t_("I accept")).LeftPosZ(224, 56).TopPosZ(200, 16))
 END_LAYOUT
 
 LAYOUT(HelpLayout, 740, 476)
 	ITEM(LabelBox, dv___0, SetLabel(t_("About PikaCRM")).LeftPosZ(8, 452).TopPosZ(4, 464))
 	ITEM(RichTextView, About, AutoHideSb(true).LeftPosZ(16, 436).TopPosZ(20, 440))
-	ITEM(RichTextCtrl, Link, LeftPosZ(468, 252).TopPosZ(12, 152))
+	ITEM(RichTextCtrl, Link, NoSb(true).LeftPosZ(468, 252).TopPosZ(12, 152))
 	ITEM(Button, btnLicense, SetLabel(t_("License")).LeftPosZ(472, 56).TopPosZ(444, 24))
 END_LAYOUT
 

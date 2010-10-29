@@ -1,5 +1,5 @@
 topic "About (Tw)";
-[G $$0,0#00000000000000000000000000000000:Default]
+[G+117 $$0,0#00000000000000000000000000000000:Default]
 [{_}%ZH-TW 
 [s0;l96; 
 @@image:2925&1000
@@ -151,7 +151,7 @@ topic "About (Tw)";
 [s0;l96; &]
 [s0;l96; 繁體中文介面免註冊完整功能版本。&]
 [s0;l96; &]
-[ {{2134:7866<64;>544; [s0;l96; 軟體首頁]
+[ {{2262:7738<64;>96; [s0;l96; 軟體首頁]
 :: [s0;l96; [^http`:`/`/pika`.sevenjay`.tw`/zh`-hant^ http://pika.sevenjay.tw/zh`-hant]]
 :: [s0;l96; 軟體論壇]
 :: [s0;l96; [^http`:`/`/pika`.sevenjay`.tw`/zh`-hant`/forum^ http://pika.sevenjay.tw/zh`-ha
@@ -160,7 +160,7 @@ nt/forum]]
 :: [s0;l96; [^mailto`:job`@sevenjay`.tw^ job`@sevenjay.tw]]}}&]
 [s0;l96; &]
 [s0;l96; 本軟體使用以下元件，感謝這些開發者無私分享&]
-[ {{2134:7866<64;>544;h1;@(204) [s0;l96; 名稱]
+[ {{2262:7738<64;>96;h1;@(204) [s0;l96; 名稱]
 :: [s0;l96; 作者]
 ::@2 [s0;l96; [^http`:`/`/www`.ultimatepp`.org`/^ Ultimate`+`+]]
 :: [s0;l96; Mirek_Fídler, Koldo_Ramirez, Tomáš_Rylek, [^http`:`/`/www`.digitalsoftware`.pl^ D

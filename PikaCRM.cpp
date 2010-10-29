@@ -1565,9 +1565,9 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	SysLog.Debug(" 11zh: ")<<StdFontZ(11);
 	SysLog.Debug(" 12zh: ")<<StdFontZ(12);
 	
-	note<<"[1G "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
+	note<<"[+75G "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
 	d.rtNoteEncrypted.SetQTF(note);
-	note2<<"[1G "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";	
+	note2<<"[+75G "<<t_("Important: if you forgot the password, there is no way to access your database.")<<" ]";	
 	d.rtNoteEncrypted2.SetQTF(note2);
 	
 	//Load from Config
@@ -1897,8 +1897,8 @@ void PikaCRM::FirstWelcome()
 	d.ok.WhenPush = THISBACK1(ChackAgree, &(d.agree));
 	d.cancel.Hide();
 	String note;
-	note<<"[2G "<<t_("Welcome to use PikaCRM")<<" &&]";
-	note<<"[1G "<<t_("You must agree the license to use")<<" ]";
+	note<<"[2G "<<t_("Welcome to use PikaCRM")<<" &]";
+	note<<"[+75G "<<t_("You must accept the license to use")<<" ]";
 	d.Welcome.SetQTF(note);
 
 	Topic t = GetTopic("PikaCRM/srcdoc/License$"+ ToLower(LNGAsText(mConfig.Language & 0xfffff)));
@@ -1916,7 +1916,7 @@ void PikaCRM::FirstWelcome()
 }
 void PikaCRM::ChackAgree(Option * agree)
 {
-	if(true!=agree->Get()) Exclamation(t_("You must agree the License."));
+	if(true!=agree->Get()) Exclamation(t_("You must accept the license to use"));
 }
 void PikaCRM::CustomerGridContactBtnClick()
 {
@@ -2525,7 +2525,7 @@ void PikaCRM::SetCsvGridData(GridCtrl * grid, Vector< Vector<String> > * griddat
 						if( IsNull( (*griddata)[i][(*match_map)[j]] ) )
 						{
 							String note;
-							note<<"[1G@3 "<<t_("There is a wrong data with red color and the data of the row can't be imported.")<<" ]";	
+							note<<"[+75G@3 "<<t_("There is a wrong data with red color and the data of the row can't be imported.")<<" ]";	
 							Import.rtWarning.SetQTF(note);
 							SysLog.Warning("The data of the row can't be imported. row:"+AsString(i)+"\n");
 						}
