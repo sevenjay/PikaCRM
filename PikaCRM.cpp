@@ -180,6 +180,9 @@ void PikaCRM::SetupUI()
 	MainFrom.WhenClose=THISBACK(CloseMainFrom);
 	MainFrom.Sizeable().Zoomable();
 	MainFrom.Title(t_("Pika Customer Relationship Management"));
+	MainFrom.Icon(SrcImages::Icon16());
+	MainFrom.LargeIcon(SrcImages::Icon32());
+	
 	
 	//TabCtrl----------------------------------------------------------------------------
 	//MainFrom.tabMain.WhenSet=THISBACK1(TabChange,MainFrom.tabMain.Get());
