@@ -153,7 +153,7 @@ public:
 class MultiButtonNotNULL : public MultiButton {
 	virtual Value GetData() const{
 		if(IsNull(Get()))
-			return ErrorValue(t_("Please select one customer."));///@todo pass msg for buyitem
+			return ErrorValue(t_("Please select one of the list by pressing the button in the red column"));///@todo pass msg for buyitem
 		else
 			return MultiButton::GetData();
 	};

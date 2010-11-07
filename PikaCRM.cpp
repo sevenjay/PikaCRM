@@ -39,7 +39,7 @@ struct ConvContactNames : Convert
 		return all_name;
 	}
 };
-class ColorNotNull : public Display
+class DisplayColorNotNull : public Display
 {
 public:
 	virtual void PaintBackground(Draw& w, const Rect& r, const Value& q,
@@ -49,7 +49,7 @@ public:
     	Display::PaintBackground(w, r, q, ink, paper, style);
 	};
 };
-class CellRedBackDisplay : public GridDisplay
+class GDisplayNullRedBack : public GridDisplay
 {
 public:
 	void Paint(Draw &w, int x, int y, int cx, int cy, const Value &val, dword style,
@@ -58,6 +58,17 @@ public:
     	//Color new_bg = bg;
     	if( IsNull(val) ) bg = Color(255, 223, 223);
     	GridDisplay::Paint(w, x, y, cx, cy, val, style, fg, bg, fnt, found, fs, fe);
+	};
+};
+class GDisplayNewUnsaved : public GridDisplay
+{
+public:
+	void Paint(Draw &w, int x, int y, int cx, int cy, const Value &val, dword style,
+						Color &fg, Color &bg, Font &fnt, bool found, int fs, int fe)
+	{
+    	Value show=val;
+    	if( -1==val ) show=t_("Unsaved");
+    	GridDisplay::Paint(w, x, y, cx, cy, show, style, fg, bg, fnt, found, fs, fe);
 	};
 };
 
@@ -355,7 +366,7 @@ void PikaCRM::SetupUI()
 	Event.Grid.AddIndex(E_ID).Default(-1);//for when create row before insert row;
 	Event.Grid.AddIndex(C_ID);
 	Event.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mEventGridCustomerBtn);
-		mEventGridCustomerBtn.SetDisplay(Single<ColorNotNull>());
+		mEventGridCustomerBtn.SetDisplay(Single<DisplayColorNotNull>());
 		mEventGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(EventGridCustomerBtnClick);
 	Event.Grid.AddColumn(E_ASK,t_("Request")).Edit(eesn);
 	//content
@@ -417,10 +428,10 @@ void PikaCRM::SetupUI()
 	Order.btnExport <<= THISBACK2(ExportFile, &(Order.Grid), "Orders");
 	Order.btnPrint <<= THISBACK2(Print, &(Order.Grid), "Orders");
 	
-	Order.Grid.AddColumn(O_ID,t_("Order ID")).Default(-1);//for when create row before insert row;
+	Order.Grid.AddColumn(O_ID,t_("Order ID")).Default(-1).SetDisplay(Single<GDisplayNewUnsaved>());//-1 for when create row before insert row;
 	Order.Grid.AddIndex(C_ID);
 	Order.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mOrderGridCustomerBtn);
-		mOrderGridCustomerBtn.SetDisplay(Single<ColorNotNull>());
+		mOrderGridCustomerBtn.SetDisplay(Single<DisplayColorNotNull>());
 		mOrderGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(OrderGridCustomerBtnClick);
 	Order.Grid.AddColumn(O_SHIP_ADD,t_("Ship Add.")).Edit(oes1);
 	Order.Grid.AddColumn(O_BILL_ADD,t_("Bill Add.")).Edit(oes2);
@@ -459,7 +470,7 @@ void PikaCRM::SetupUI()
 	Order.BuyItemGrid.AddIndex(B_ID).Default(-1);//for when create row before insert row;
 	Order.BuyItemGrid.AddIndex(M_ID);
 	Order.BuyItemGrid.AddColumn(M_NAME,t_("Product Name / Model")).Edit(mBuyItemGridMerchBtn);
-		mBuyItemGridMerchBtn.SetDisplay(Single<ColorNotNull>());
+		mBuyItemGridMerchBtn.SetDisplay(Single<DisplayColorNotNull>());
 		mBuyItemGridMerchBtn.AddButton().SetLabel("...").WhenPush=THISBACK(BuyItemGridMerchBtnClick);
 	//Order.BuyItemGrid.AddColumn(M_MODEL,t_("Product Model"));
 	Order.BuyItemGrid.AddColumn(M_PRICE,t_("Price"));
@@ -2388,7 +2399,7 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 		if(!grid->GetColumn(i).IsHidden())
 		{
 			if(0==Import.Grid.GetColumnCount()) //every grid import first column is not null;
-				Import.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName()).SetDisplay(Single<CellRedBackDisplay>());
+				Import.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName()).SetDisplay(Single<GDisplayNullRedBack>());
 			else
 				Import.Grid.AddColumn(grid->GetColumnId(i), grid->GetColumn(i).GetName());
 			match_map.Add(grid->GetColumnId(i), Import.Grid.GetColumnCount()-1);
