@@ -730,6 +730,7 @@ void PikaCRM::NewCustomer()
 }
 void PikaCRM::InsertCustomer()
 {
+	SysLog.Debug("Insert Customer\n");
 	try
 	{
 		SQL & Insert(CUSTOMER)
@@ -778,6 +779,7 @@ void PikaCRM::DuplicateCustomer()///@note not use, because not support multisele
 }
 void PikaCRM::UpdateCustomer()
 {
+	SysLog.Debug("Update Customer\n");
 	try
 	{
 		SQL & ::Update(CUSTOMER)
@@ -815,6 +817,7 @@ void PikaCRM::UpdateCustomer()
 }
 void PikaCRM::RemoveCustomer()
 {
+	SysLog.Debug("Remove Customer\n");
 	const VectorMap<int, String> & contact_map= ValueTo< VectorMap<int, String> >(Customer.Grid(CONTACTS_MAP));
 	try
 	{
@@ -850,7 +853,8 @@ void PikaCRM::LoadContact()
 	}
 }
 void PikaCRM::InsertContact()
-{	
+{
+	SysLog.Debug("Insert Contact\n");
 	try
 	{
 		SQL & Insert(CONTACT)
@@ -881,6 +885,7 @@ void PikaCRM::InsertContact()
 }
 void PikaCRM::UpdateContact()
 {
+	SysLog.Debug("Update Contact\n");
 	try
 	{
 		SQL & ::Update(CONTACT)
@@ -924,6 +929,7 @@ void PikaCRM::UpdateContact()
 }
 void PikaCRM::RemoveContact()
 {
+	SysLog.Debug("Remove Contact\n");
 	try
 	{
 		SQL & Delete(CONTACT).Where(CO_ID == Contact.Grid(CO_ID));
@@ -951,18 +957,6 @@ void PikaCRM::RemoveContact()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
-void PikaCRM::Update_dg_contact()
-{
-	/*dg_contact.Clear();
-	SQL & Select(CO_ID, CO_NAME)
-		.From(CONTACT)
-		.Where(IsNull(C_ID));
-
-	while(SQL.Fetch())
-		dg_contact.Add(SQL[C_ID], SQL[CO_NAME]);//C_ID: "CO_NAME1\nCO_NAME2\nCO_NAME3...
-	*/
-	//dg_contact.SetEditable(false);
-}
 
 void PikaCRM::LoadEvent()
 {
@@ -980,7 +974,8 @@ void PikaCRM::LoadEvent()
 	UpdateEventDropStatus();
 }
 void PikaCRM::InsertEvent()
-{	
+{
+	SysLog.Debug("Insert Event\n");
 	try
 	{
 		SQL & Insert(EVENT)
@@ -1003,6 +998,7 @@ void PikaCRM::InsertEvent()
 }
 void PikaCRM::UpdateEvent()
 {
+	SysLog.Debug("Update Event\n");
 	try
 	{
 		SQL & ::Update(EVENT)
@@ -1023,6 +1019,7 @@ void PikaCRM::UpdateEvent()
 }
 void PikaCRM::RemoveEvent()
 {
+	SysLog.Debug("Remove Event\n");
 	try
 	{
 		SQL & Delete(EVENT).Where(E_ID == Event.Grid(E_ID));
@@ -1036,6 +1033,7 @@ void PikaCRM::RemoveEvent()
 }
 void PikaCRM::UpdateEventDropStatus()
 {
+	SysLog.Debug("Update Event Drop Status\n");
 	try
 	{
 		mEventDropStatus.Clear();
@@ -1062,7 +1060,8 @@ void PikaCRM::LoadMerchandise()
 	}
 }
 void PikaCRM::InsertMerchandise()
-{	
+{
+	SysLog.Debug("Insert Merchandise\n");
 	try
 	{
 		SQL & Insert(MERCHANDISE)
@@ -1091,6 +1090,7 @@ void PikaCRM::InsertMerchandise()
 }
 void PikaCRM::UpdateMerchandise()
 {
+	SysLog.Debug("Update Merchandise\n");
 	try
 	{
 		SQL & ::Update(MERCHANDISE)
@@ -1118,6 +1118,7 @@ void PikaCRM::UpdateMerchandise()
 }
 void PikaCRM::RemoveMerchandise()
 {
+	SysLog.Debug("Remove Merchandise\n");
 	try
 	{
 		SQL & Delete(MERCHANDISE).Where(M_ID == Merchandise.Grid(M_ID));
@@ -1198,7 +1199,8 @@ void PikaCRM::LoadOrderCustomer()
 	}
 }
 void PikaCRM::InsertOrder()
-{	
+{
+	SysLog.Debug("Insert Order\n");
 	try
 	{
 		SQL & Insert(ORDERS)
@@ -1222,6 +1224,7 @@ void PikaCRM::InsertOrder()
 }
 void PikaCRM::UpdateOrder()
 {
+	SysLog.Debug("Update Order\n");
 	String now_time="CURRENT_TIMESTAMP";
 	try
 	{
@@ -1246,6 +1249,7 @@ void PikaCRM::UpdateOrder()
 }
 void PikaCRM::RemoveOrder()
 {
+	SysLog.Debug("Remove Order\n");
 	try
 	{
 		SQL & Delete(ORDERS).Where(O_ID == Order.Grid(O_ID));
@@ -1261,6 +1265,7 @@ void PikaCRM::RemoveOrder()
 }
 void PikaCRM::ChangeOrder()
 {
+	SysLog.Debug("Change Order\n");
 	LoadOrderCustomer();
 	LoadBuyItem(Order.Grid(O_ID));
 }
@@ -1303,6 +1308,7 @@ void PikaCRM::NewBuyItem()
 }
 void PikaCRM::InsertBuyItem()
 {
+	SysLog.Debug("Insert Buy Item\n");
 	try
 	{
 		SQL & Insert(BUYITEM)
@@ -1325,6 +1331,7 @@ void PikaCRM::InsertBuyItem()
 }
 void PikaCRM::UpdateBuyItem()
 {
+	SysLog.Debug("Update Buy Item\n");
 	try
 	{
 		SQL & ::Update(BUYITEM)
@@ -1346,6 +1353,7 @@ void PikaCRM::UpdateBuyItem()
 }
 void PikaCRM::RemoveBuyItem()
 {
+	SysLog.Debug("Remove Buy Item\n");
 	try
 	{
 		SQL & Delete(BUYITEM).Where(B_ID == Order.BuyItemGrid(B_ID));
@@ -1359,6 +1367,7 @@ void PikaCRM::RemoveBuyItem()
 }
 void PikaCRM::RemoveOrderBuyItem()
 {
+	SysLog.Debug("Remove Order Buy Item\n");
 	try
 	{
 		SQL & Delete(BUYITEM).Where(O_ID == Order.Grid(O_ID));
@@ -1737,9 +1746,7 @@ void PikaCRM::LoadConfig(const String & config_file_path)
 		SaveConfig(config_file_path);
 	}
 }
-void PikaCRM::SetConfig()
-{
-}
+
 void PikaCRM::SaveConfig(const String & config_file_path)
 {
 	if(mConfig.Save(config_file_path))
@@ -1897,7 +1904,7 @@ void PikaCRM::FirstWelcome()
 	WithFirstWelcomeLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d, t_("Welcome to use PikaCRM"));
 
-	d.ok.WhenPush = THISBACK1(ChackAgree, &(d.agree));
+	d.ok.WhenPush = THISBACK1(CheckAgree, &(d.agree));
 	d.cancel.Hide();
 	String note;
 	note<<"[2G "<<t_("Welcome to use PikaCRM")<<" &]";
@@ -1917,7 +1924,7 @@ void PikaCRM::FirstWelcome()
 		throw ApExc("user cancel").SetHandle(ApExc::NONE);
 	}
 }
-void PikaCRM::ChackAgree(Option * agree)
+void PikaCRM::CheckAgree(Option * agree)
 {
 	if(true!=agree->Get()) Exclamation(t_("You must accept the license to use"));
 }

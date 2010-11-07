@@ -274,7 +274,6 @@ private :
 	void InsertContact();
 	void UpdateContact();
 	void RemoveContact();
-	void Update_dg_contact();
 	
 	void LoadEvent();
 	void InsertEvent();
@@ -322,7 +321,6 @@ private :
 	String CombineKey(const String & key1, const String & key2);
 	
 	void LoadConfig(const String & config_file_path);
-	void SetConfig();
 	void SaveConfig(const String & config_file_path);
 	
 	void SetAllFieldMap();
@@ -339,7 +337,7 @@ public:
 	
 	//interactive with GUI==============================================================
 	void	FirstWelcome();
-		void ChackAgree(Option * agree);
+		void CheckAgree(Option * agree);
 	void	CustomerGridContactBtnClick();
 	
 	void	BtnSearchClearClick(){ Customer.Grid.ClearFound(); };
@@ -378,5 +376,5 @@ public:
 //some function-----------------------------------------------
 String Replace(String str, String find, String replace);
 std::vector<std::string> ParserCsvLine(const char * line);
-Font StdFontS(int scale);
+Font StdFontS(int scale); //return scaled StdFont, like 12, scale=-1 return 11
 #endif
