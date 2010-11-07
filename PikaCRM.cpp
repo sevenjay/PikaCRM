@@ -227,10 +227,10 @@ void PikaCRM::SetupUI()
 	
 	Customer.btnCreate.SetImage(fitScale(SrcImages::CustomerAdd(),scale)).SetFont(StdFontS(-1));
 	Customer.btnModify.SetImage(fitScale(SrcImages::CustomerEdit(),scale)).SetFont(StdFontS(-1));
-	Customer.btnDelete.SetImage(fitScale(SrcImages::CustomerRemove(),scale)).SetFont(StdFontS(-1));
+	Customer.btnDelete.SetImage(fitScale(SrcImages::CustomerCancel(),scale)).SetFont(StdFontS(-1));
 	Customer.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
 	Customer.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
-	Customer.btnDeleteF.SetImage(fitScale(SrcImages::CustomRemove(),scale)).SetFont(StdFontS(-1));
+	Customer.btnDeleteF.SetImage(fitScale(SrcImages::CustomSetup(),scale)).SetFont(StdFontS(-1));
 	Customer.btnImport.SetImage(fitScale(SrcImages::Import(),scale)).SetFont(StdFontS(-1));
 	Customer.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
 	Customer.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
@@ -240,7 +240,7 @@ void PikaCRM::SetupUI()
 	Contact.btnDelete.SetImage(fitScale(SrcImages::ContactRemove(),scale)).SetFont(StdFontS(-1));
 	Contact.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
 	Contact.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
-	Contact.btnDeleteF.SetImage(fitScale(SrcImages::CustomRemove(),scale)).SetFont(StdFontS(-1));
+	Contact.btnDeleteF.SetImage(fitScale(SrcImages::CustomSetup(),scale)).SetFont(StdFontS(-1));
 	Contact.btnImport.SetImage(fitScale(SrcImages::Import(),scale)).SetFont(StdFontS(-1));
 	Contact.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
 	Contact.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
@@ -309,7 +309,9 @@ void PikaCRM::SetupUI()
 	Customer.Grid.WhenDuplicateRow=THISBACK(DuplicateCustomer);
 	Customer.Grid.WhenUpdateRow = THISBACK(UpdateCustomer);
 	Customer.Grid.WhenRemoveRow = THISBACK(RemoveCustomer);
-	//Customer.Grid.SetToolBar();
+
+	Customer.Grid.WhenStartEdit = THISBACK(StartEditCustomer);
+	Customer.Grid.WhenEndEdit = THISBACK(EndEditCustomer);
 	//Customer Search------------------------------------------
 	Customer.Add(customer_search_bar.LeftPosZ(286, 84).TopPosZ(4, 20));
 		Customer.Grid.FindBar(customer_search_bar, Ctrl::HorzLayoutZoom(80));

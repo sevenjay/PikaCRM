@@ -269,6 +269,8 @@ private :
 	void DuplicateCustomer();
 	void UpdateCustomer();
 	void RemoveCustomer();
+	void StartEditCustomer() {Customer.btnDelete.SetLabel("Cancel");};
+	void EndEditCustomer() {Customer.btnDelete.SetLabel("Delete");};
 
 	void LoadContact();
 	void InsertContact();
