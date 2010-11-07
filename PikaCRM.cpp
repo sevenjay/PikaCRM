@@ -201,12 +201,12 @@ void PikaCRM::SetupUI()
 	MainFrom.tabMain.Add(Customer.SizePos(), t_("Customers"));
 	CtrlLayout(Contact);
 	MainFrom.tabMain.Add(Contact.SizePos(), t_("Contacts"));
-	CtrlLayout(Event);
-	MainFrom.tabMain.Add(Event.SizePos(), t_("Events"));
-	CtrlLayout(Order);
-	MainFrom.tabMain.Add(Order.SizePos(), t_("Orders"));
 	CtrlLayout(Merchandise);
 	MainFrom.tabMain.Add(Merchandise.SizePos(), t_("Merchandises"));
+	CtrlLayout(Order);
+	MainFrom.tabMain.Add(Order.SizePos(), t_("Orders"));
+	CtrlLayout(Event);
+	MainFrom.tabMain.Add(Event.SizePos(), t_("Events"));
 	CtrlLayout(Preference);
 	MainFrom.tabMain.Add(Preference.SizePos(), t_("Preferences"));	
 	CtrlLayout(Help);
