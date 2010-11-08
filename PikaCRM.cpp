@@ -456,7 +456,7 @@ void PikaCRM::SetupUI()
 		mOrderGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(OrderGridCustomerBtnClick);
 	Order.Grid.AddColumn(O_SHIP_ADD,t_("Ship Add.")).Edit(oes1);
 	Order.Grid.AddColumn(O_BILL_ADD,t_("Bill Add.")).Edit(oes2);
-	Order.Grid.AddColumn(O_ORDER_DATE,t_("Order Date")).Edit(odd1);
+	Order.Grid.AddColumn(O_ORDER_DATE,t_("Order Date")).Edit(odd1).Default(GetSysDate());
 	Order.Grid.AddColumn(O_SHIP_DATE,t_("Ship Date")).Edit(odd2);
 	Order.Grid.AddColumn(O_STATUS,t_("Status")).Edit(oes3);
 	Order.Grid.AddColumn(O_NOTE,t_("Note")).Edit(oes4);
@@ -1338,6 +1338,13 @@ void PikaCRM::NewBuyItem()
 		Order.BuyItemGrid.DoCancelEdit();
 		return;
 	}
+		
+	if(-1==Order.Grid(O_ID))
+	{
+		Exclamation(t_("Please save the order first."));
+		Order.BuyItemGrid.DoCancelEdit();
+		return;
+	}	
 	
 	Order.BuyItemGrid(O_ID)=Order.Grid(O_ID);
 }
@@ -2210,7 +2217,9 @@ try{
 		}
 		Order.Grid.Set(C_ID,costomer_id);		
 		Order.Grid.Set(C_TITLE,title);
-		LoadOrderCustomer();
+		LoadOrderCustomer();				
+		Order.Grid.Set(O_SHIP_ADD, Order.CustomerADD.GetText());
+		Order.Grid.Set(O_BILL_ADD, Order.CustomerADD.GetText());
     }
 }
 catch(SqlExc &e)
