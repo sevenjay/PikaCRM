@@ -269,30 +269,38 @@ private :
 	void DuplicateCustomer();
 	void UpdateCustomer();
 	void RemoveCustomer();
-	void StartEditCustomer() {Customer.btnDelete.SetLabel("Cancel");};
-	void EndEditCustomer() {Customer.btnDelete.SetLabel("Delete");};
+	void StartEditCustomer() {Customer.btnDelete.Hide(); Customer.btnCancel.Show();}
+	void EndEditCustomer() {Customer.btnDelete.Show(); Customer.btnCancel.Hide();}
 
 	void LoadContact();
 	void InsertContact();
 	void UpdateContact();
 	void RemoveContact();
+	void StartEditContact() {Contact.btnDelete.Hide(); Contact.btnCancel.Show();}
+	void EndEditContact() {Contact.btnDelete.Show(); Contact.btnCancel.Hide();}
 	
 	void LoadEvent();
 	void InsertEvent();
 	void UpdateEvent();
 	void RemoveEvent();
+	void StartEditEvent() {Event.btnDelete.Hide(); Event.btnCancel.Show();}
+	void EndEditEvent() {Event.btnDelete.Show(); Event.btnCancel.Hide();}
 	void UpdateEventDropStatus();
 		
 	void LoadMerchandise();
 	void InsertMerchandise();
 	void UpdateMerchandise();
 	void RemoveMerchandise();
+	void StartEditMerchandise() {Merchandise.btnDelete.Hide(); Merchandise.btnCancel.Show();}
+	void EndEditMerchandise() {Merchandise.btnDelete.Show(); Merchandise.btnCancel.Hide();}
 			
 	void LoadOrder();
 	void LoadOrderCustomer();
 	void InsertOrder();
 	void UpdateOrder();
 	void RemoveOrder();
+	void StartEditOrder() {Order.btnDelete.Hide(); Order.btnCancel.Show();}
+	void EndEditOrder() {Order.btnDelete.Show(); Order.btnCancel.Hide();}
 	void ChangeOrder();
 	void RemoveOrderBuyItem();
 				

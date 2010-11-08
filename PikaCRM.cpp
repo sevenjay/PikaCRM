@@ -227,7 +227,8 @@ void PikaCRM::SetupUI()
 	
 	Customer.btnCreate.SetImage(fitScale(SrcImages::CustomerAdd(),scale)).SetFont(StdFontS(-1));
 	Customer.btnModify.SetImage(fitScale(SrcImages::CustomerEdit(),scale)).SetFont(StdFontS(-1));
-	Customer.btnDelete.SetImage(fitScale(SrcImages::CustomerCancel(),scale)).SetFont(StdFontS(-1));
+	Customer.btnDelete.SetImage(fitScale(SrcImages::CustomerRemove(),scale)).SetFont(StdFontS(-1));
+	Customer.btnCancel.SetImage(fitScale(SrcImages::CustomerCancel(),scale)).SetFont(StdFontS(-1)).Hide();
 	Customer.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
 	Customer.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
 	Customer.btnDeleteF.SetImage(fitScale(SrcImages::CustomSetup(),scale)).SetFont(StdFontS(-1));
@@ -238,6 +239,7 @@ void PikaCRM::SetupUI()
 	Contact.btnCreate.SetImage(fitScale(SrcImages::ContactAdd(),scale)).SetFont(StdFontS(-1));
 	Contact.btnModify.SetImage(fitScale(SrcImages::ContactEdit(),scale)).SetFont(StdFontS(-1));
 	Contact.btnDelete.SetImage(fitScale(SrcImages::ContactRemove(),scale)).SetFont(StdFontS(-1));
+	Contact.btnCancel.SetImage(fitScale(SrcImages::ContactCancel(),scale)).SetFont(StdFontS(-1)).Hide();
 	Contact.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
 	Contact.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
 	Contact.btnDeleteF.SetImage(fitScale(SrcImages::CustomSetup(),scale)).SetFont(StdFontS(-1));
@@ -248,18 +250,21 @@ void PikaCRM::SetupUI()
 	Event.btnCreate.SetImage(fitScale(SrcImages::EventAdd(),scale)).SetFont(StdFontS(-1));
 	Event.btnModify.SetImage(fitScale(SrcImages::EventEdit(),scale)).SetFont(StdFontS(-1));
 	Event.btnDelete.SetImage(fitScale(SrcImages::EventRemove(),scale)).SetFont(StdFontS(-1));
+	Event.btnCancel.SetImage(fitScale(SrcImages::EventCancel(),scale)).SetFont(StdFontS(-1)).Hide();
 	Event.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
 	Event.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 				
 	Order.btnCreate.SetImage(fitScale(SrcImages::OrderAdd(),scale)).SetFont(StdFontS(-1));
 	Order.btnModify.SetImage(fitScale(SrcImages::OrderEdit(),scale)).SetFont(StdFontS(-1));
 	Order.btnDelete.SetImage(fitScale(SrcImages::OrderRemove(),scale)).SetFont(StdFontS(-1));
+	Order.btnCancel.SetImage(fitScale(SrcImages::OrderCancel(),scale)).SetFont(StdFontS(-1)).Hide();
 	Order.btnExport.SetImage(fitScale(SrcImages::Export(),scale)).SetFont(StdFontS(-1));
 	Order.btnPrint.SetImage(fitScale(SrcImages::Print(),scale)).SetFont(StdFontS(-1));
 		
 	Merchandise.btnCreate.SetImage(fitScale(SrcImages::MerchandiseAdd(),scale)).SetFont(StdFontS(-1));
 	Merchandise.btnModify.SetImage(fitScale(SrcImages::MerchandiseEdit(),scale)).SetFont(StdFontS(-1));
 	Merchandise.btnDelete.SetImage(fitScale(SrcImages::MerchandiseRemove(),scale)).SetFont(StdFontS(-1));
+	Merchandise.btnCancel.SetImage(fitScale(SrcImages::MerchandiseCancel(),scale)).SetFont(StdFontS(-1)).Hide();
 	Merchandise.btnCreateF.SetImage(fitScale(SrcImages::CustomAdd(),scale)).SetFont(StdFontS(-1));
 	Merchandise.btnModifyF.SetImage(fitScale(SrcImages::CustomEdit(),scale)).SetFont(StdFontS(-1));
 	Merchandise.btnDeleteF.SetImage(fitScale(SrcImages::CustomRemove(),scale)).SetFont(StdFontS(-1));
@@ -271,6 +276,7 @@ void PikaCRM::SetupUI()
 	Customer.btnCreate <<= callback(&(Customer.Grid),&GridCtrl::DoAppend);
 	Customer.btnModify <<= callback(&(Customer.Grid),&GridCtrl::DoEdit);
 	Customer.btnDelete <<= callback(&(Customer.Grid),&GridCtrl::DoRemove);
+	Customer.btnCancel <<= callback(&(Customer.Grid),&GridCtrl::DoCancelEdit);
 	Customer.btnCreateF <<= THISBACK2(CreateField, &(Customer.Grid), "c");
 	Customer.btnModifyF <<= THISBACK2(ModifyField, &(Customer.Grid), "c");
 	Customer.btnDeleteF.Disable();
@@ -322,6 +328,7 @@ void PikaCRM::SetupUI()
 	Contact.btnCreate <<= callback(&(Contact.Grid),&GridCtrl::DoAppend);
 	Contact.btnModify <<= callback(&(Contact.Grid),&GridCtrl::DoEdit);
 	Contact.btnDelete <<= callback(&(Contact.Grid),&GridCtrl::DoRemove);
+	Contact.btnCancel <<= callback(&(Contact.Grid),&GridCtrl::DoCancelEdit);
 	Contact.btnCreateF <<= THISBACK2(CreateField, &(Contact.Grid), "co");
 	Contact.btnModifyF <<= THISBACK2(ModifyField, &(Contact.Grid), "co");
 	Contact.btnDeleteF.Disable();
@@ -352,6 +359,9 @@ void PikaCRM::SetupUI()
 	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
+
+	Contact.Grid.WhenStartEdit = THISBACK(StartEditContact);
+	Contact.Grid.WhenEndEdit = THISBACK(EndEditContact);
 	//Contact Search------------------------------------------
 	Contact.Add(contact_search_bar.LeftPosZ(286, 84).TopPosZ(4, 20));
 		Contact.Grid.FindBar(contact_search_bar, Ctrl::HorzLayoutZoom(80));
@@ -362,6 +372,7 @@ void PikaCRM::SetupUI()
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
 	Event.btnModify <<= callback(&(Event.Grid),&GridCtrl::DoEdit);
 	Event.btnDelete <<= callback(&(Event.Grid),&GridCtrl::DoRemove);
+	Event.btnCancel <<= callback(&(Event.Grid),&GridCtrl::DoCancelEdit);
 	Event.btnExport <<= THISBACK2(ExportFile, &(Event.Grid), "Events");
 	Event.btnPrint <<= THISBACK2(Print, &(Event.Grid), "Events");
 	
@@ -381,6 +392,9 @@ void PikaCRM::SetupUI()
 	Event.Grid.WhenInsertRow = THISBACK(InsertEvent);
 	Event.Grid.WhenUpdateRow = THISBACK(UpdateEvent);
 	Event.Grid.WhenRemoveRow = THISBACK(RemoveEvent);
+
+	Event.Grid.WhenStartEdit = THISBACK(StartEditEvent);
+	Event.Grid.WhenEndEdit = THISBACK(EndEditEvent);
 	//Event Search------------------------------------------
 	Event.Add(event_search_bar.LeftPosZ(147, 84).TopPosZ(4, 20));
 		Event.Grid.FindBar(event_search_bar, Ctrl::HorzLayoutZoom(80));
@@ -391,6 +405,7 @@ void PikaCRM::SetupUI()
 	Merchandise.btnCreate <<= callback(&(Merchandise.Grid),&GridCtrl::DoAppend);
 	Merchandise.btnModify <<= callback(&(Merchandise.Grid),&GridCtrl::DoEdit);
 	Merchandise.btnDelete <<= callback(&(Merchandise.Grid),&GridCtrl::DoRemove);
+	Merchandise.btnCancel <<= callback(&(Merchandise.Grid),&GridCtrl::DoCancelEdit);
 	Merchandise.btnCreateF <<= THISBACK2(CreateField, &(Merchandise.Grid), "m");
 	Merchandise.btnModifyF <<= THISBACK2(ModifyField, &(Merchandise.Grid), "m");
 	Merchandise.btnDeleteF.Disable();
@@ -417,6 +432,9 @@ void PikaCRM::SetupUI()
 	Merchandise.Grid.WhenInsertRow = THISBACK(InsertMerchandise);
 	Merchandise.Grid.WhenUpdateRow = THISBACK(UpdateMerchandise);
 	Merchandise.Grid.WhenRemoveRow = THISBACK(RemoveMerchandise);
+
+	Merchandise.Grid.WhenStartEdit = THISBACK(StartEditMerchandise);
+	Merchandise.Grid.WhenEndEdit = THISBACK(EndEditMerchandise);
 	//Merchandise Search------------------------------------------
 	Merchandise.Add(merchandise_search_bar.LeftPosZ(286, 84).TopPosZ(4, 20));
 		Merchandise.Grid.FindBar(merchandise_search_bar, Ctrl::HorzLayoutZoom(80));
@@ -427,6 +445,7 @@ void PikaCRM::SetupUI()
 	Order.btnCreate <<= callback(&(Order.Grid),&GridCtrl::DoAppend);
 	Order.btnModify <<= callback(&(Order.Grid),&GridCtrl::DoEdit);
 	Order.btnDelete <<= callback(&(Order.Grid),&GridCtrl::DoRemove);
+	Order.btnCancel <<= callback(&(Order.Grid),&GridCtrl::DoCancelEdit);
 	Order.btnExport <<= THISBACK2(ExportFile, &(Order.Grid), "Orders");
 	Order.btnPrint <<= THISBACK2(Print, &(Order.Grid), "Orders");
 	
@@ -446,6 +465,9 @@ void PikaCRM::SetupUI()
 	Order.Grid.WhenUpdateRow = THISBACK(UpdateOrder);
 	Order.Grid.WhenRemoveRow = THISBACK(RemoveOrder);
 	Order.Grid.WhenChangeRow = THISBACK(ChangeOrder);
+
+	Order.Grid.WhenStartEdit = THISBACK(StartEditOrder);
+	Order.Grid.WhenEndEdit = THISBACK(EndEditOrder);
 	//Order Filter------------------------------------------
 	Order.dlFilter.Add(t_("All"));//0
 	Order.dlFilter.Add(t_("Past year"));//1
