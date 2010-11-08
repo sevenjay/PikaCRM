@@ -385,7 +385,7 @@ void PikaCRM::SetupUI()
 	//content
 	Event.Grid.AddColumn(E_STATUS,t_("Status")).Edit(mEventDropStatus);
 		mEventDropStatus.AddPlus(THISBACK(EventNewStatusClick));
-	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edt);
+	Event.Grid.AddColumn(E_RTIME,t_("Request Time")).Edit(edt).Default(GetSysTime());
 	Event.Grid.AddColumn(E_CTIME,t_("Create Time"));
 	Event.Grid.AddColumn(E_NOTE,t_("Note")).Edit(ees1);
 	Event.Grid.Appending().Removing().AskRemove().Editing().Canceling().ColorRows();
@@ -1207,6 +1207,11 @@ void PikaCRM::LoadOrder()
 void PikaCRM::LoadOrderCustomer()
 {
 	SysLog.Info("Load the Customer of the Order\n");
+	Order.CustomerTitle	= t_("The customer was deleted");
+	Order.CustomerPhone	= "";
+	Order.CustomerADD	= "";
+	Order.CustomerEmail	= "";
+	Order.CustomerWeb	= "";
 	Order.ContactDrop.GetList().Clear();//DropGrid.Clear() will set focus, use DropGrid.list.Clear()
 	bool is_sql_ok=SQL.Execute("select * from Customer where c_id = ?;", Order.Grid(C_ID));
 	if(is_sql_ok)
