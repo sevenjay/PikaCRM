@@ -74,7 +74,6 @@ public:
 
 PikaCRM::PikaCRM()
 {
-	SetAllFieldMap();
 }
 
 PikaCRM::~PikaCRM()
@@ -91,14 +90,16 @@ void PikaCRM::Initial()
 	SetLanguage( SetLNGCharset( mConfig.Language, CHARSET_UTF8 ) );
 	
 	int QtfHigh=20;
-	mSplash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(mConfig.Language),SrcImages::Logo(),mConfig.Language);	
-	mSplash.ShowSplash();
+	SplashSV splash;
+	splash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(mConfig.Language),SrcImages::Logo(),mConfig.Language);	
+	splash.ShowSplash();
 
+	SetAllFieldMap();
 	SetupUI();
 
 	if(mConfig.IsDBEncrypt)
 	{
-		mSplash.HideSplash();
+		splash.HideSplash();
 		if(mConfig.IsRememberPW)
 		{
 			SysLog.Info("config: Remeber the PW\n");
@@ -129,15 +130,15 @@ void PikaCRM::Initial()
 			SysLog.Info("config: Not Remeber the PW\n");
 			if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::NONE);
 		}
-		mSplash.ShowSplash();
+		splash.ShowSplash();
 	}
 
 	
-	mSplash.ShowSplashStatus(t_("Checking Database..."));
+	splash.ShowSplashStatus(t_("Checking Database..."));
 	SysLog.Info(t_("Checking Database..."))<<"\n";
 	if(IsHaveDBFile(database_file_path))
 	{
-		mSplash.ShowSplashStatus(t_("Loading Database..."));
+		splash.ShowSplashStatus(t_("Loading Database..."));
 		SysLog.Info(t_("Loading Database..."))<<"\n";
 		CreateOrOpenDB(database_file_path);//OpenDB
 
@@ -145,19 +146,19 @@ void PikaCRM::Initial()
 	else
 	{
 		SysLog.Info("setup the database file\n");
-		mSplash.HideSplash();
+		splash.HideSplash();
 		FirstWelcome();
 		if(!IsSetupDB(config_file_path)) throw ApExc("user cancel").SetHandle(ApExc::NONE);
-		mSplash.ShowSplash();
-		mSplash.ShowSplashStatus(t_("Creating the database..."));
+		splash.ShowSplash();
+		splash.ShowSplashStatus(t_("Creating the database..."));
 		SysLog.Info(t_("Creating the database..."))<<"\n";;
 		CreateOrOpenDB(database_file_path);//CreateDB
 	}
 	
 	//test if database OK-----------------------------------------------------
-	bool is_sql_ok=SQL.Execute("PRAGMA database_list;");
+	//SQL.ExecuteX("PRAGMA database_list;");
 	
-	if(is_sql_ok)
+	if(IsDBWork(mSqlite3Session))
 		;//donothing
 	else //pw error or not the file?
 	{
@@ -183,7 +184,32 @@ void PikaCRM::Initial()
 	{
 		show can not up compatibility, please use the Latest version
 	}	
-	*/		
+	*/	
+	
+	try
+	{
+		//Load and set customer field(UI+data)
+		LoadSetAllField();
+		//Load all tab data
+		LoadCustomer();
+		LoadContact();
+		LoadEvent();
+		LoadMerchandise();
+		LoadOrder();	
+	}
+	catch(SqlExc &e)
+	{
+		splash.HideSplash();
+		SysLog.Error(e+"\n");
+		Exclamation( t_("There is a database operation error.&"
+						"If data is not correct, please report to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report] with the log and last error: &")
+						+ DeQtfLf(SQL.GetLastError()));
+	}
+
+	splash.ShowSplashStatus(t_("Normal Running..."));
+	SysLog.Info(t_("Normal Running..."))<<"\n";
+	
+	splash.SetSplashTimer(500);	
 }
 void PikaCRM::SetupUI()
 {
@@ -1434,34 +1460,9 @@ String PikaCRM::GetLogPath()
 	return getConfigDirPath()+FILE_LOG;	
 }
 void PikaCRM::OpenMainFrom()
-{	
-	try
-	{
-		//Load and set customer field(UI+data)
-		LoadSetAllField();
-		//Load all tab data
-		LoadCustomer();
-		LoadContact();
-		LoadEvent();
-		LoadMerchandise();
-		LoadOrder();	
-	}
-	catch(SqlExc &e)
-	{
-		mSplash.HideSplash();
-		SysLog.Error(e+"\n");
-		Exclamation( t_("There is a database operation error.\n"
-						"If data is not correct, please report to our web site (Help->Report bugs) with the log and last error: \n")
-						+ SQL.GetLastError());
-	}
-	
+{
 	if(mConfig.IsMaximized) MainFrom.Maximize();
 	MainFrom.OpenMain();
-	
-	mSplash.ShowSplashStatus(t_("Normal Running..."));
-	SysLog.Info(t_("Normal Running..."))<<"\n";
-	
-	mSplash.SetSplashTimer(500);
 }
 void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 {
@@ -1522,7 +1523,6 @@ void PikaCRM::CloseMainFrom()//MainFrom.WhenClose call back
 	
 	SaveConfig(config_file_path);
 	
-	mSplash.~SplashSV();
 	MainFrom.Close();
 }
 
@@ -2928,7 +2928,47 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 	fileSel.Type("Sqlite Database (*.sqlite)", "*.sqlite");
 	fileSel.Type("All file", "*");
 	if(fileSel.ExecuteOpen()){
+		Sqlite3Session sqlsession;
+		if(!sqlsession.Open(~fileSel))
+		{
+			Exclamation(t_("Open the database file fail!"));
+			sqlsession.Close();
+			return;
+		}
+		
+		
+		SysLog.Debug("opened database file: "+~fileSel+"\n");
+		
+
 		*path=~fileSel;
+		
+		
+		
+		/*
+			mSqlite3Session.Close();
+	if(!mSqlite3Session.Open(database_file_path))
+	{
+		String msg = t_("Can't create or open database file: ")	+ database_file_path;
+		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+	}
+	SysLog.Debug("created or opened database file: "+database_file_path+"\n");
+	
+#ifdef _DEBUG
+	mSqlite3Session.SetTrace();
+#endif
+	
+	SQL = mSqlite3Session;//this is Upp default globe 
+	
+	if(!mConfig.Password.IsEqual(PW_EMPTY))
+	{
+		SysLog.Info("set database encrypted key.\n");
+		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
+		{
+			SysLog.Error("sqlite3 set key error\n");
+			///@note we dont know how to deal this error, undefine		
+		}
+	}
+		*/
 	}
 }
 

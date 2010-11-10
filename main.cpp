@@ -6,12 +6,9 @@
 
 GUI_APP_MAIN
 {	
-	//RLOG("Start Application...");//in ~/.upp/PikaCRM/PikaCRM.log //this is must for log.old bug
+	PikaCRM pikaCRM;
 try
 {
-	//SetLanguage( SetLNGCharset( GetSystemLNG(), CHARSET_UTF8 ) );
-	
-	PikaCRM pikaCRM;
 	FirstSetVppLogName(pikaCRM.GetLogPath());
 	SysLog.Open(GetExeTitle());	
 #ifdef _DEBUG
@@ -59,18 +56,22 @@ catch(ApExc & e)
 	if(e.GetHandle()&ApExc::EXIT) SysLog.Critical(e+"\n");
 	else SysLog.Error(e+"\n");
 	
+	String msg="[G* " + DeQtfLf(e) + "]";
 	
-	if(e.GetHandle()&ApExc::REPORT) e+="\nAnd please report this issue to xxxweb.";
+	if(e.GetHandle()&ApExc::REPORT) msg+=t_("[* &And please report this issue to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report].]");
 	
-	if(e.GetHandle()&ApExc::NOTICE) Exclamation("[* " + DeQtfLf(e) + "]");
+	if(e.GetHandle()&ApExc::NOTICE) Exclamation(msg);
 	
 }
 catch(...)
 {	//can not do anything
-	String what= t_("Sorry, there is an unknown error.\n"
-					"If it always happens, you can report to our web site (Help->Report bugs) with the log and last error:\n")
-				+GetLastErrorMessage();
-	Exclamation("[* " + DeQtfLf(what) + "]");
+	String what= t_("Sorry, there is an unknown error.&"
+					"If it always happens, you can report to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report] with the log and last error:&")
+				+ DeQtfLf(GetLastErrorMessage());
+	Exclamation(what);
+	
+	SysLog.Critical("last error: "+GetLastErrorMessage()+"\n");
+	SysLog.Critical("last sql error: "+SQL.GetLastError()+"\n");
 }
 }
 

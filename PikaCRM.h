@@ -49,7 +49,7 @@ Windows 2000					_WIN32_WINNT_WIN2K (0x0500)
 #define SOFTWARE_NAME					"PikaCRM"
 #define SOFTWARE_VERSION				"1.0 beta2"
 #define DATABASE_VERSION				"1"
-#define BUILD_DATE						Date(2010, 11, 8)
+#define BUILD_DATE						Date(2010, 11, 10)
 
 #define PW_MAGIC_WORD					"sevenjay777"
 #define PW_EMPTY						getMD5(PW_MAGIC_WORD) //avoid clear config file pw hack
@@ -61,6 +61,8 @@ Windows 2000					_WIN32_WINNT_WIN2K (0x0500)
 #define FILE_CONFIG						"PikaCRM.xml"//in PATH_USER_HOME
 #define FILE_LOG						"PikaCRM.log"//in PATH_USER_HOME
 #define FILE_DATABASE					"PikaCRM.sqlite"//in PATH_USER_HOME
+
+#define WEB_UPDATE						"http://pika.sevenjay.tw/update"
 //end define file path and name--------------------------------------------------
 class ApExc : public String {
 	byte mHandle;
@@ -224,8 +226,6 @@ private :
 	
 	
 	//must initial in PikaCRM(), Initial(), OpenMainFrom()	------------------------------------
-	SplashSV mSplash;
-	
 	Config mConfig;
 	
 	Sqlite3Session mSqlite3Session;
@@ -323,7 +323,10 @@ private :
 		void OnOptPWAction(WithInitialDBLayout<TopWindow> * d);
 		void OnOptRevealPWAction(WithInitialDBLayout<TopWindow> * d);
 		void CheckPWSame(WithInitialDBLayout<TopWindow> * d);
-	bool IsDBWork();
+	bool IsDBWork(Sqlite3Session & sqlsession){
+		Sql sql(sqlsession);
+		return sql.Execute("PRAGMA database_list;");
+	}
 	
 	bool IsInputPWCheck();
 		void CheckPWRight(WithInputPWLayout<TopWindow> * d, const String & pw);
