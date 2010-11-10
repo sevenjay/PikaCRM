@@ -378,6 +378,9 @@ public:
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();
 	void	SavePreference();
+	void	DBBackup();
+	void	DBRestore();
+			void SelectRestoreDB(EditString * path);
 	
 	//Help Tab------------------------------------------------------------
 	void	ShowLicense();

@@ -1,3 +1,11 @@
+LAYOUT(FirstWelcomeLayout, 412, 228)
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(8, 304).BottomPosZ(8, 24))
+	ITEM(Button, ok, SetLabel(t_("Next")).HSizePosZ(296, 16).BottomPosZ(8, 24))
+	ITEM(RichTextCtrl, License, SetFrame(FieldFrame()).LeftPosZ(8, 392).TopPosZ(40, 144))
+	ITEM(RichTextCtrl, Welcome, LeftPosZ(8, 392).TopPosZ(4, 36))
+	ITEM(Option, agree, SetLabel(t_("I accept")).LeftPosZ(224, 56).TopPosZ(200, 16))
+END_LAYOUT
+
 LAYOUT(PikaCRMLayout, 750, 500)
 	ITEM(TabCtrl, tabMain, HSizePosZ(2, 2).VSizePosZ(0, 0))
 END_LAYOUT
@@ -160,6 +168,13 @@ LAYOUT(PreferenceLayout, 596, 400)
 	ITEM(Button, btnSave, SetLabel(t_("Save")).RightPosZ(144, 56).BottomPosZ(37, 19))
 END_LAYOUT
 
+LAYOUT(HelpLayout, 740, 476)
+	ITEM(LabelBox, dv___0, SetLabel(t_("About PikaCRM")).LeftPosZ(8, 452).TopPosZ(4, 464))
+	ITEM(RichTextView, About, AutoHideSb(true).LeftPosZ(16, 436).TopPosZ(20, 440))
+	ITEM(RichTextCtrl, Link, NoSb(true).LeftPosZ(468, 252).TopPosZ(12, 152))
+	ITEM(Button, btnLicense, SetLabel(t_("License")).LeftPosZ(472, 56).TopPosZ(444, 24))
+END_LAYOUT
+
 LAYOUT(ModifyFieldsLayout, 196, 320)
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).HCenterPosZ(72, 54).BottomPosZ(8, 20))
 	ITEM(StaticText, dv___1, SetText(t_("Modified")).HCenterPosZ(60, 36).TopPosZ(4, 16))
@@ -206,18 +221,12 @@ LAYOUT(ImportMatchLayout, 456, 220)
 	ITEM(Label, dv___7, SetLabel(t_("Column")).LeftPosZ(4, 57).TopPosZ(12, 20))
 END_LAYOUT
 
-LAYOUT(FirstWelcomeLayout, 412, 228)
-	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(8, 304).BottomPosZ(8, 24))
-	ITEM(Button, ok, SetLabel(t_("Next")).HSizePosZ(296, 16).BottomPosZ(8, 24))
-	ITEM(RichTextCtrl, License, SetFrame(FieldFrame()).LeftPosZ(8, 392).TopPosZ(40, 144))
-	ITEM(RichTextCtrl, Welcome, LeftPosZ(8, 392).TopPosZ(4, 36))
-	ITEM(Option, agree, SetLabel(t_("I accept")).LeftPosZ(224, 56).TopPosZ(200, 16))
-END_LAYOUT
-
-LAYOUT(HelpLayout, 740, 476)
-	ITEM(LabelBox, dv___0, SetLabel(t_("About PikaCRM")).LeftPosZ(8, 452).TopPosZ(4, 464))
-	ITEM(RichTextView, About, AutoHideSb(true).LeftPosZ(16, 436).TopPosZ(20, 440))
-	ITEM(RichTextCtrl, Link, NoSb(true).LeftPosZ(468, 252).TopPosZ(12, 152))
-	ITEM(Button, btnLicense, SetLabel(t_("License")).LeftPosZ(472, 56).TopPosZ(444, 24))
+LAYOUT(DBRestoreLayout, 400, 200)
+	ITEM(Label, dv___0, SetLabel(t_("File:")).LeftPosZ(20, 40).TopPosZ(112, 20))
+	ITEM(EditString, esFilePath, NotNull(true).SetEditable(false).LeftPosZ(64, 244).TopPosZ(112, 19))
+	ITEM(Button, btnBrowse, SetLabel(t_("Browse")).LeftPosZ(324, 52).TopPosZ(112, 20))
+	ITEM(Button, ok, SetLabel(t_("Restore")).LeftPosZ(264, 52).BottomPosZ(12, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).LeftPosZ(336, 52).BottomPosZ(12, 20))
+	ITEM(RichTextCtrl, rtNoteRestore, NoSb(true).LeftPosZ(16, 364).TopPosZ(12, 60))
 END_LAYOUT
 

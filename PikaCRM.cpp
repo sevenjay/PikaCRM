@@ -520,6 +520,8 @@ void PikaCRM::SetupUI()
 	
 	Preference.btnSave <<= THISBACK(SavePreference);
 	Preference.btnDatabase <<= THISBACK(ConfigDB);
+	Preference.btnDBBackup <<= THISBACK(DBBackup);
+	Preference.btnDBRestore <<= THISBACK(DBRestore);
 	
 	//Help Tab-----------------------------------------------------------------------
 	Help.btnLicense << THISBACK(ShowLicense);
@@ -1606,7 +1608,7 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	SysLog.Info("setup the database\n");
 	WithInitialDBLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d, t_("Setup your database"));
-	d.TopMost();
+	d.TopMost();///@remark how it look in meego?
 	d.esPassword.Password();
 	d.esCheckPassword.Password();
 	d.optRequire.SetEditable(false);
@@ -1615,6 +1617,7 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	d.ok.WhenPush = THISBACK1(CheckPWSame, &d);
 	
 	String note,note2;
+	//meego will fail in this section?----------------------------------
 	Font ff= GetStdFont();
 	SysLog.Debug(ff.GetFaceName()+"\n");
 	SysLog.Debug("h: ")<<ff.GetHeight();
@@ -1623,6 +1626,7 @@ bool PikaCRM::IsSetupDB(const String config_file_path)
 	SysLog.Debug(" 10zh: ")<<StdFontZ(10);
 	SysLog.Debug(" 11zh: ")<<StdFontZ(11);
 	SysLog.Debug(" 12zh: ")<<StdFontZ(12);
+	//end meego will fail in this section?----------------------------------
 	
 	note<<"[+75G "<<t_("Encrypted database can't be read even if someone has the database file.")<<" ]";
 	d.rtNoteEncrypted.SetQTF(note);
@@ -2882,6 +2886,50 @@ void PikaCRM::SavePreference()
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	SaveConfig(config_file_path);
 	PromptOK(t_("The setting has been saved and will take effect the next time you start this application."));
+}
+
+void PikaCRM::DBBackup()
+{
+	SysLog.Info("Database backup...\n");
+	String stamp;
+	Time now = GetSysTime();
+	stamp=Format("_%d_%02d_%02d_%02d%02d", now.year, now.month, now.day, now.hour, now.minute);
+	static FileSel fileSelDB; //static for remember user selection in one session
+	fileSelDB.Type("Sqlite Database (*.sqlite)", "*.sqlite");
+	fileSelDB.Set("PikaCRM"+stamp+".sqlite");
+	if(fileSelDB.ExecuteSaveAs()){
+		String database_file_path = getConfigDirPath()+FILE_DATABASE;
+		if(!FileCopy(database_file_path, ~fileSelDB))
+		{
+			Exclamation(t_("backup the database file fail!"));
+		}
+	}
+}
+void PikaCRM::DBRestore()
+{
+	SysLog.Info("Database Restoring...\n");
+	//UI--------------------------------------------
+	WithDBRestoreLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d, t_("Restore your database"));
+	d.btnBrowse <<= THISBACK1(SelectRestoreDB,&(d.esFilePath));
+	
+	String note;
+	note<<t_("[G Note:&][Gl200 Restoring a backup will overwrite existing data. All new data will be lost.]");
+	d.rtNoteRestore.SetQTF(note);
+	//end UI--------------------------------------------
+		
+	if(d.Run()==IDOK) {
+		//ExportCSV(grid, ~(d.esFilePath), name, d.opUTF8BOM.Get());
+	}
+}
+void PikaCRM::SelectRestoreDB(EditString * path)
+{
+	static FileSel fileSel; //static for remember user selection in one session
+	fileSel.Type("Sqlite Database (*.sqlite)", "*.sqlite");
+	fileSel.Type("All file", "*");
+	if(fileSel.ExecuteOpen()){
+		*path=~fileSel;
+	}
 }
 
 void PikaCRM::ShowLicense()
