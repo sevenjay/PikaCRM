@@ -56,19 +56,19 @@ catch(ApExc & e)
 	if(e.GetHandle()&ApExc::EXIT) SysLog.Critical(e+"\n");
 	else SysLog.Error(e+"\n");
 	
-	String msg="[G* " + DeQtfLf(e) + "]";
+	String msg=DeQtfLf(e);
 	
-	if(e.GetHandle()&ApExc::REPORT) msg+=t_("[* &And please report this issue to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report].]");
+	if(e.GetHandle()&ApExc::REPORT) msg+=t_("&And please report this issue to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report].");
 	
-	if(e.GetHandle()&ApExc::NOTICE) Exclamation(msg);
+	if(e.GetHandle()&ApExc::NOTICE) Exclamation("[G* " + msg + "]");
 	
 }
 catch(...)
 {	//can not do anything
 	String what= t_("Sorry, there is an unknown error.&"
 					"If it always happens, you can report to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report] with the log and last error:&")
-				+ DeQtfLf(GetLastErrorMessage());
-	Exclamation(what);
+				 + DeQtfLf(GetLastErrorMessage());
+	Exclamation("[G* " + what + "]");
 	
 	SysLog.Critical("last error: "+GetLastErrorMessage()+"\n");
 	SysLog.Critical("last sql error: "+SQL.GetLastError()+"\n");

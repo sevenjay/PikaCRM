@@ -155,9 +155,7 @@ void PikaCRM::Initial()
 		CreateOrOpenDB(database_file_path);//CreateDB
 	}
 	
-	//test if database OK-----------------------------------------------------
-	//SQL.ExecuteX("PRAGMA database_list;");
-	
+	//test if database OK-----------------------------------------------------	
 	if(IsDBWork(mSqlite3Session))
 		;//donothing
 	else //pw error or not the file?
