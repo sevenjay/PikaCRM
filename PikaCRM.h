@@ -259,6 +259,21 @@ private :
 	
 	//database control------------------------------------------------------------
 	bool OpenDB(Sqlite3Session & sqlsession, const String & database_file_path, const String & password, bool log=false);
+	void ResetDBKey(Sqlite3Session & sqlsession, const String & password){
+			SysLog.Info("reset database encrypted key.\n");
+			String pwkey;
+			if(password.IsEqual(PW_EMPTY))
+				pwkey="";
+			else
+				pwkey=password;
+				
+			if(!sqlsession.ResetKey(getSwap1st2ndChar(pwkey)))
+			{
+				SysLog.Error("sqlite3 reset key error\n");
+				///@note we dont know how to deal this error, undefine		
+			}	
+	}
+
 	void LoadSetAllField();
 	void CreateField(GridCtrl * grid, String f_table);
 	void ModifyField(GridCtrl * grid, String f_table);
@@ -386,7 +401,9 @@ public:
 	void	DBBackup();
 	void	DBRestore();
 			void SelectRestoreDB(EditString * path);
-	bool	DBUpdate(const String & path, const String & key);
+			
+	enum	UP_STATUS{UP_NONE, UP_OK, UP_NOT_WORK, UP_OPEN_FAIL, UP_COPY_FAIL, UP_OLDER};
+	UP_STATUS	DBUpdate(const String & path, const String & key);
 	//Help Tab------------------------------------------------------------
 	void	ShowLicense();
 };

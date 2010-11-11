@@ -2848,11 +2848,11 @@ void PikaCRM::Print(GridCtrl * grid, String name)
 void PikaCRM::ConfigDB()
 {
 	SysLog.Info("configure the database\n");
-	if(mConfig.Password.IsEqual(PW_EMPTY))
+	if(mConfig.Password.IsEqual(PW_EMPTY)) //if no pw (PW_EMPTY) not need
 	{
 		;
 	}
-	else //if no pw (PW_EMPTY) not need
+	else //input your password before change
 	{
 		if(!IsInputPWCheck()) return;
 	}
@@ -2863,18 +2863,7 @@ void PikaCRM::ConfigDB()
 	
 	if(IsSetupDB(config_file_path))
 	{
-			SysLog.Info("reset database encrypted key.\n");
-			String pwkey;
-			if(mConfig.Password.IsEqual(PW_EMPTY))
-				pwkey="";
-			else
-				pwkey=mConfig.Password;
-				
-			if(!mSqlite3Session.ResetKey(getSwap1st2ndChar(pwkey)))
-			{
-				SysLog.Error("sqlite3 reset key error\n");
-				///@note we dont know how to deal this error, undefine		
-			}
+		ResetDBKey(mSqlite3Session, mConfig.Password);
 	}
 	
 }
@@ -2945,8 +2934,34 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 	fileSel.Type("Sqlite Database (*.sqlite)", "*.sqlite");
 	fileSel.Type("All file", "*");
 	if(fileSel.ExecuteOpen()){
-		DBUpdate(~fileSel,"");
+		String tempEncPW=PW_EMPTY;
+		UP_STATUS result=UP_NONE;
+		do{
+			if(UP_NOT_WORK==result) //not db, or input pw key
+			{
+				;	
+				
+			}
+			
+			
+			result=DBUpdate(~fileSel,tempEncPW);
+			
+		}while(UP_NOT_WORK==result); //not db, or input pw key
 
+		switch(result){
+			default:
+				//show fail
+			case UP_OLDER:
+				//show Not SUpport this DB
+				return;
+			
+			
+			case UP_OK:
+				;
+			
+		}
+		//if(UP_OK!=result) return;
+				
 		*path=~fileSel;
 		
 		
@@ -2978,24 +2993,41 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 		*/
 	}
 }
-bool PikaCRM::DBUpdate(const String & path, const String & password)
+PikaCRM::UP_STATUS PikaCRM::DBUpdate(const String & path, const String & password)
 {
+	SysLog.Info("updating to new database version...\n");
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
 	String new_path = getConfigDirPath()+"PikaCRM_new.sqlite";
 	if(!FileCopy(path, new_path))
 	{
 		SysLog.Error(path+" copy to file fail: "+new_path+"\n");
-		return false;
+		return UP_COPY_FAIL;
 	}
 	
 	Sqlite3Session sqlsession;
 	if(!OpenDB(sqlsession, new_path, password, true))
 	{
 		SysLog.Error("open the database file fail: "+new_path+"\n");
-		return false;
+		return UP_OPEN_FAIL;
 	}
 	
-
+	if(!IsDBWork(sqlsession))
+	{
+		SysLog.Error("new database is not work.\n");		
+		return UP_NOT_WORK;///@note not db, or input pw key, do it in outside caller
+	}
+	
+	if(password!=mConfig.Password)
+	{
+		SysLog.Info("reset the new database encrypted key.\n");		
+		ResetDBKey(sqlsession, password);
+	}
+	else
+	{
+		;//password is the same
+	}
+	
+	return UP_OK;
 }
 	
 void PikaCRM::ShowLicense()
