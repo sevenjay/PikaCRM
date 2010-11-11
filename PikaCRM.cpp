@@ -181,31 +181,13 @@ void PikaCRM::Initial()
 		show can not up compatibility, please use the Latest version
 	}	
 	*/	
-	
-	try
-	{
-		//Load and set customer field(UI+data)
-		LoadSetAllField();
-		//Load all tab data
-		LoadCustomer();
-		LoadContact();
-		LoadEvent();
-		LoadMerchandise();
-		LoadOrder();	
-	}
-	catch(SqlExc &e)
-	{
-		splash.HideSplash();
-		SysLog.Error(e+"\n");
-		Exclamation( t_("There is a database operation error.&"
-						"If data is not correct, please report to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report] with the log and last error: &")
-						+ DeQtfLf(SQL.GetLastError()));
-	}
 
 	splash.ShowSplashStatus(t_("Normal Running..."));
 	SysLog.Info(t_("Normal Running..."))<<"\n";
 	
 	splash.SetSplashTimer(500);	
+	
+	LoadAllData();
 }
 void PikaCRM::SetupUI()
 {
@@ -605,6 +587,29 @@ bool PikaCRM::OpenDB(Sqlite3Session & sqlsession, const String & database_file_p
 	
 	return true;
 }
+void PikaCRM::LoadAllData()
+{
+	try
+	{
+		//Load and set customer field(UI+data)
+		LoadSetAllField();
+		//Load all tab data
+		LoadCustomer();
+		LoadContact();
+		LoadEvent();
+		LoadMerchandise();
+		LoadOrder();	
+	}
+	catch(SqlExc &e)
+	{
+		//splash.HideSplash();
+		SysLog.Error(e+"\n");
+		Exclamation( t_("There is a database operation error.&"
+						"If data is not correct, please report to [^http://pika.sevenjay.tw/node/add/forum/2^ Bugs Report] with the log and last error: &")
+						+ DeQtfLf(SQL.GetLastError()));
+	}	
+}
+
 void PikaCRM::LoadSetAllField()
 {
 	SysLog.Info("Load and Set All Fields\n");
@@ -2964,35 +2969,12 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 		}
 		//if(UP_OK!=result) return;
 				
+		
+		LoadAllData();			
+	
 		*path=~fileSel;
 		
-		
-		
-		/*
-			mSqlite3Session.Close();
-	if(!mSqlite3Session.Open(database_file_path))
-	{
-		String msg = t_("Can't create or open database file: ")	+ database_file_path;
-		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
-	}
-	SysLog.Debug("created or opened database file: "+database_file_path+"\n");
-	
-#ifdef _DEBUG
-	mSqlite3Session.SetTrace();
-#endif
-	
-	SQL = mSqlite3Session;//this is Upp default globe 
-	
-	if(!mConfig.Password.IsEqual(PW_EMPTY))
-	{
-		SysLog.Info("set database encrypted key.\n");
-		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
-		{
-			SysLog.Error("sqlite3 set key error\n");
-			///@note we dont know how to deal this error, undefine		
-		}
-	}
-		*/
+
 	}
 }
 PikaCRM::UP_STATUS PikaCRM::DBUpdate(const String & path, const String & password)

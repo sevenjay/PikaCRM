@@ -273,7 +273,8 @@ private :
 				///@note we dont know how to deal this error, undefine		
 			}	
 	}
-
+	void LoadAllData();
+	
 	void LoadSetAllField();
 	void CreateField(GridCtrl * grid, String f_table);
 	void ModifyField(GridCtrl * grid, String f_table);
