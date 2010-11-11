@@ -399,9 +399,10 @@ public:
 	//Preference Tab------------------------------------------------------
 	void	ConfigDB();
 	void	SavePreference();
-	void	DBBackup();
-	void	DBRestore();
+	void	BackupDB();
+	void	RestoreDB();
 			void SelectRestoreDB(EditString * path);
+	void	DoDBUpdate(WithDBRestoreLayout<TopWindow> * d);
 			
 	enum	UP_STATUS{UP_NONE, UP_OK, UP_NOT_WORK, UP_OPEN_FAIL, UP_COPY_FAIL, UP_OLDER};
 	UP_STATUS	DBUpdate(const String & path, const String & key);

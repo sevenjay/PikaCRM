@@ -523,9 +523,9 @@ void PikaCRM::SetupUI()
 	else Preference.dlLang.SetIndex(index);
 	
 	Preference.btnSave <<= THISBACK(SavePreference);
-	Preference.btnDatabase <<= THISBACK(ConfigDB);
-	Preference.btnDBBackup <<= THISBACK(DBBackup);
-	Preference.btnDBRestore <<= THISBACK(DBRestore);
+	Preference.btnDBConfig <<= THISBACK(ConfigDB);
+	Preference.btnDBBackup <<= THISBACK(BackupDB);
+	Preference.btnDBRestore <<= THISBACK(RestoreDB);
 	
 	//Help Tab-----------------------------------------------------------------------
 	Help.btnLicense << THISBACK(ShowLicense);
@@ -2901,7 +2901,7 @@ void PikaCRM::SavePreference()
 	PromptOK(t_("The setting has been saved and will take effect the next time you start this application."));
 }
 
-void PikaCRM::DBBackup()
+void PikaCRM::BackupDB()
 {
 	SysLog.Info("Database backup...\n");
 	String stamp;
@@ -2918,13 +2918,14 @@ void PikaCRM::DBBackup()
 		}
 	}
 }
-void PikaCRM::DBRestore()
+void PikaCRM::RestoreDB()
 {
 	SysLog.Info("Database Restoring...\n");
 	//UI--------------------------------------------
 	WithDBRestoreLayout<TopWindow> d;
 	CtrlLayoutOKCancel(d, t_("Restore your database"));
 	d.btnBrowse <<= THISBACK1(SelectRestoreDB,&(d.esFilePath));
+	d.ok.WhenAction = THISBACK1(DoDBUpdate,&(d));
 	
 	String note;
 	note<<t_("[G Note:&][Gl200 Restoring a backup will overwrite existing data. All new data will be lost.]");
@@ -2932,6 +2933,7 @@ void PikaCRM::DBRestore()
 	//end UI--------------------------------------------
 		
 	if(d.Run()==IDOK) {
+		test();
 		//ExportCSV(grid, ~(d.esFilePath), name, d.opUTF8BOM.Get());
 	}
 }
@@ -2941,41 +2943,46 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 	fileSel.Type("Sqlite Database (*.sqlite)", "*.sqlite");
 	fileSel.Type("All file", "*");
 	if(fileSel.ExecuteOpen()){
-		String tempEncPW=PW_EMPTY;
-		UP_STATUS result=UP_NONE;
-		do{
-			if(UP_NOT_WORK==result) //not db, or input pw key
-			{
-				;	
-				
-			}
-			
-			
-			result=DBUpdate(~fileSel,tempEncPW);
-			
-		}while(UP_NOT_WORK==result); //not db, or input pw key
-
-		switch(result){
-			default:
-				//show fail
-			case UP_OLDER:
-				//show Not SUpport this DB
-				return;
-			
-			
-			case UP_OK:
-				;
-			
-		}
-		//if(UP_OK!=result) return;
-				
 		
-		LoadAllData();			
 	
 		*path=~fileSel;
 		
 
 	}
+}
+void PikaCRM::DoDBUpdate(WithDBRestoreLayout<TopWindow> * d)
+{
+	if(!d->AcceptBreak(IDOK)) return;
+	SysLog.Debug("processing database update\n");
+	
+	String tempEncPW=PW_EMPTY;
+	UP_STATUS result=UP_NONE;
+	do{
+		if(UP_NOT_WORK==result) //not db, or input pw key
+		{
+			;	
+				
+		}
+		
+			
+		result=DBUpdate((d->esFilePath), tempEncPW);
+			
+	}while(UP_NOT_WORK==result); //not db, or input pw key
+
+	switch(result){
+		default:
+			//show fail
+		case UP_OLDER:
+			//show Not SUpport this DB
+			return;
+			
+			
+		case UP_OK:
+			;
+			
+	}				
+		
+	LoadAllData();
 }
 PikaCRM::UP_STATUS PikaCRM::DBUpdate(const String & path, const String & password)
 {

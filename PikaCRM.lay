@@ -159,7 +159,7 @@ LAYOUT(MerchandiseLayout, 596, 400)
 END_LAYOUT
 
 LAYOUT(PreferenceLayout, 596, 400)
-	ITEM(Button, btnDatabase, SetLabel(t_("Setup Encryption")).RightPosZ(20, 92).TopPosZ(20, 20))
+	ITEM(Button, btnDBConfig, SetLabel(t_("Setup Encryption")).RightPosZ(20, 92).TopPosZ(20, 20))
 	ITEM(Button, btnDBRestore, SetLabel(t_("Database Restore")).RightPosZ(20, 92).TopPosZ(104, 20))
 	ITEM(Button, btnDBBackup, SetLabel(t_("Database Backup")).RightPosZ(20, 92).TopPosZ(72, 20))
 	ITEM(LabelBox, dv___3, HSizePosZ(4, 124).VSizePosZ(4, 24))
