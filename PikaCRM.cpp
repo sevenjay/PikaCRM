@@ -2926,17 +2926,7 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 	fileSel.Type("Sqlite Database (*.sqlite)", "*.sqlite");
 	fileSel.Type("All file", "*");
 	if(fileSel.ExecuteOpen()){
-		Sqlite3Session sqlsession;
-		if(!sqlsession.Open(~fileSel))
-		{
-			Exclamation(t_("Open the database file fail!"));
-			sqlsession.Close();
-			return;
-		}
-		
-		
-		SysLog.Debug("opened database file: "+~fileSel+"\n");
-		
+		DBUpdate(~fileSel,"");
 
 		*path=~fileSel;
 		
@@ -2969,7 +2959,40 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 		*/
 	}
 }
-
+bool PikaCRM::DBUpdate(const String & path, const String & password)
+{
+	String database_file_path = getConfigDirPath()+FILE_DATABASE;
+	String new_path = getConfigDirPath()+"PikaCRM_new.sqlite";
+	if(!FileCopy(path, new_path))
+	{
+		//Exclamation(t_("backup the database file fail!"));
+		//SysLog.Error("opened database file: "+path+"\n");
+		return false;
+	}
+	
+	Sqlite3Session sqlsession;
+	if(!sqlsession.Open(new_path))
+	{
+		Exclamation(t_("Open the database file fail!"));
+		//SysLog.Error("opened database file: "+path+"\n");
+		sqlsession.Close();
+		return false;
+	}
+		
+	if( !(password.IsEmpty() || password.IsEqual(PW_EMPTY)) )
+	{
+		SysLog.Info("set database encrypted key.\n");
+		if(!sqlsession.SetKey(getSwap1st2ndChar(password)))
+		{
+			SysLog.Error("sqlite3 set key error\n");
+			return false;
+			///@note we dont know how to deal this error, undefine		
+		}
+	}		
+	SysLog.Debug("opened database file: "+path+"\n");
+	
+}
+	
 void PikaCRM::ShowLicense()
 {
 	//UI--------------------------------------------

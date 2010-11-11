@@ -384,7 +384,7 @@ public:
 	void	DBBackup();
 	void	DBRestore();
 			void SelectRestoreDB(EditString * path);
-	
+	bool	DBUpdate(const String & path, const String & key);
 	//Help Tab------------------------------------------------------------
 	void	ShowLicense();
 };
