@@ -140,8 +140,7 @@ void PikaCRM::Initial()
 	{
 		splash.ShowSplashStatus(t_("Loading Database..."));
 		SysLog.Info(t_("Loading Database..."))<<"\n";
-		CreateOrOpenDB(database_file_path);//OpenDB
-
+		OpenMainDB(database_file_path);//OpenDB
 	}
 	else
 	{
@@ -152,7 +151,7 @@ void PikaCRM::Initial()
 		splash.ShowSplash();
 		splash.ShowSplashStatus(t_("Creating the database..."));
 		SysLog.Info(t_("Creating the database..."))<<"\n";;
-		CreateOrOpenDB(database_file_path);//CreateDB
+		CreateMainDB(database_file_path);//CreateDB
 	}
 	
 	//test if database OK-----------------------------------------------------	
@@ -580,6 +579,32 @@ void PikaCRM::SetupUI()
 	
 }
 //database control------------------------------------------------------------
+bool PikaCRM::OpenDB(Sqlite3Session & sqlsession, const String & database_file_path, const String & password, bool log)
+{
+	sqlsession.Close();
+	if(!sqlsession.Open(database_file_path))
+	{
+		SysLog.Error("can't open database file: "+database_file_path+"\n");
+		return false;
+	}
+	SysLog.Debug("opened database file: "+database_file_path+"\n");
+	
+	if(log)
+		sqlsession.SetTrace();
+
+	
+	if( !(password.IsEmpty() || password.IsEqual(PW_EMPTY)) )
+	{
+		SysLog.Info("set database encrypted key.\n");
+		if(!sqlsession.SetKey(getSwap1st2ndChar(password)))
+		{
+			SysLog.Error("sqlite3 set key error\n");
+			///@note we dont know how to deal this error, undefine		
+		}
+	}
+	
+	return true;
+}
 void PikaCRM::LoadSetAllField()
 {
 	SysLog.Info("Load and Set All Fields\n");
@@ -1528,10 +1553,22 @@ bool PikaCRM::IsHaveDBFile(const String & database_file_path)
 {	
 	return FileExists(database_file_path);
 }
-
-void PikaCRM::CreateOrOpenDB(const String & database_file_path)
+void PikaCRM::CreateMainDB(const String & database_file_path)
 {
-	mSqlite3Session.Close();
+	OpenMainDB(database_file_path);
+}
+void PikaCRM::OpenMainDB(const String & database_file_path)
+{
+	if(OpenDB(mSqlite3Session, database_file_path, mConfig.Password, true))
+	{
+		SQL = mSqlite3Session;//this is Upp default globe 
+		return;
+	}
+	
+	String msg = t_("Can't create or open database file: ")	+ database_file_path;
+	throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
+		
+	/*mSqlite3Session.Close();
 	if(!mSqlite3Session.Open(database_file_path))
 	{
 		String msg = t_("Can't create or open database file: ")	+ database_file_path;
@@ -1553,7 +1590,7 @@ void PikaCRM::CreateOrOpenDB(const String & database_file_path)
 			SysLog.Error("sqlite3 set key error\n");
 			///@note we dont know how to deal this error, undefine		
 		}
-	}
+	}*/
 }
 int PikaCRM::GetDBVersion()
 {
@@ -2840,7 +2877,7 @@ void PikaCRM::ConfigDB()
 	
 	String config_file_path = getConfigDirPath()+FILE_CONFIG;	
 	String database_file_path = getConfigDirPath()+FILE_DATABASE;
-	CreateOrOpenDB(database_file_path);//must resetkey before any operation after open db, so we re-open
+	OpenMainDB(database_file_path);//must resetkey before any operation after open db, so we re-open
 	
 	if(IsSetupDB(config_file_path))
 	{

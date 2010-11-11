@@ -258,6 +258,7 @@ private :
 	void	test(){PromptOK("test");};
 	
 	//database control------------------------------------------------------------
+	bool OpenDB(Sqlite3Session & sqlsession, const String & database_file_path, const String & password, bool log=false);
 	void LoadSetAllField();
 	void CreateField(GridCtrl * grid, String f_table);
 	void ModifyField(GridCtrl * grid, String f_table);
@@ -316,7 +317,8 @@ private :
 	//used in initial====================================================
 	void SetupUI();
 	bool IsHaveDBFile(const String & database_file_path);
-	void CreateOrOpenDB(const String & database_file_path);
+	void CreateMainDB(const String & database_file_path);
+	void OpenMainDB(const String & database_file_path);
 	int  GetDBVersion();
 	void InitialDB();
 	bool IsSetupDB(const String config_file_path);
