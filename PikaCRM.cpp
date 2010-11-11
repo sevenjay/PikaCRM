@@ -94,7 +94,6 @@ void PikaCRM::Initial()
 	splash.SplashInit("PikaCRM/srcdoc/Splash",QtfHigh,getLangLogo(mConfig.Language),SrcImages::Logo(),mConfig.Language);	
 	splash.ShowSplash();
 
-	SetAllFieldMap();
 	SetupUI();
 
 	if(mConfig.IsDBEncrypt)
@@ -611,6 +610,9 @@ void PikaCRM::LoadSetAllField()
 	SysLog.Info("Load and Set All Fields\n");
 	SQL.ExecuteX("select * from Field;");
 
+	mFieldMap.Clear();
+	SetAllFieldMap();
+	
 	while(SQL.Fetch())
 	{
 		mFieldEditList.Add(new EditString());
@@ -3020,13 +3022,38 @@ PikaCRM::UP_STATUS PikaCRM::DBUpdate(const String & path, const String & passwor
 	if(password!=mConfig.Password)
 	{
 		SysLog.Info("reset the new database encrypted key.\n");		
-		ResetDBKey(sqlsession, password);
+		ResetDBKey(sqlsession, mConfig.Password);
 	}
 	else
 	{
 		;//password is the same
 	}
+
+	int past_db_ver=GetDBVersion();
+	if(StrInt(DATABASE_VERSION) >= past_db_ver)
+	{
+		///@todo
+		///upgrade new db
+	}
+	else
+	{
+		return UP_OLDER;
+	}
 	
+	//Close original db
+	mSqlite3Session.Close();
+	//Rename original  db
+	FileMove(database_file_path, getConfigDirPath()+"PikaCRM_original.sqlite");
+	//close and Rename new db file
+	sqlsession.Close();
+	FileMove(new_path, database_file_path);		
+	///open db
+	OpenMainDB(database_file_path);
+	//if(!OpenDB(sqlsession, new_path, password, true))
+	//{
+	//	SysLog.Error("open the database file fail: "+new_path+"\n");
+	//	return UP_OPEN_FAIL;
+	//}
 	return UP_OK;
 }
 	
