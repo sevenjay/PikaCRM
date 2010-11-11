@@ -599,7 +599,8 @@ bool PikaCRM::OpenDB(Sqlite3Session & sqlsession, const String & database_file_p
 		if(!sqlsession.SetKey(getSwap1st2ndChar(password)))
 		{
 			SysLog.Error("sqlite3 set key error\n");
-			///@note we dont know how to deal this error, undefine		
+			///@note we dont know how to deal this error, undefine
+			///so unknow return true or false		
 		}
 	}
 	
@@ -1559,7 +1560,12 @@ void PikaCRM::CreateMainDB(const String & database_file_path)
 }
 void PikaCRM::OpenMainDB(const String & database_file_path)
 {
-	if(OpenDB(mSqlite3Session, database_file_path, mConfig.Password, true))
+	bool settrace=false;
+#ifdef _DEBUG
+	settrace=true;
+#endif
+
+	if(OpenDB(mSqlite3Session, database_file_path, mConfig.Password, settrace))
 	{
 		SQL = mSqlite3Session;//this is Upp default globe 
 		return;
@@ -1567,30 +1573,6 @@ void PikaCRM::OpenMainDB(const String & database_file_path)
 	
 	String msg = t_("Can't create or open database file: ")	+ database_file_path;
 	throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
-		
-	/*mSqlite3Session.Close();
-	if(!mSqlite3Session.Open(database_file_path))
-	{
-		String msg = t_("Can't create or open database file: ")	+ database_file_path;
-		throw ApExc(msg).SetHandle(ApExc::SYS_FAIL);
-	}
-	SysLog.Debug("created or opened database file: "+database_file_path+"\n");
-	
-#ifdef _DEBUG
-	mSqlite3Session.SetTrace();
-#endif
-	
-	SQL = mSqlite3Session;//this is Upp default globe 
-	
-	if(!mConfig.Password.IsEqual(PW_EMPTY))
-	{
-		SysLog.Info("set database encrypted key.\n");
-		if(!mSqlite3Session.SetKey(getSwap1st2ndChar(mConfig.Password)))
-		{
-			SysLog.Error("sqlite3 set key error\n");
-			///@note we dont know how to deal this error, undefine		
-		}
-	}*/
 }
 int PikaCRM::GetDBVersion()
 {
@@ -3002,32 +2984,18 @@ bool PikaCRM::DBUpdate(const String & path, const String & password)
 	String new_path = getConfigDirPath()+"PikaCRM_new.sqlite";
 	if(!FileCopy(path, new_path))
 	{
-		//Exclamation(t_("backup the database file fail!"));
-		//SysLog.Error("opened database file: "+path+"\n");
+		SysLog.Error(path+" copy to file fail: "+new_path+"\n");
 		return false;
 	}
 	
 	Sqlite3Session sqlsession;
-	if(!sqlsession.Open(new_path))
+	if(!OpenDB(sqlsession, new_path, password, true))
 	{
-		Exclamation(t_("Open the database file fail!"));
-		//SysLog.Error("opened database file: "+path+"\n");
-		sqlsession.Close();
+		SysLog.Error("open the database file fail: "+new_path+"\n");
 		return false;
 	}
-		
-	if( !(password.IsEmpty() || password.IsEqual(PW_EMPTY)) )
-	{
-		SysLog.Info("set database encrypted key.\n");
-		if(!sqlsession.SetKey(getSwap1st2ndChar(password)))
-		{
-			SysLog.Error("sqlite3 set key error\n");
-			return false;
-			///@note we dont know how to deal this error, undefine		
-		}
-	}		
-	SysLog.Debug("opened database file: "+path+"\n");
 	
+
 }
 	
 void PikaCRM::ShowLicense()
