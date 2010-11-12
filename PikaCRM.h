@@ -155,7 +155,7 @@ public:
 class MultiButtonNotNULL : public MultiButton {
 	virtual Value GetData() const{
 		if(IsNull(Get()))
-			return ErrorValue(t_("Please select one of the list by pressing the button in the red column"));///@todo pass msg for buyitem
+			return ErrorValue(t_("Please select one of the list by pressing the button in the red column"));
 		else
 			return MultiButton::GetData();
 	};
@@ -197,6 +197,7 @@ private :
 	//Contact.Grid
 	EditStringNotNull coesn;
 	EditString coes1,coes2,coes3;
+	MultiButton mContactGridCustomerBtn;
 	ToolBar contact_search_bar;
 	
 	//Event.Grid
@@ -368,11 +369,14 @@ public:
 	
 	//interactive with GUI==============================================================
 	void	FirstWelcome();
-		void CheckAgree(Option * agree);
+			void CheckAgree(Option * agree);
 	void	CustomerGridContactBtnClick();
 	
 	void	BtnSearchClearClick(){ Customer.Grid.ClearFound(); };
 	void	BtnSearchGoClick(){ Customer.Grid.DoFind(); };
+
+	void	ContactGridCustomerBtnClick();
+			bool IsSelectCustomerDialog(int original_id, int & costomer_id, String & title);
 			
 	void	EventGridCustomerBtnClick();
 	void	EventNewStatusClick();

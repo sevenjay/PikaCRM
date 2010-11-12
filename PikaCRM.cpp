@@ -344,7 +344,8 @@ void PikaCRM::SetupUI()
 	Contact.Grid.AddIndex(CO_ID);
 	Contact.Grid.AddColumn(CO_NAME,t_("Name_")).Edit(coesn).Width(mConfig.COWidth.Get(~CO_NAME));
 	Contact.Grid.AddIndex(C_ID).Default(-1);
-	Contact.Grid.AddColumn(C_TITLE,t_("Customer")).Width(mConfig.COWidth.Get(~C_TITLE));
+	Contact.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mContactGridCustomerBtn).Width(mConfig.COWidth.Get(~C_TITLE));
+		mContactGridCustomerBtn.AddButton().SetLabel("...").WhenPush=THISBACK(ContactGridCustomerBtnClick);
 	Contact.Grid.AddColumn(CO_PHONE,t_("Phone")).Edit(coes1).Width(mConfig.COWidth.Get(~CO_PHONE));
 	Contact.Grid.AddColumn(CO_ADDRESS,t_("Address")).Edit(coes2).Width(mConfig.COWidth.Get(~CO_ADDRESS));
 	Contact.Grid.AddColumn(CO_EMAIL,t_("Email")).Edit(coes3).Width(mConfig.COWidth.Get(~CO_EMAIL));
@@ -2102,13 +2103,18 @@ catch(SqlExc &e)
 
 }
 
-void PikaCRM::EventGridCustomerBtnClick()
+void PikaCRM::ContactGridCustomerBtnClick()
+{
+	
+	
+}
+bool PikaCRM::IsSelectCustomerDialog(int original_id, int & costomer_id, String & title)
 {
 	//UI--------------------------------------------
 	TopWindow d;
 	Button ok, cancel;
 
-    d.Title(t_("Select one customer")).SetRect(0, 0, 400, 400);
+	d.Title(t_("Select one customer")).SetRect(0, 0, 400, 400);
 	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(40, 64).BottomPosZ(12, 24));
 	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(130, 64).BottomPosZ(12, 24));
 	ok.Ok() <<= d.Acceptor(IDOK);
@@ -2120,8 +2126,7 @@ void PikaCRM::EventGridCustomerBtnClick()
 	list.Columns(3);
 	//list.MultiSelect();
 	//end UI--------------------------------------------
-try
-{
+	
 	//add costomer to select
 	SQL & Select(C_ID, C_TITLE).From(CUSTOMER);
 	while(SQL.Fetch())
@@ -2129,20 +2134,18 @@ try
 		list.Add(SQL[C_ID], SQL[C_TITLE],true);
 	}
 	
-	if(list.GetCount()<=0)	return;//there is no any customer
-	if(Event.Grid(C_ID).IsNull())
+	if(list.GetCount()<=0)	return false;//there is no any customer
+	int list_index = list.Find(original_id);
+	if(-1==list_index)
 	{
-		int list_index=list.Find(Customer.Grid(C_ID));
+		list_index=list.Find(Customer.Grid(C_ID));
 		list.SetCursor(list_index);
 	}
 	else
 	{
-		int list_index=list.Find(Event.Grid(C_ID));
 		list.SetCursor(list_index);
 	}
 	
-	int costomer_id;
-	String title;
 	if(d.Run()==IDOK) {
 		for(int i = 0; i < list.GetCount(); i++)
 		{
@@ -2152,18 +2155,37 @@ try
 								
 				//show on the grid
 				title=String(list.GetValue(i));
-				
+				return true;
 				//update in the database
-				if(-1 != Event.Grid(E_ID))
-				{
-					SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
-				}
+				//if(-1 != Event.Grid(E_ID))
+				//{
+				//	SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
+				//}
 			}
+		}
+		//Event.Grid.Set(C_ID,costomer_id);		
+		//Event.Grid.Set(C_TITLE,title);
+    }
+    
+    return false;
+}
+
+void PikaCRM::EventGridCustomerBtnClick()
+{
+try
+{
+	int costomer_id;
+	String title;
+	
+	if(IsSelectCustomerDialog(Event.Grid(C_ID),costomer_id,title))
+	{
+		if(-1 != Event.Grid(E_ID))
+		{
+			SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
 		}
 		Event.Grid.Set(C_ID,costomer_id);		
 		Event.Grid.Set(C_TITLE,title);
     }
-    
 }
 catch(SqlExc &e)
 {
@@ -2197,59 +2219,15 @@ void PikaCRM::EventNewStatusClick()
 
 void PikaCRM::OrderGridCustomerBtnClick()
 {
-	//UI--------------------------------------------
-	TopWindow d;
-	Button ok, cancel;
-
-    d.Title(t_("Select one customer")).SetRect(0, 0, 400, 400);
-	d.Add(ok.SetLabel(t_("OK")).LeftPosZ(40, 64).BottomPosZ(12, 24));
-	d.Add(cancel.SetLabel(t_("Cancel")).LeftPosZ(130, 64).BottomPosZ(12, 24));
-	ok.Ok() <<= d.Acceptor(IDOK);
-	cancel.Cancel() <<= d.Rejector(IDCANCEL);
-	
-	ColumnList list;
-	d.Add(list);
-	list.SetRect(0, 0, 400, 325);
-	list.Columns(3);
-	//end UI--------------------------------------------
-try{
-	//add costomer to select
-	SQL & Select(C_ID, C_TITLE).From(CUSTOMER);
-	while(SQL.Fetch())
-	{
-		list.Add(SQL[C_ID], SQL[C_TITLE],true);
-	}
-	
-	if(list.GetCount()<=0)	return;//there is no any customer
-	if(Order.Grid(C_ID).IsNull())
-	{
-		int list_index=list.Find(Customer.Grid(C_ID));
-		list.SetCursor(list_index);
-	}
-	else
-	{
-		int list_index=list.Find(Order.Grid(C_ID));
-		list.SetCursor(list_index);
-	}
-	
+try
+{
 	int costomer_id;
 	String title;
-	if(d.Run()==IDOK) {
-		for(int i = 0; i < list.GetCount(); i++)
+	if(IsSelectCustomerDialog(Order.Grid(C_ID),costomer_id,title))
+	{
+		if(-1 != Order.Grid(O_ID))
 		{
-			if(list.IsSel(i))
-			{
-				costomer_id=list.Get(i);
-								
-				//show on the grid
-				title=String(list.GetValue(i));
-				
-				//update in the database
-				if(-1 != Order.Grid(O_ID))
-				{
-					SQL & ::Update(ORDERS) (C_ID, costomer_id) (C_TITLE,title).Where(O_ID == Order.Grid(O_ID));
-				}
-			}
+			SQL & ::Update(ORDERS) (C_ID, costomer_id) (C_TITLE,title).Where(O_ID == Order.Grid(O_ID));
 		}
 		Order.Grid.Set(C_ID,costomer_id);		
 		Order.Grid.Set(C_TITLE,title);
