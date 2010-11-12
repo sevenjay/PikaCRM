@@ -341,7 +341,7 @@ void PikaCRM::SetupUI()
 	Contact.btnPrint <<= THISBACK2(Print, &(Contact.Grid), "Contacts");
 	
 	Contact.Grid.Absolute();
-	Contact.Grid.AddIndex(CO_ID);
+	Contact.Grid.AddIndex(CO_ID).Default(-1);
 	Contact.Grid.AddColumn(CO_NAME,t_("Name_")).Edit(coesn).Width(mConfig.COWidth.Get(~CO_NAME));
 	Contact.Grid.AddIndex(C_ID).Default(-1);
 	Contact.Grid.AddColumn(C_TITLE,t_("Customer")).Edit(mContactGridCustomerBtn).Width(mConfig.COWidth.Get(~C_TITLE));
@@ -969,7 +969,18 @@ void PikaCRM::InsertContact()
 			(CO_8,  Contact.Grid(CO_8))
 			(CO_9,  Contact.Grid(CO_9));
 
-		Contact.Grid(CO_ID) = SQL.GetInsertedId();//it will return only one int primary key
+		Contact.Grid(CO_ID) = SQL.GetInsertedId();//it will return only one int primary key				
+		int customer_row=Customer.Grid.Find(Contact.Grid(C_ID), C_ID);
+		if(-1!=customer_row) //update for customer.grid contact list, add
+		{
+			const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+			VectorMap<int, String> new_contact_map = contact_map;
+			new_contact_map.Add(Contact.Grid(CO_ID),Contact.Grid(CO_NAME));
+			Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+			String all_name;
+			all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+			Customer.Grid.Set(customer_row,CO_NAME,all_name);
+		}
 	}
 	catch(SqlExc &e)
 	{
@@ -1000,11 +1011,10 @@ void PikaCRM::UpdateContact()
 			(CO_9,  Contact.Grid(CO_9))
 			.Where(CO_ID == Contact.Grid(CO_ID));
 			
-		//UpdateCustomerContact2(Contact.Grid(C_ID));----------------------------
-		if(-1==Contact.Grid(C_ID)) return;
-		
+		//UpdateCustomerContact2(Contact.Grid(C_ID));----------------------------		
 		int customer_id=Contact.Grid(C_ID);
 		int customer_row=Customer.Grid.Find(customer_id,C_ID);
+		if(-1==customer_row) return;
 		const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
 		VectorMap<int, String> new_contact_map = contact_map;
 		new_contact_map.UnlinkKey(Contact.Grid(CO_ID));
@@ -2105,8 +2115,50 @@ catch(SqlExc &e)
 
 void PikaCRM::ContactGridCustomerBtnClick()
 {
-	
-	
+	try
+	{
+		int costomer_id;
+		String title;
+		int original_id = Contact.Grid(C_ID);
+		if(IsSelectCustomerDialog(original_id,costomer_id,title))
+		{
+			if(-1 != Contact.Grid(CO_ID))
+			{
+				SQL & ::Update(CONTACT) (C_ID, costomer_id).Where(CO_ID == Contact.Grid(CO_ID));
+				
+				int customer_row=Customer.Grid.Find(original_id,C_ID);
+				if(-1!=customer_row) //update for customer.grid contact list, remove
+				{
+					const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+					VectorMap<int, String> new_contact_map = contact_map;
+					new_contact_map.RemoveKey(Contact.Grid(CO_ID));//UnlinkKey will error
+					Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+					String all_name;
+					all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+					Customer.Grid.Set(customer_row,CO_NAME,all_name);
+				}
+					
+				customer_row=Customer.Grid.Find(costomer_id,C_ID);
+				if(-1!=customer_row) //update for customer.grid contact list, add
+				{
+					const VectorMap<int, String> & contact_map = ValueTo< VectorMap<int, String> >(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+					VectorMap<int, String> new_contact_map = contact_map;
+					new_contact_map.Add(Contact.Grid(CO_ID),Contact.Grid(CO_NAME));
+					Customer.Grid.Set(customer_row,CONTACTS_MAP,RawToValue(new_contact_map));
+					String all_name;
+					all_name = ConvContactNames().Format(Customer.Grid.Get(customer_row, CONTACTS_MAP));
+					Customer.Grid.Set(customer_row,CO_NAME,all_name);
+				}
+			}
+			Contact.Grid.Set(C_ID,costomer_id);		
+			Contact.Grid.Set(C_TITLE,title);
+	    }
+	}
+	catch(SqlExc &e)
+	{
+		SysLog.Error(e+"\n");
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}	
 }
 bool PikaCRM::IsSelectCustomerDialog(int original_id, int & costomer_id, String & title)
 {
@@ -2152,19 +2204,10 @@ bool PikaCRM::IsSelectCustomerDialog(int original_id, int & costomer_id, String 
 			if(list.IsSel(i))
 			{
 				costomer_id=list.Get(i);
-								
-				//show on the grid
 				title=String(list.GetValue(i));
 				return true;
-				//update in the database
-				//if(-1 != Event.Grid(E_ID))
-				//{
-				//	SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
-				//}
 			}
 		}
-		//Event.Grid.Set(C_ID,costomer_id);		
-		//Event.Grid.Set(C_TITLE,title);
     }
     
     return false;
@@ -2172,26 +2215,26 @@ bool PikaCRM::IsSelectCustomerDialog(int original_id, int & costomer_id, String 
 
 void PikaCRM::EventGridCustomerBtnClick()
 {
-try
-{
-	int costomer_id;
-	String title;
-	
-	if(IsSelectCustomerDialog(Event.Grid(C_ID),costomer_id,title))
+	try
 	{
-		if(-1 != Event.Grid(E_ID))
+		int costomer_id;
+		String title;
+		
+		if(IsSelectCustomerDialog(Event.Grid(C_ID),costomer_id,title))
 		{
-			SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
-		}
-		Event.Grid.Set(C_ID,costomer_id);		
-		Event.Grid.Set(C_TITLE,title);
-    }
-}
-catch(SqlExc &e)
-{
-	SysLog.Error(e+"\n");
-	Exclamation("[* " + DeQtfLf(e) + "]");
-}
+			if(-1 != Event.Grid(E_ID))
+			{
+				SQL & ::Update(EVENT) (C_ID, costomer_id) (C_TITLE,title).Where(E_ID == Event.Grid(E_ID));
+			}
+			Event.Grid.Set(C_ID,costomer_id);		
+			Event.Grid.Set(C_TITLE,title);
+	    }
+	}
+	catch(SqlExc &e)
+	{
+		SysLog.Error(e+"\n");
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
 }
 void PikaCRM::EventNewStatusClick()
 {
@@ -2219,28 +2262,28 @@ void PikaCRM::EventNewStatusClick()
 
 void PikaCRM::OrderGridCustomerBtnClick()
 {
-try
-{
-	int costomer_id;
-	String title;
-	if(IsSelectCustomerDialog(Order.Grid(C_ID),costomer_id,title))
+	try
 	{
-		if(-1 != Order.Grid(O_ID))
+		int costomer_id;
+		String title;
+		if(IsSelectCustomerDialog(Order.Grid(C_ID),costomer_id,title))
 		{
-			SQL & ::Update(ORDERS) (C_ID, costomer_id) (C_TITLE,title).Where(O_ID == Order.Grid(O_ID));
-		}
-		Order.Grid.Set(C_ID,costomer_id);		
-		Order.Grid.Set(C_TITLE,title);
-		LoadOrderCustomer();				
-		Order.Grid.Set(O_SHIP_ADD, Order.CustomerADD.GetText());
-		Order.Grid.Set(O_BILL_ADD, Order.CustomerADD.GetText());
-    }
-}
-catch(SqlExc &e)
-{
-	SysLog.Error(e+"\n");
-	Exclamation("[* " + DeQtfLf(e) + "]");
-}
+			if(-1 != Order.Grid(O_ID))
+			{
+				SQL & ::Update(ORDERS) (C_ID, costomer_id) (C_TITLE,title).Where(O_ID == Order.Grid(O_ID));
+			}
+			Order.Grid.Set(C_ID,costomer_id);		
+			Order.Grid.Set(C_TITLE,title);
+			LoadOrderCustomer();				
+			Order.Grid.Set(O_SHIP_ADD, Order.CustomerADD.GetText());
+			Order.Grid.Set(O_BILL_ADD, Order.CustomerADD.GetText());
+	    }
+	}
+	catch(SqlExc &e)
+	{
+		SysLog.Error(e+"\n");
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
 }
 
 void PikaCRM::OrderFilterSet()
