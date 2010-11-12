@@ -403,6 +403,7 @@ public:
 	void	RestoreDB();
 			void SelectRestoreDB(EditString * path);
 	void	DoDBUpdate(WithDBRestoreLayout<TopWindow> * d);
+			bool InputDBPW(String & pw);
 			
 	enum	UP_STATUS{UP_NONE, UP_OK, UP_NOT_WORK, UP_OPEN_FAIL, UP_COPY_FAIL, UP_OLDER};
 	UP_STATUS	DBUpdate(const String & path, const String & key);

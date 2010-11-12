@@ -230,3 +230,11 @@ LAYOUT(DBRestoreLayout, 400, 200)
 	ITEM(RichTextCtrl, rtNoteRestore, NoSb(true).LeftPosZ(16, 364).TopPosZ(12, 60))
 END_LAYOUT
 
+LAYOUT(InputDBPWLayout, 340, 136)
+	ITEM(EditString, esPassword, MaxChars(16).HSizePosZ(88, 140).TopPosZ(72, 19))
+	ITEM(Label, dv___1, SetLabel(t_("Password:")).HSizePosZ(20, 256).TopPosZ(72, 20))
+	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(224, 28).BottomPosZ(12, 20))
+	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(20, 232).BottomPosZ(12, 20))
+	ITEM(RichTextCtrl, rtNote, NoSb(true).LeftPosZ(12, 312).TopPosZ(4, 60))
+END_LAYOUT
+

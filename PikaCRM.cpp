@@ -2914,7 +2914,7 @@ void PikaCRM::BackupDB()
 		String database_file_path = getConfigDirPath()+FILE_DATABASE;
 		if(!FileCopy(database_file_path, ~fileSelDB))
 		{
-			Exclamation(t_("backup the database file fail!"));
+			Exclamation(t_("Backup the database file fail!"));
 		}
 	}
 }
@@ -2923,7 +2923,7 @@ void PikaCRM::RestoreDB()
 	SysLog.Info("Database Restoring...\n");
 	//UI--------------------------------------------
 	WithDBRestoreLayout<TopWindow> d;
-	CtrlLayoutOKCancel(d, t_("Restore your database"));
+	CtrlLayoutOKCancel(d, t_("Please select a database to restore"));
 	d.btnBrowse <<= THISBACK1(SelectRestoreDB,&(d.esFilePath));
 	d.ok.WhenAction = THISBACK1(DoDBUpdate,&(d));
 	
@@ -2933,7 +2933,6 @@ void PikaCRM::RestoreDB()
 	//end UI--------------------------------------------
 		
 	if(d.Run()==IDOK) {
-		test();
 		//ExportCSV(grid, ~(d.esFilePath), name, d.opUTF8BOM.Get());
 	}
 }
@@ -2942,17 +2941,13 @@ void PikaCRM::SelectRestoreDB(EditString * path)
 	static FileSel fileSel; //static for remember user selection in one session
 	fileSel.Type("Sqlite Database (*.sqlite)", "*.sqlite");
 	fileSel.Type("All file", "*");
-	if(fileSel.ExecuteOpen()){
-		
-	
+	if(fileSel.ExecuteOpen()){		
 		*path=~fileSel;
-		
-
 	}
 }
 void PikaCRM::DoDBUpdate(WithDBRestoreLayout<TopWindow> * d)
 {
-	if(!d->AcceptBreak(IDOK)) return;
+	if(!d->Accept()) return; //will check if esFilePath empty
 	SysLog.Debug("processing database update\n");
 	
 	String tempEncPW=PW_EMPTY;
@@ -2960,29 +2955,52 @@ void PikaCRM::DoDBUpdate(WithDBRestoreLayout<TopWindow> * d)
 	do{
 		if(UP_NOT_WORK==result) //not db, or input pw key
 		{
-			;	
-				
+			//file is encrypted or is not a database;	
+			if(!InputDBPW(tempEncPW)) return;	
 		}
-		
-			
+					
 		result=DBUpdate((d->esFilePath), tempEncPW);
 			
 	}while(UP_NOT_WORK==result); //not db, or input pw key
 
 	switch(result){
 		default:
-			//show fail
+			Exclamation(t_("Restore the database file fail!"));
+			return;
 		case UP_OLDER:
-			//show Not SUpport this DB
+			Exclamation(t_("This database is a newer version. Please upgrade PikaCRM to the latest version."));
 			return;
 			
 			
 		case UP_OK:
-			;
+			PromptOK(t_("Restore Successfully"));
 			
 	}				
 		
 	LoadAllData();
+	d->Break(IDOK);
+}
+bool PikaCRM::InputDBPW(String & pw)
+{
+	WithInputDBPWLayout<TopWindow> d;
+	CtrlLayoutOKCancel(d,t_("Restore encrypted file or not a database."));
+	
+	String note;
+	note<<t_("[G The file is encrypted or is not a database.&"
+			 "If it is encrypted database, please input the original password of this database to access.]");
+	d.rtNote.SetQTF(note);
+	d.esPassword.Password();
+	if(d.Run() == IDOK) {
+		SysLog.Debug("input the password\n");
+		String temppw=d.esPassword.GetData();
+		pw=getMD5(temppw<<PW_MAGIC_WORD);
+		return true;
+	}
+	else
+	{
+		SysLog.Debug("cancel input the password\n");
+		return false;
+	}
 }
 PikaCRM::UP_STATUS PikaCRM::DBUpdate(const String & path, const String & password)
 {
@@ -3137,7 +3155,8 @@ String PikaCRM::getMD5(const String & text)
 }
 String PikaCRM::getSwap1st2ndChar(const String & text)
 {
-	if(text.IsEmpty()) return "";
+	//if(text.IsEmpty()) return "";
+	if(text.GetLength()<2) return text;
 	
 	String r(text);
 	//String r2=text;
