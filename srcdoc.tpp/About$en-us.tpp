@@ -149,7 +149,7 @@ topic "About (En)";
 [s0;l96; Software Ver.  ##SoftwareVersion  ##BuildDate&]
 [s0;l96; Database Ver. ##DatabaseVersion&]
 [s0;l96; &]
-[s0;l96; Beta version with full function&]
+[s0;l96; Beta version with full functions&]
 [s0;l96; &]
 [ {{2262:7738<64;>96; [s0;l96; Web]
 :: [s0;l96; [^http`:`/`/pika`.sevenjay`.tw`/^ http://pika.sevenjay.tw/]]

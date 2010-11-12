@@ -1288,7 +1288,10 @@ void PikaCRM::LoadOrderCustomer()
 			{
 				Order.ContactDrop.Add(sql2[CO_NAME], sql2[CO_PHONE], sql2[CO_EMAIL]);
 			}
-			if(!Order.ContactDrop.IsEmpty()) Order.ContactDrop.SetIndex(0);
+			
+			if(!Order.ContactDrop.IsEmpty())
+				Order.ContactDrop.SetIndex(0);
+			Order.ContactDrop.Refresh();
 		}
 	}
 	else
