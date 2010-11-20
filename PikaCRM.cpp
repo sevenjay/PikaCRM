@@ -517,6 +517,7 @@ void PikaCRM::SetupUI()
 	//Preference Tab-----------------------------------------------------------------------
 	Preference.dlLang.Add( SetLNGCharset(LNG_('E','N','U','S'),CHARSET_UTF8) , "English" );
 	Preference.dlLang.Add( SetLNGCharset(LNG_('Z','H','T','W'),CHARSET_UTF8) , "繁體中文" );
+	Preference.dlLang.Add( SetLNGCharset(LNG_('Z','H','C','N'),CHARSET_UTF8) , "简体中文" );
 	//Preference.dlLang.Add( SetLNGCharset(LNG_('J','A','J','P'),CHARSET_UTF8) , "日本語" );
 	
 	int index=Preference.dlLang.FindKey(mConfig.Language);
