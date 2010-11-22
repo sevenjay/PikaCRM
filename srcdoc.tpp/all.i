@@ -14,6 +14,10 @@ TOPIC("License$en-us")
 #include "License$en-us.tppi"
 END_TOPIC
 
+TOPIC("License$zh-cn")
+#include "License$zh-cn.tppi"
+END_TOPIC
+
 TOPIC("Splash$zh-tw")
 #include "Splash$zh-tw.tppi"
 END_TOPIC
@@ -22,12 +26,20 @@ TOPIC("Link$zh-tw")
 #include "Link$zh-tw.tppi"
 END_TOPIC
 
+TOPIC("Splash$zh-cn")
+#include "Splash$zh-cn.tppi"
+END_TOPIC
+
 TOPIC("About$zh-tw")
 #include "About$zh-tw.tppi"
 END_TOPIC
 
 TOPIC("About$zh-cn")
 #include "About$zh-cn.tppi"
+END_TOPIC
+
+TOPIC("Link$zh-cn")
+#include "Link$zh-cn.tppi"
 END_TOPIC
 
 TOPIC("Splash$")

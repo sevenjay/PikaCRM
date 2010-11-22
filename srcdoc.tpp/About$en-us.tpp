@@ -127,7 +127,7 @@ topic "About (En)";
 Â¡„Âˆ¡„Âˆ¡„Â„ˆ¡„Âˆ¡¡„Âˆ¡„ˆÂˆ¡„ÂˆÂ¡„Âˆ¡„Âˆ¡„Â„ˆ¡„Âˆ¡¡„Âˆ¡„ˆÂˆ¡„Âˆ
 Â¡„Âˆ¡„Âˆ¡„Â„ˆ¡„Âˆ¡„Âˆ¡–•ˆÿ†’Ğ¸Ì
 &]
-[s0;l96; copyright Â© 2010 sevenjay. All rights reserved&]
+[s0;l96; copyright Â© 2010 Sevenjay. All rights reserved&]
 [s0;l96; Software Ver.  ##SoftwareVersion  ##BuildDate&]
 [s0;l96; Database Ver. ##DatabaseVersion&]
 [s0;l96; &]

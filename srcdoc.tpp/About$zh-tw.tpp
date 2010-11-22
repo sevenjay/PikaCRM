@@ -127,7 +127,7 @@ topic "About (Tw)";
 Â¡„Âˆ¡„Âˆ¡„Â„ˆ¡„Âˆ¡¡„Âˆ¡„ˆÂˆ¡„ÂˆÂ¡„Âˆ¡„Âˆ¡„Â„ˆ¡„Âˆ¡¡„Âˆ¡„ˆÂˆ¡„Âˆ
 Â¡„Âˆ¡„Âˆ¡„Â„ˆ¡„Âˆ¡„Âˆ¡–•ˆÿ†’Ð¸Ì
 &]
-[s0;l96; ç‰ˆæ¬Šæ‰€æœ‰ Â© 2010 sevenjay&]
+[s0;l96; ç‰ˆæ¬Šæ‰€æœ‰ Â© 2010 Sevenjay ä¿ç•™æ‰€æœ‰æ¬Šåˆ©&]
 [s0;l96; è»Ÿé«”ç‰ˆæœ¬  ##SoftwareVersion  ##BuildDate&]
 [s0;l96; è³‡æ–™åº«ç‰ˆæœ¬ ##DatabaseVersion&]
 [s0;l96; &]
