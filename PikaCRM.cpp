@@ -539,6 +539,9 @@ void PikaCRM::SetupUI()
 	about.text=Replace(about.text,"##SoftwareVersion",SOFTWARE_VERSION);
 	about.text=Replace(about.text,"##DatabaseVersion",DATABASE_VERSION);
 	about.text=Replace(about.text,"##BuildDate",Format(BUILD_DATE));
+	about.text=Replace(about.text,"##RegisterState",t_("Unregistered"));//Unregistered
+	//about.text=Replace(about.text,"##RegisterState",t_("Registered"));
+	about.text=Replace(about.text,"##Limit",t_("First release version with full functions"));
 	Help.About.SetQTF(about);
 	
 	Topic link = GetTopic("PikaCRM/srcdoc/Link$"+lan);
