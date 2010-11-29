@@ -96,9 +96,9 @@ void PikaCRM::Initial()
 
 	SetupUI();
 
+	splash.HideSplash();
 	if(mConfig.IsDBEncrypt)
 	{
-		splash.HideSplash();
 		if(mConfig.IsRememberPW)
 		{
 			SysLog.Info("config: Remeber the PW\n");
@@ -129,8 +129,13 @@ void PikaCRM::Initial()
 			SysLog.Info("config: Not Remeber the PW\n");
 			if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::NONE);
 		}
-		splash.ShowSplash();
 	}
+	else if(!mConfig.Password.IsEqual(PW_EMPTY)) //avoid hack set Encrypted value="0"
+	{
+		SysLog.Info("config: Encrypted value is false but password is not empty\n");
+		if(!IsInputPWCheck()) throw ApExc("user cancel Input PW").SetHandle(ApExc::NONE);
+	}
+	splash.ShowSplash();
 
 	
 	splash.ShowSplashStatus(t_("Checking Database..."));
