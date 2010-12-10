@@ -40,6 +40,7 @@ Windows 2000					_WIN32_WINNT_WIN2K (0x0500)
 //#include "boost/smart_ptr.hpp"
 //#include "boost/tokenizer.hpp"
 
+#include "PikaCtrl.h" //must include before *.lay
 //end useful library---------------------------------------------------
 
 #define LAYOUTFILE <PikaCRM/PikaCRM.lay>
@@ -187,6 +188,7 @@ private :
 	
 	WithImportLayout<TopWindow> Import;
 
+	WithContactInfoLayout<PanelCtrl> pcInfo2; 
 	//Customer.Grid
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;

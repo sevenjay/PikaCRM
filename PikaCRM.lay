@@ -80,7 +80,7 @@ LAYOUT(ContactLayout, 596, 400)
 	ITEM(Button, btnDeleteF, SetLabel(t_("Setup")).LeftPosZ(236, 40).TopPosZ(4, 40))
 	ITEM(Button, btnSearchGo, SetLabel(t_("Search")).LeftPosZ(288, 36).TopPosZ(24, 20))
 	ITEM(Button, btnSearchClear, SetLabel(t_("Clear")).LeftPosZ(332, 36).TopPosZ(24, 20))
-	ITEM(GridCtrl, Grid, HSizePosZ(0, 2).VSizePosZ(60, 2))
+	ITEM(GridCtrl, Grid, HSizePosZ(0, 2).VSizePosZ(60, 36))
 END_LAYOUT
 
 LAYOUT(EventLayout, 596, 400)
@@ -236,5 +236,13 @@ LAYOUT(InputDBPWLayout, 340, 136)
 	ITEM(Button, cancel, SetLabel(t_("Cancel")).HSizePosZ(224, 28).BottomPosZ(12, 20))
 	ITEM(Button, ok, SetLabel(t_("OK")).HSizePosZ(20, 232).BottomPosZ(12, 20))
 	ITEM(RichTextCtrl, rtNote, NoSb(true).LeftPosZ(12, 312).TopPosZ(4, 60))
+END_LAYOUT
+
+LAYOUT(ContactInfoLayout, 400, 200)
+	ITEM(Label, dv___0, SetLabel(t_("test")).SetFrame(BlackFrame()).LeftPosZ(0, 200).TopPosZ(0, 200))
+	ITEM(Button, dv___1, SetLabel(t_("1")).LeftPosZ(340, 56).TopPosZ(4, 15))
+	ITEM(Button, dv___2, SetLabel(t_("1")).LeftPosZ(4, 56).TopPosZ(180, 15))
+	ITEM(Button, dv___3, SetLabel(t_("1")).LeftPosZ(340, 56).TopPosZ(180, 15))
+	ITEM(Button, dv___4, SetLabel(t_("1")).LeftPosZ(8, 56).TopPosZ(4, 15))
 END_LAYOUT
 

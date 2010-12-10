@@ -11,6 +11,7 @@ uses
 
 file
 	sql/sql.ids,
+	PikaCtrl.h,
 	PikaCRM.h,
 	srcdoc.tpp,
 	PikaCRM.t,
