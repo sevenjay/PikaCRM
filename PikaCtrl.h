@@ -149,7 +149,7 @@ class CutImage : public ImageCtrl {
 	double mScaleTo;
 	
 	int mCutWidth;
-	int mCutHigh;
+	int mCutHeight;
 	
 	Point mMove;
 	Point mStart;
@@ -207,7 +207,7 @@ class CutImage : public ImageCtrl {
 		
 		Vector<Point> p;
 		p << Point(cutx, cuty) << Point(cutx+mCutWidth, cuty) 
-		  << Point(cutx+mCutWidth, cuty+mCutHigh) << Point(cutx, cuty+mCutHigh) << Point(cutx, cuty);
+		  << Point(cutx+mCutWidth, cuty+mCutHeight) << Point(cutx, cuty+mCutHeight) << Point(cutx, cuty);
 		w.DrawPolyline(p, 4, Black);		
 	}
 	
@@ -221,17 +221,23 @@ public:
 		mScaleTo=1;
 		
 		mCutWidth=200;
-		mCutHigh=200;
+		mCutHeight=200;
 	}
 	
 	Image GetCutImage(void)
 	{
 		Size rsz = img.GetSize();
-		return Crop(Rescale(img, rsz.cx*mScaleTo, rsz.cy*mScaleTo), mStop.x, mStop.y, mCutWidth, mCutHigh);
+		return Crop(Rescale(img, rsz.cx*mScaleTo, rsz.cy*mScaleTo), mStop.x, mStop.y, mCutWidth, mCutHeight);
 	}
 	
 	void ScaleLarge(){if(mScaleTo<10) mScaleTo=mScaleTo*mLarge;Refresh();}
 	void ScaleSmall(){if(mScaleTo>0.1) mScaleTo=mScaleTo*mSmall;Refresh();}
+			
+	void SetCutSize(int width, int height)
+	{
+		mCutWidth=width;
+		mCutHeight=height;
+	}	
 };
 
 
@@ -241,12 +247,18 @@ class GrabImage : public ImageCtrl {
 	
 public:
 	Callback WhenClick;
+	
 	virtual void LeftDown(Point, dword)
 	{
 		WhenClick(); 
 		LoadCutImage();
 		EditCutImage();
 	}
+	
+	void SetCutSize(int width, int height)
+	{
+		mCutImg.SetCutSize(width, height);
+	}	
 	
 	void LoadCutImage(void)
 	{	
@@ -265,17 +277,17 @@ public:
 		//UI--------------------------------------------
 		TopWindow d;
 		Button ok, cancel;
-		Button large, small;
+		Button ilarge, ismall;
 		
 		d.Title(t_("Move and Crop the Image")).SetRect(0, 0, Ctrl::HorzLayoutZoom(700), Ctrl::VertLayoutZoom(460));
 		d.Add(ok.SetLabel(t_("OK")).RightPosZ(170, 56).BottomPosZ(6, 20));
 		d.Add(cancel.SetLabel(t_("Cancel")).RightPosZ(70, 56).BottomPosZ(6, 20));
-		d.Add(small.SetImage(CtrlImg::Minus()).RightPosZ(340, 20).BottomPosZ(6, 20));
-		d.Add(large.SetImage(CtrlImg::Plus()).RightPosZ(300, 20).BottomPosZ(6, 20));
+		d.Add(ismall.SetImage(CtrlImg::Minus()).RightPosZ(340, 20).BottomPosZ(6, 20));
+		d.Add(ilarge.SetImage(CtrlImg::Plus()).RightPosZ(300, 20).BottomPosZ(6, 20));
 		ok.Ok() <<= d.Acceptor(IDOK);
 		cancel.Cancel() <<= d.Rejector(IDCANCEL);
-		small<<=callback(&mCutImg,&CutImage::ScaleSmall);
-		large<<=callback(&mCutImg,&CutImage::ScaleLarge);
+		ismall<<=callback(&mCutImg,&CutImage::ScaleSmall);
+		ilarge<<=callback(&mCutImg,&CutImage::ScaleLarge);
 		
 		d.Add(mCutImg.LeftPosZ(8, 684).TopPosZ(8, 420));
 		//end UI--------------------------------------------

@@ -384,6 +384,7 @@ void PikaCRM::SetupUI()
 	ContactInfo.Indent(&(Contact.Grid));
 	ContactInfo.SetPos(HidePanel::BOTTOM);
 	ContactInfo.SetLength(730);
+	ContactInfo.giCard.SetCutSize(400,200);
 	
 	//Event Tab-----------------------------------------------------------------------
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);

@@ -9,4 +9,5 @@
 #include "DropGrid/init"
 #include "DBCharset/init"
 #include "Report/init"
+#include "plugin/jpg/init"
 #endif

@@ -238,7 +238,8 @@ LAYOUT(InputDBPWLayout, 340, 136)
 	ITEM(RichTextCtrl, rtNote, NoSb(true).LeftPosZ(12, 312).TopPosZ(4, 60))
 END_LAYOUT
 
-LAYOUT(ContactInfoLayout, 600, 200)
-	ITEM(GrabImage, dv___0, SetFrame(BlackFrame()).LeftPosZ(16, 200).TopPosZ(0, 200))
+LAYOUT(ContactInfoLayout, 700, 200)
+	ITEM(GrabImage, giProfile, SetFrame(BlackFrame()).LeftPosZ(16, 200).TopPosZ(0, 200))
+	ITEM(GrabImage, giCard, SetFrame(BlackFrame()).LeftPosZ(228, 400).TopPosZ(0, 200))
 END_LAYOUT
 

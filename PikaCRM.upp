@@ -7,7 +7,8 @@ uses
 	GridCtrl,
 	DropGrid,
 	DBCharset,
-	Report;
+	Report,
+	plugin/jpg;
 
 file
 	sql/sql.ids,
