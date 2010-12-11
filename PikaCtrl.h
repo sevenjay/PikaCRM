@@ -136,7 +136,7 @@ class PreviewImage : public ImageCtrl {
 	void SetData(const Value& val)
 	{
 		String path = val;
-		if(!path.IsEmpty())
+		if(IsNull(path.IsEmpty()))
 			SetImage(Null);
  		else
 			SetImage(StreamRaster::LoadFileAny(~path));
@@ -227,7 +227,7 @@ public:
 	Image GetCutImage(void)
 	{
 		Size rsz = img.GetSize();
-		return Crop(Rescale(img, rsz.cx*mScaleTo, rsz.cy*mScaleTo), mStop.x, mStop.y, 250, 250);
+		return Crop(Rescale(img, rsz.cx*mScaleTo, rsz.cy*mScaleTo), mStop.x, mStop.y, mCutWidth, mCutHigh);
 	}
 	
 	void ScaleLarge(){if(mScaleTo<10) mScaleTo=mScaleTo*mLarge;Refresh();}
@@ -250,13 +250,13 @@ public:
 	
 	void LoadCutImage(void)
 	{	
-		static FileSel fileSelIm; //static for remember user selection in one session
-		fileSelIm.Type("jpg file", "*.jpg");
-		fileSelIm.Type("png file (*.png)", "*.png");
+		static FileSel gFileSelImage; //static for remember user selection in one session
+		gFileSelImage.Type("jpg file", "*.jpg");
+		gFileSelImage.Type("png file (*.png)", "*.png");
 		mPreImg.SetImage(Null);
-		fileSelIm.Preview(mPreImg);
-		if(fileSelIm.ExecuteOpen()){
-			mCutImg.SetImage( StreamRaster::LoadFileAny(~fileSelIm));
+		gFileSelImage.Preview(mPreImg);
+		if(gFileSelImage.ExecuteOpen()){
+			mCutImg.SetImage( StreamRaster::LoadFileAny(~gFileSelImage));
 		}
 	}
 	

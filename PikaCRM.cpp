@@ -2410,12 +2410,12 @@ void PikaCRM::ExportFile(GridCtrl * grid, String name)
 }
 void PikaCRM::SelectExportDir(EditString * path, String & name)
 {
-	static FileSel fileSelEx; //static for remember user selection in one session
-	fileSelEx.Type("CSV file (*.csv)", "*.csv");
-	fileSelEx.Type("Text file (*.txt)", "*.txt");
-	fileSelEx.Set(name+".csv");
-	if(fileSelEx.ExecuteSaveAs()){
-		*path=~fileSelEx;
+	static FileSel gFileSelEx; //static for remember user selection in one session
+	gFileSelEx.Type("CSV file (*.csv)", "*.csv");
+	gFileSelEx.Type("Text file (*.txt)", "*.txt");
+	gFileSelEx.Set(name+".csv");
+	if(gFileSelEx.ExecuteSaveAs()){
+		*path=~gFileSelEx;
 	}
 }
 
@@ -2522,14 +2522,14 @@ void PikaCRM::ImportFile(GridCtrl * grid, String name)
 void PikaCRM::SelectImportDir(GridCtrl * grid, Vector< Vector<String> > * griddata, VectorMap<Id, int> * match_map)
 {	
 	SysLog.Debug("Selecting Import Dir\n");
-	static FileSel fileSelIm; //static for remember user selection in one session
-	fileSelIm.Type("CSV file (*.csv)", "*.csv");
-	fileSelIm.Type("Text file (*.txt)", "*.txt");
-	if(fileSelIm.ExecuteOpen()){
-		FileIn csv(~fileSelIm);
+	static FileSel gFileSelIm; //static for remember user selection in one session
+	gFileSelIm.Type("CSV file (*.csv)", "*.csv");
+	gFileSelIm.Type("Text file (*.txt)", "*.txt");
+	if(gFileSelIm.ExecuteOpen()){
+		FileIn csv(~gFileSelIm);
 		if(csv.IsOpen())
 		{
-			Import.esFilePath=~fileSelIm;
+			Import.esFilePath=~gFileSelIm;
 			Import.rtWarning.Clear();
 			StringStream content(LoadStreamBOM(csv));
 			ParserCSVFile(content, *griddata);
