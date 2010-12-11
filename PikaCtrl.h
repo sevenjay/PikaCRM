@@ -216,8 +216,8 @@ public:
 	
 	CutImage():mLastMove(0,0), mMove(0,0), mStart(0,0), mStop(0,0), mIsDrag(false)
 	{
-		mSmall=0.8;
-		mLarge=1.25;
+		mSmall=0.95;
+		mLarge=1.052631579;
 		mScaleTo=1;
 		
 		mCutWidth=200;
