@@ -188,7 +188,7 @@ private :
 	
 	WithImportLayout<TopWindow> Import;
 
-	WithContactInfoLayout<PanelCtrl> pcInfo2; 
+	WithContactInfoLayout<HidePanel> ContactInfo; 
 	//Customer.Grid
 	EditStringNotNull cesn;
 	EditString ces1,ces2,ces3,ces4,ces5;

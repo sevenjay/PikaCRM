@@ -379,10 +379,11 @@ void PikaCRM::SetupUI()
 	Contact.btnSearchGo <<= callback(&(Contact.Grid),&GridCtrl::DoFind);
 	
 	//Contact.btnShowSwitch.SetImage(CtrlImg::SortUp());
-	CtrlLayout(pcInfo2);
-	Contact.Add(pcInfo2);
-	pcInfo2.SetPos(PanelCtrl::BOTTOM);
-	pcInfo2.SetLength(730);
+	CtrlLayout(ContactInfo);
+	Contact.Add(ContactInfo);
+	ContactInfo.Indent(&(Contact.Grid));
+	ContactInfo.SetPos(HidePanel::BOTTOM);
+	ContactInfo.SetLength(730);
 	
 	//Event Tab-----------------------------------------------------------------------
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
