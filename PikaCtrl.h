@@ -132,5 +132,161 @@ public:
 };
 
 
+class PreviewImage : public ImageCtrl {
+	void SetData(const Value& val)
+	{
+		String path = val;
+		if(!path.IsEmpty())
+			SetImage(Null);
+ 		else
+			SetImage(StreamRaster::LoadFileAny(~path));
+	}
+};
+
+class CutImage : public ImageCtrl {
+	double mSmall;
+	double mLarge;
+	double mScaleTo;
+	
+	int mCutWidth;
+	int mCutHigh;
+	
+	Point mMove;
+	Point mStart;
+	Point mLastMove;
+	Point mStop;
+	bool  mIsDrag;
+	
+	virtual void   MouseMove(Point p, dword keyflags)
+	{
+		if(mIsDrag)
+		{
+			mMove = p;
+			Refresh();
+		}
+	}
+	
+	virtual void LeftDrag(Point p, dword keyflags)
+	{
+		mStart = p;
+		mIsDrag = true;
+	}
+	
+	virtual void   LeftUp(Point p, dword keyflags)
+	{
+		if(mIsDrag)
+		{
+			mStop=mStop+mLastMove;
+			mLastMove=Point(0, 0);
+			mIsDrag = false;
+		}
+	}
+
+	virtual void   MouseWheel(Point p, int zdelta, dword keyflags)
+	{
+		if(zdelta>0) ScaleLarge();
+		else ScaleSmall();
+	}
+	
+	virtual void Paint(Draw& w)
+	{
+		w.DrawRect(GetSize(), White);
+		if(mIsDrag) mLastMove=mMove-mStart;
+		int cutx=mStop.x+mLastMove.x;
+		int cuty=mStop.y+mLastMove.y;
+				
+		if(img)
+		{
+			Size rsz = img.GetSize();
+			w.DrawImage(0, 0, rsz.cx*mScaleTo, rsz.cy*mScaleTo, img);
+		}
+		else
+		{
+			w.DrawText(0, 0, "No image loaded!", Arial(30).Italic());
+		}
+		
+		Vector<Point> p;
+		p << Point(cutx, cuty) << Point(cutx+mCutWidth, cuty) 
+		  << Point(cutx+mCutWidth, cuty+mCutHigh) << Point(cutx, cuty+mCutHigh) << Point(cutx, cuty);
+		w.DrawPolyline(p, 4, Black);		
+	}
+	
+	
+public: 
+	
+	CutImage():mLastMove(0,0), mMove(0,0), mStart(0,0), mStop(0,0), mIsDrag(false)
+	{
+		mSmall=0.8;
+		mLarge=1.25;
+		mScaleTo=1;
+		
+		mCutWidth=200;
+		mCutHigh=200;
+	}
+	
+	Image GetCutImage(void)
+	{
+		Size rsz = img.GetSize();
+		return Crop(Rescale(img, rsz.cx*mScaleTo, rsz.cy*mScaleTo), mStop.x, mStop.y, 250, 250);
+	}
+	
+	void ScaleLarge(){if(mScaleTo<10) mScaleTo=mScaleTo*mLarge;Refresh();}
+	void ScaleSmall(){if(mScaleTo>0.1) mScaleTo=mScaleTo*mSmall;Refresh();}
+};
+
+
+class GrabImage : public ImageCtrl {
+	PreviewImage mPreImg;
+	CutImage mCutImg;
+	
+public:
+	Callback WhenClick;
+	virtual void LeftDown(Point, dword)
+	{
+		WhenClick(); 
+		LoadCutImage();
+		EditCutImage();
+	}
+	
+	void LoadCutImage(void)
+	{	
+		static FileSel fileSelIm; //static for remember user selection in one session
+		fileSelIm.Type("jpg file", "*.jpg");
+		fileSelIm.Type("png file (*.png)", "*.png");
+		mPreImg.SetImage(Null);
+		fileSelIm.Preview(mPreImg);
+		if(fileSelIm.ExecuteOpen()){
+			mCutImg.SetImage( StreamRaster::LoadFileAny(~fileSelIm));
+		}
+	}
+	
+	void EditCutImage(void)
+	{
+		//UI--------------------------------------------
+		TopWindow d;
+		Button ok, cancel;
+		Button large, small;
+		
+		d.Title(t_("Move and Crop the Image")).SetRect(0, 0, Ctrl::HorzLayoutZoom(700), Ctrl::VertLayoutZoom(460));
+		d.Add(ok.SetLabel(t_("OK")).RightPosZ(170, 56).BottomPosZ(6, 20));
+		d.Add(cancel.SetLabel(t_("Cancel")).RightPosZ(70, 56).BottomPosZ(6, 20));
+		d.Add(small.SetImage(CtrlImg::Minus()).RightPosZ(340, 20).BottomPosZ(6, 20));
+		d.Add(large.SetImage(CtrlImg::Plus()).RightPosZ(300, 20).BottomPosZ(6, 20));
+		ok.Ok() <<= d.Acceptor(IDOK);
+		cancel.Cancel() <<= d.Rejector(IDCANCEL);
+		small<<=callback(&mCutImg,&CutImage::ScaleSmall);
+		large<<=callback(&mCutImg,&CutImage::ScaleLarge);
+		
+		d.Add(mCutImg.LeftPosZ(8, 684).TopPosZ(8, 420));
+		//end UI--------------------------------------------
+		
+		if(d.Run()==IDOK)
+		{
+			SetImage(mCutImg.GetCutImage());
+			Refresh();
+		}
+	}
+};
+
 
 #endif

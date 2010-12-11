@@ -239,6 +239,6 @@ LAYOUT(InputDBPWLayout, 340, 136)
 END_LAYOUT
 
 LAYOUT(ContactInfoLayout, 600, 200)
-	ITEM(ImageCtrl, dv___0, SetFrame(BlackFrame()).LeftPosZ(12, 200).TopPosZ(0, 200))
+	ITEM(GrabImage, dv___0, SetFrame(BlackFrame()).LeftPosZ(16, 200).TopPosZ(0, 200))
 END_LAYOUT
 
