@@ -247,12 +247,15 @@ class GrabImage : public ImageCtrl {
 	
 public:
 	Callback WhenClick;
+	Callback WhenGrabed;
 	
 	virtual void LeftDown(Point, dword)
 	{
 		WhenClick(); 
-		LoadCutImage();
-		EditCutImage();
+		if(LoadCutImage())
+		{
+			EditCutImage();
+		}
 	}
 	
 	void SetCutSize(int width, int height)
@@ -260,16 +263,17 @@ public:
 		mCutImg.SetCutSize(width, height);
 	}	
 	
-	void LoadCutImage(void)
+	bool LoadCutImage(void)
 	{	
 		static FileSel gFileSelImage; //static for remember user selection in one session
-		gFileSelImage.Type("jpg file", "*.jpg");
-		gFileSelImage.Type("png file (*.png)", "*.png");
+		gFileSelImage.Type("Image file (*.bmp, *.jpg, *.png)", "*.bmp;*.jpg;*.png");
 		mPreImg.SetImage(Null);
 		gFileSelImage.Preview(mPreImg);
 		if(gFileSelImage.ExecuteOpen()){
 			mCutImg.SetImage( StreamRaster::LoadFileAny(~gFileSelImage));
+			return true;
 		}
+		return false;
 	}
 	
 	void EditCutImage(void)
@@ -296,7 +300,13 @@ public:
 		{
 			SetImage(mCutImg.GetCutImage());
 			Refresh();
+			WhenGrabed();
 		}
+	}
+	
+	String ToString(void) const
+	{
+		return img.ToString();
 	}
 };
 
