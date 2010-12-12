@@ -245,13 +245,17 @@ class GrabImage : public ImageCtrl {
 	//PreviewImage mPreImg;
 	CutImage mCutImg;
 	
+	bool mCancelLoad;
+	
 public:
 	Callback WhenClick;
 	Callback WhenGrabed;
 	
 	virtual void LeftDown(Point, dword)
 	{
+		mCancelLoad=false;
 		WhenClick(); 
+		if(mCancelLoad) return;
 		if(LoadCutImage())
 		{
 			EditCutImage();
@@ -325,6 +329,7 @@ public:
 	}
 	
 	void SetImageClear(){img.Clear();Refresh();}
+	void CancelLoad(){mCancelLoad=true;}
 };
 
 

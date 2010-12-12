@@ -50,7 +50,7 @@ Windows 2000					_WIN32_WINNT_WIN2K (0x0500)
 #define SOFTWARE_NAME					"PikaCRM"
 #define SOFTWARE_VERSION				"1.0"
 #define DATABASE_VERSION				"1"
-#define BUILD_DATE						Date(2010, 11, 29)
+#define BUILD_DATE						Date(2010, 12, 12)
 
 #define PW_MAGIC_WORD					"sevenjay777"
 #define PW_EMPTY						getMD5(PW_MAGIC_WORD) //avoid clear config file pw hack
@@ -296,6 +296,7 @@ private :
 	void LoadContact();
 	void InsertContact();
 	void UpdateContact();
+	void NewContactImage();
 	void UpdateContactImage(bool isPro);
 	void RemoveContact();
 	void ChangeContactRow();
