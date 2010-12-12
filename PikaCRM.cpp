@@ -369,6 +369,7 @@ void PikaCRM::SetupUI()
 	Contact.Grid.WhenInsertRow = THISBACK(InsertContact);
 	Contact.Grid.WhenUpdateRow = THISBACK(UpdateContact);
 	Contact.Grid.WhenRemoveRow = THISBACK(RemoveContact);
+	Contact.Grid.WhenChangeRow = THISBACK(ChangeContactRow);
 
 	Contact.Grid.WhenStartEdit = THISBACK(StartEditContact);
 	Contact.Grid.WhenEndEdit = THISBACK(EndEditContact);
@@ -378,13 +379,16 @@ void PikaCRM::SetupUI()
 	Contact.btnSearchClear <<= callback2(&(Contact.Grid),&GridCtrl::ClearFound,true,true);
 	Contact.btnSearchGo <<= callback(&(Contact.Grid),&GridCtrl::DoFind);
 	
-	//Contact.btnShowSwitch.SetImage(CtrlImg::SortUp());
+	//ContactInfo, giProfile, giCard
 	CtrlLayout(ContactInfo);
 	Contact.Add(ContactInfo);
 	ContactInfo.Indent(&(Contact.Grid));
 	ContactInfo.SetPos(HidePanel::BOTTOM);
 	ContactInfo.SetLength(730);
 	ContactInfo.giCard.SetCutSize(400,200);
+	ContactInfo.giProfile.WhenGrabed= THISBACK1(UpdateContactImage, true);
+	ContactInfo.giCard.WhenGrabed = THISBACK1(UpdateContactImage, false);
+	//ContactInfo.giCard.whenclick = THISBACK(NewContactImage)
 	
 	//Event Tab-----------------------------------------------------------------------
 	Event.btnCreate <<= callback(&(Event.Grid),&GridCtrl::DoAppend);
@@ -1049,6 +1053,50 @@ void PikaCRM::UpdateContact()
 		Exclamation("[* " + DeQtfLf(e) + "]");
 	}
 }
+void PikaCRM::UpdateContactImage(bool isPro)
+{
+	SysLog.Debug("Update Contact Image\n");
+	
+	//should be in NewContactImage
+	if(Contact.Grid.IsEmpty())
+	{
+		Exclamation(t_("Please create an order first."));
+		//Order.BuyItemGrid.DoCancelEdit();
+		return;
+	}
+	
+	if(!Contact.Grid.IsSelected())
+	{
+		Exclamation(t_("Please select an order first."));
+		//Order.BuyItemGrid.DoCancelEdit();
+		return;
+	}
+		
+	if(-1==Contact.Grid(CO_ID))
+	{
+		Exclamation(t_("Please save the order first."));
+		//Order.BuyItemGrid.DoCancelEdit();
+		return;
+	}
+	
+	
+	String strImage;
+	if(isPro) strImage = ContactInfo.giProfile.ToString();
+	else  strImage = ContactInfo.giCard.ToString();
+	//CO_CARD
+	try
+	{
+		SQL & ::Update(CONTACT)
+			(CO_PROFILE,  SqlBinary(strImage))
+			.Where(CO_ID == Contact.Grid(CO_ID));
+	}
+	catch(SqlExc &e)
+	{
+		//Contact.Grid.CancelUpdate();
+		SysLog.Error(e+"\n");
+		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
 void PikaCRM::RemoveContact()
 {
 	SysLog.Debug("Remove Contact\n");
@@ -1077,6 +1125,23 @@ void PikaCRM::RemoveContact()
 		Contact.Grid.CancelRemove();
 		SysLog.Error(e+"\n");
 		Exclamation("[* " + DeQtfLf(e) + "]");
+	}
+}
+void PikaCRM::ChangeContactRow()
+{
+	SysLog.Debug("Change Order\n");
+		
+	ContactInfo.giProfile.SetImageClear();
+	//try
+	//Card
+	SQL & Select(CO_PROFILE).From(CONTACT).Where(CO_ID==Contact.Grid(CO_ID));
+	while(SQL.Fetch())
+	{
+		if(!SQL[CO_PROFILE].IsNull())
+		{
+			ContactInfo.giProfile.LoadFromString(SQL[CO_PROFILE].ToString());
+			ContactInfo.giProfile.Refresh();
+		}
 	}
 }
 

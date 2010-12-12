@@ -296,7 +296,9 @@ private :
 	void LoadContact();
 	void InsertContact();
 	void UpdateContact();
+	void UpdateContactImage(bool isPro);
 	void RemoveContact();
+	void ChangeContactRow();
 	void StartEditContact() {Contact.btnDelete.Hide(); Contact.btnCancel.Show();}
 	void EndEditContact() {Contact.btnDelete.Show(); Contact.btnCancel.Hide();}
 	

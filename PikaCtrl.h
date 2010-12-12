@@ -242,7 +242,7 @@ public:
 
 
 class GrabImage : public ImageCtrl {
-	PreviewImage mPreImg;
+	//PreviewImage mPreImg;
 	CutImage mCutImg;
 	
 public:
@@ -266,9 +266,9 @@ public:
 	bool LoadCutImage(void)
 	{	
 		static FileSel gFileSelImage; //static for remember user selection in one session
+		PreviewImage preImg;
 		gFileSelImage.Type("Image file (*.bmp, *.jpg, *.png)", "*.bmp;*.jpg;*.png");
-		mPreImg.SetImage(Null);
-		gFileSelImage.Preview(mPreImg);
+		gFileSelImage.Preview(preImg);
 		if(gFileSelImage.ExecuteOpen()){
 			mCutImg.SetImage( StreamRaster::LoadFileAny(~gFileSelImage));
 			return true;
@@ -304,10 +304,27 @@ public:
 		}
 	}
 	
-	String ToString(void) const
+	//String ToString(void) const
+	//{
+	//	return img.ToString();
+	//}
+	
+	String ToString()
 	{
-		return img.ToString();
+		PNGEncoder png;
+		if (!img.IsEmpty())
+			return png.SaveString(img);
+		else
+			return "";
 	}
+
+	void LoadFromString(String s)
+	{
+		PNGRaster pngr;
+		img = pngr.LoadString(s);
+	}
+	
+	void SetImageClear(){img.Clear();Refresh();}
 };
 
 
